@@ -1,0 +1,16 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.plugin.serialization"
+    id 'application'
+}
+
+dependencies {
+    api project(":tasks_bot.common")
+
+    api libs.plagubot.bot
+    api libs.psql
+}
+
+application {
+    mainClassName = 'dev.inmo.plagubot.AppKt'
+}

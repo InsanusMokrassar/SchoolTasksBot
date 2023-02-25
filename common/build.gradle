@@ -9,7 +9,8 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api libs.microutils.startup.plugin
+                api libs.plagubot.plugin
+                api libs.tgbotapi
             }
         }
     }

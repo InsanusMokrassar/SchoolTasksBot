@@ -1,0 +1,12 @@
+{
+  "database": {
+    "url": "jdbc:postgresql://127.0.0.1:8094/test",
+    "username": "test",
+    "password": "test",
+    "driver": "org.postgresql.Driver"
+  },
+  "botToken": "1234567890:ABCDEFGHIJKLMNOP_qrstuvwxyz12345678",
+  "plugins": [
+    "center.sciprog.tasks_bot.common.JvmPlugin"
+  ]
+}

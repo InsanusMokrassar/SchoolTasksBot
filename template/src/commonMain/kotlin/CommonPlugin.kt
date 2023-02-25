@@ -1,16 +1,18 @@
 package center.sciprog.tasks_bot.template
 
-import dev.inmo.micro_utils.startup.plugin.StartPlugin
+import dev.inmo.micro_utils.fsm.common.State
+import dev.inmo.plagubot.Plugin
+import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import kotlinx.serialization.json.JsonObject
+import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
 import org.koin.core.module.Module
 
-object CommonPlugin : StartPlugin {
-    override fun Module.setupDI(config: JsonObject) {
+object CommonPlugin : Plugin {
+    override fun Module.setupDI(database: Database, params: JsonObject) {
 
     }
+    override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {
 
-    override suspend fun startPlugin(koin: Koin) {
-        super.startPlugin(koin)
     }
 }

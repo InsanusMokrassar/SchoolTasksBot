@@ -5,4 +5,5 @@
     <string name="addTeacherCommandReplyButtonText">Добавить преподавателя</string>
     <string name="addTeacherSuccessText">Преподаватель успешно добавлен. Попросите этого пользователя начать диалог со мной, чтобы я мог корректно с ним работать</string>
     <string name="addTeacherFailureText">Не получилось добавить преподавателя в базу</string>
+    <string name="startWelcome">Доброго времени суток, вы были добавлены как преподаватель</string>
 </resources>

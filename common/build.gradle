@@ -9,7 +9,6 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api project(":tasks_bot.common")
                 api libs.microutils.startup.plugin
             }
         }

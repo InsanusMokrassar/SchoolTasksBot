@@ -12,6 +12,8 @@ buildscript {
         classpath libs.kotlin.gradle.plugin
         classpath libs.kotlin.serialization.plugin
         classpath libs.kotlin.dokka.plugin
+        classpath libs.moko.resources.plugin
+        classpath libs.kotlin.ksp.plugin
     }
 }
 

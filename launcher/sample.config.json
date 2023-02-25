@@ -8,5 +8,6 @@
   "botToken": "1234567890:ABCDEFGHIJKLMNOP_qrstuvwxyz12345678",
   "plugins": [
     "center.sciprog.tasks_bot.common.JvmPlugin"
-  ]
+  ],
+  "supervisor": 123456789
 }

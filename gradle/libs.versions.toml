@@ -5,11 +5,12 @@ kotlin-serialization = "1.4.1"
 
 dokka = "1.7.20"
 
-microutils = "0.16.12"
+microutils = "0.16.13-branch_0.16.13-build374"
 
 tgbotapi = "5.2.1"
 tgbotapi-libraries = "0.8.1"
 plagubot = "3.5.0"
+plagubot-plugins = "0.8.1"
 
 psql = "42.5.0"
 
@@ -42,9 +43,13 @@ plagubot-bot = { module = "dev.inmo:plagubot.bot", version.ref = "plagubot" }
 
 microutils-koin = { module = "dev.inmo:micro_utils.koin", version.ref = "microutils" }
 microutils-koin-generator = { module = "dev.inmo:micro_utils.koin.generator", version.ref = "microutils" }
+microutils-repos-common = { module = "dev.inmo:micro_utils.repos.common", version.ref = "microutils" }
+microutils-repos-cache = { module = "dev.inmo:micro_utils.repos.cache", version.ref = "microutils" }
+microutils-repos-generator = { module = "dev.inmo:micro_utils.repos.generator", version.ref = "microutils" }
 
 tgbotapi-libraries-resender = { module = "dev.inmo:tgbotapi.libraries.resender", version.ref = "tgbotapi-libraries" }
 tgbotapi = { module = "dev.inmo:tgbotapi", version.ref = "tgbotapi" }
+plagubot-plugins-commands = { module = "dev.inmo:plagubot.plugins.commands", version.ref = "plagubot-plugins" }
 
 psql = { module = "org.postgresql:postgresql", version.ref = "psql" }
 

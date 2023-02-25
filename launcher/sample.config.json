@@ -7,7 +7,11 @@
   },
   "botToken": "1234567890:ABCDEFGHIJKLMNOP_qrstuvwxyz12345678",
   "plugins": [
-    "center.sciprog.tasks_bot.common.JvmPlugin"
+    "center.sciprog.tasks_bot.common.JvmPlugin",
+    "center.sciprog.tasks_bot.teachers.JvmPlugin",
+    "dev.inmo.plagubot.plugins.commands.CommandsPlugin"
   ],
-  "supervisor": 123456789
+  "supervisor": 123456789,
+  "supervisor_locale": "ru",
+  "useCache": true
 }

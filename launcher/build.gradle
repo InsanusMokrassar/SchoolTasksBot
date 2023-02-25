@@ -6,6 +6,7 @@ plugins {
 
 dependencies {
     api project(":tasks_bot.common")
+    api project(":tasks_bot.teachers")
 
     api libs.plagubot.bot
     api libs.psql

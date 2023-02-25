@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="addTeacherCommandDescription">Trigger teacher adding</string>
+    <string name="addTeacherCommandReplyText">Ok, push the reply button to choose new teacher</string>
+    <string name="addTeacherCommandReplyButtonText">Add teacher</string>
+    <string name="addTeacherSuccessText">Successfully added the teacher. Ask this user to start the chat with me to let me ability to work with him</string>
+    <string name="addTeacherFailureText">Unable to add this teacher to database</string>
+</resources>

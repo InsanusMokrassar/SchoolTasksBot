@@ -3,6 +3,7 @@ rootProject.name = 'tasks_bot'
 String[] includes = [
     ":common",
     ":launcher",
+    ":teachers",
 ]
 
 

@@ -5,7 +5,7 @@ kotlin-serialization = "1.4.1"
 
 dokka = "1.7.20"
 
-microutils = "0.16.13"
+microutils = "0.16.13-branch_0.16.13-build374"
 
 tgbotapi = "5.2.1"
 tgbotapi-libraries = "0.8.1"

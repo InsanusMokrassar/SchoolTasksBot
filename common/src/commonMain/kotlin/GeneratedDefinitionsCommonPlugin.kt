@@ -4,7 +4,9 @@
 package center.sciprog.tasks_bot.common
 
 import dev.inmo.micro_utils.language_codes.IetfLanguageCode
+import dev.inmo.micro_utils.repos.KeyValueRepo
 import dev.inmo.tgbotapi.types.ChatId
+import dev.inmo.tgbotapi.types.IdChatIdentifier
 import kotlin.Boolean
 import org.koin.core.Koin
 import org.koin.core.definition.Definition
@@ -45,11 +47,13 @@ public val Koin.supervisorIetfLanguageCode: IetfLanguageCode
   get() = get(named("supervisorIetfLanguageCode"))
 
 /**
- * Will register [definition] with [org.koin.core.module.Module.single] and key "supervisorIetfLanguageCode"
+ * Will register [definition] with [org.koin.core.module.Module.single] and key
+ * "supervisorIetfLanguageCode"
  */
 public fun Module.supervisorIetfLanguageCodeSingle(createdAtStart: Boolean = false,
     definition: Definition<IetfLanguageCode>): KoinDefinition<IetfLanguageCode> =
-    single(named("supervisorIetfLanguageCode"), createdAtStart = createdAtStart, definition = definition)
+    single(named("supervisorIetfLanguageCode"), createdAtStart = createdAtStart, definition =
+    definition)
 
 /**
  * @return Definition by key "useCache"
@@ -69,3 +73,23 @@ public val Koin.useCache: Boolean
 public fun Module.useCacheSingle(createdAtStart: Boolean = false, definition: Definition<Boolean>):
     KoinDefinition<Boolean> = single(named("useCache"), createdAtStart = createdAtStart, definition
     = definition)
+
+/**
+ * @return Definition by key "languagesRepo"
+ */
+public val Scope.languagesRepo: KeyValueRepo<IdChatIdentifier, IetfLanguageCode>
+  get() = get(named("languagesRepo"))
+
+/**
+ * @return Definition by key "languagesRepo"
+ */
+public val Koin.languagesRepo: KeyValueRepo<IdChatIdentifier, IetfLanguageCode>
+  get() = get(named("languagesRepo"))
+
+/**
+ * Will register [definition] with [org.koin.core.module.Module.single] and key "languagesRepo"
+ */
+public fun Module.languagesRepoSingle(createdAtStart: Boolean = false,
+    definition: Definition<KeyValueRepo<IdChatIdentifier, IetfLanguageCode>>):
+    KoinDefinition<KeyValueRepo<IdChatIdentifier, IetfLanguageCode>> =
+    single(named("languagesRepo"), createdAtStart = createdAtStart, definition = definition)

@@ -1,13 +1,16 @@
 @file:GenerateKoinDefinition("supervisorId", UserId::class, nullable = false, generateFactory = false)
 @file:GenerateKoinDefinition("supervisorIetfLanguageCode", IetfLanguageCode::class, nullable = false, generateFactory = false)
 @file:GenerateKoinDefinition("useCache", Boolean::class, nullable = false, generateFactory = false)
+@file:GenerateKoinDefinition("languagesRepo", KeyValueRepo::class, IdChatIdentifier::class, IetfLanguageCode::class, nullable = false, generateFactory = false)
 package center.sciprog.tasks_bot.common
 
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.annotations.GenerateKoinDefinition
 import dev.inmo.micro_utils.language_codes.IetfLanguageCode
+import dev.inmo.micro_utils.repos.KeyValueRepo
 import dev.inmo.plagubot.Plugin
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
+import dev.inmo.tgbotapi.types.IdChatIdentifier
 import dev.inmo.tgbotapi.types.UserId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

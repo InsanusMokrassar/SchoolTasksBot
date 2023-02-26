@@ -4,6 +4,7 @@ import center.sciprog.tasks_bot.courses.models.NewCourse
 import center.sciprog.tasks_bot.courses.models.RegisteredCourse
 import center.sciprog.tasks_bot.courses.models.Course
 import center.sciprog.tasks_bot.courses.models.CourseId
+import center.sciprog.tasks_bot.teachers.models.TeacherId
 import dev.inmo.micro_utils.repos.CRUDRepo
 import dev.inmo.micro_utils.repos.exposed.AbstractExposedCRUDRepo
 import dev.inmo.micro_utils.repos.exposed.initTable
@@ -20,7 +21,8 @@ class ExposedCoursesRepo(
 ) : CoursesRepo,
     AbstractExposedCRUDRepo<RegisteredCourse, CourseId, NewCourse>(tableName = "courses") {
     val idColumn = long("id").autoIncrement()
-    private val userIdColumn = long("tg_user_id").uniqueIndex()
+    private val titleColumn = text("title")
+    private val teacherIdColumn = long("teacher_id").uniqueIndex()
 
     override val primaryKey: PrimaryKey = PrimaryKey(idColumn)
 
@@ -32,7 +34,8 @@ class ExposedCoursesRepo(
     override val ResultRow.asObject: RegisteredCourse
         get() = RegisteredCourse(
             asId,
-            UserId(get(userIdColumn))
+            TeacherId(get(teacherIdColumn)),
+            get(titleColumn)
         )
 
     init {
@@ -40,11 +43,12 @@ class ExposedCoursesRepo(
     }
 
     override fun update(id: CourseId?, value: NewCourse, it: UpdateBuilder<Int>) {
-        it[userIdColumn] = value.userId.chatId
+        it[teacherIdColumn] = value.teacherId.long
     }
 
     override fun InsertStatement<Number>.asObject(value: NewCourse): RegisteredCourse = RegisteredCourse(
         CourseId(get(idColumn)),
-        UserId(get(userIdColumn))
+        TeacherId(get(teacherIdColumn)),
+        get(titleColumn)
     )
 }

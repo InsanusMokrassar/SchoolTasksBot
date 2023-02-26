@@ -7,6 +7,8 @@ import kotlinx.serialization.Serializable
 @GenerateCRUDModel(IRegisteredCourse::class)
 @Serializable
 sealed interface Course {
-    val teacherId: TeacherId
+    @Suppress("RemoveRedundantQualifierName")
+    val teacherId: center.sciprog.tasks_bot.teachers.models.TeacherId
     val title: String
+    val registrationLink: CourseRegistrationLink
 }

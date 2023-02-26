@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-
+    <string name="suggestAddTitleForCourse">Ok, write me a title for new course or push cancel button</string>
 </resources>

@@ -5,6 +5,7 @@ import center.sciprog.tasks_bot.courses.repos.CachedCoursesRepo
 import center.sciprog.tasks_bot.courses.repos.ExposedCoursesRepo
 import center.sciprog.tasks_bot.courses.repos.CoursesRepo
 import dev.inmo.micro_utils.fsm.common.State
+import dev.inmo.micro_utils.koin.singleWithBinds
 import dev.inmo.plagubot.Plugin
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import kotlinx.serialization.json.JsonObject
@@ -18,7 +19,7 @@ object JvmPlugin : Plugin {
 
         single { ExposedCoursesRepo(get()) }
 
-        single<CoursesRepo> {
+        singleWithBinds<CoursesRepo> {
             val base = get<ExposedCoursesRepo>()
             if (useCache) {
                 CachedCoursesRepo(base, get())

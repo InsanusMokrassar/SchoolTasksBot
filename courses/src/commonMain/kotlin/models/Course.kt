@@ -10,5 +10,4 @@ sealed interface Course {
     @Suppress("RemoveRedundantQualifierName")
     val teacherId: center.sciprog.tasks_bot.teachers.models.TeacherId
     val title: String
-    val registrationLink: CourseRegistrationLink
 }

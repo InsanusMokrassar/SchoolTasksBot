@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
     <string name="suggestAddTitleForCourse">Хорошо, отправьте название нового курса или нажмите кнопку отмены</string>
+    <string name="unableCreateCourseText">Не получилось создать новый курс. Попробуйте позже</string>
+    <string name="courseCreatingSuccessTemplate">Курс "%s" был успешно создан</string>
 </resources>

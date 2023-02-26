@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-    <string name="suggestAddTitleForCourse">Ok, write me a title for new course or push cancel button</string>
+    <string name="suggestAddTitleForCourse">Ok, write me a title for new course or press cancel button</string>
+    <string name="unableCreateCourseText">Unable to create new course</string>
+    <string name="courseCreatingSuccessTemplate">The course "%s" has been created successfully</string>
 </resources>

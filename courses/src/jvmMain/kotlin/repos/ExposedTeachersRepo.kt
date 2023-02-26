@@ -4,6 +4,7 @@ import center.sciprog.tasks_bot.courses.models.NewCourse
 import center.sciprog.tasks_bot.courses.models.RegisteredCourse
 import center.sciprog.tasks_bot.courses.models.Course
 import center.sciprog.tasks_bot.courses.models.CourseId
+import center.sciprog.tasks_bot.courses.models.CourseRegistrationLink
 import center.sciprog.tasks_bot.teachers.models.TeacherId
 import dev.inmo.micro_utils.repos.CRUDRepo
 import dev.inmo.micro_utils.repos.exposed.AbstractExposedCRUDRepo
@@ -44,6 +45,7 @@ class ExposedCoursesRepo(
 
     override fun update(id: CourseId?, value: NewCourse, it: UpdateBuilder<Int>) {
         it[teacherIdColumn] = value.teacherId.long
+        it[titleColumn] = value.title
     }
 
     override fun InsertStatement<Number>.asObject(value: NewCourse): RegisteredCourse = RegisteredCourse(

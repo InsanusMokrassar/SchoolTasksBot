@@ -13,7 +13,6 @@ import kotlinx.serialization.Serializable
 public data class NewCourse(
   public override val teacherId: TeacherId,
   public override val title: String,
-  public override val registrationLink: CourseRegistrationLink,
 ) : Course
 
 @Serializable
@@ -22,10 +21,9 @@ public data class RegisteredCourse(
   public override val id: CourseId,
   public override val teacherId: TeacherId,
   public override val title: String,
-  public override val registrationLink: CourseRegistrationLink,
 ) : Course, IRegisteredCourse
 
-public fun Course.asNew(): NewCourse = NewCourse(teacherId, title, registrationLink)
+public fun Course.asNew(): NewCourse = NewCourse(teacherId, title)
 
 public fun Course.asRegistered(id: CourseId): RegisteredCourse = RegisteredCourse(id, teacherId,
-    title, registrationLink)
+    title)

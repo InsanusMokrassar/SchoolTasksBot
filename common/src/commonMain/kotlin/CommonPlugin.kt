@@ -41,6 +41,5 @@ object CommonPlugin : Plugin {
         single { CoroutineScope(Dispatchers.Default + SupervisorJob()) }
     }
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {
-
     }
 }

@@ -5,6 +5,7 @@ import center.sciprog.tasks_bot.teachers.repos.CachedTeachersRepo
 import center.sciprog.tasks_bot.teachers.repos.ExposedTeachersRepo
 import center.sciprog.tasks_bot.teachers.repos.TeachersRepo
 import dev.inmo.micro_utils.fsm.common.State
+import dev.inmo.micro_utils.koin.singleWithBinds
 import dev.inmo.plagubot.Plugin
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import kotlinx.serialization.json.JsonObject
@@ -18,7 +19,7 @@ object JvmPlugin : Plugin {
 
         single { ExposedTeachersRepo(get()) }
 
-        single<TeachersRepo> {
+        singleWithBinds<TeachersRepo> {
             val base = get<ExposedTeachersRepo>()
             if (useCache) {
                 CachedTeachersRepo(base, get())

@@ -1,0 +1,33 @@
+plugins {
+    id "org.jetbrains.kotlin.multiplatform"
+    id "org.jetbrains.kotlin.plugin.serialization"
+    id "com.google.devtools.ksp"
+}
+
+apply plugin: "dev.icerock.mobile.multiplatform-resources"
+apply from: "$mppJavaProjectPresetPath"
+
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                api project(":tasks_bot.common")
+                api project(":tasks_bot.teachers")
+                api libs.moko.resources
+            }
+        }
+    }
+}
+
+dependencies {
+    add("kspCommonMainMetadata", libs.microutils.koin.generator)
+    add("kspCommonMainMetadata", libs.microutils.repos.generator)
+}
+
+ksp {
+}
+
+multiplatformResources {
+    multiplatformResourcesPackage = "$group.${project.name}" // required
+    multiplatformResourcesClassName = "courses_resources" // optional, default MR
+}

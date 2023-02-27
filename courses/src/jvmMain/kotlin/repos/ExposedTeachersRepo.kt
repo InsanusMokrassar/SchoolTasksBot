@@ -23,7 +23,7 @@ class ExposedCoursesRepo(
     AbstractExposedCRUDRepo<RegisteredCourse, CourseId, NewCourse>(tableName = "courses") {
     val idColumn = long("id").autoIncrement()
     private val titleColumn = text("title")
-    private val teacherIdColumn = long("teacher_id").uniqueIndex()
+    private val teacherIdColumn = long("teacher_id")
 
     override val primaryKey: PrimaryKey = PrimaryKey(idColumn)
 

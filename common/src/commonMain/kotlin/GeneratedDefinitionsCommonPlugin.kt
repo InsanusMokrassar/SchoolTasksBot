@@ -8,6 +8,7 @@ import dev.inmo.micro_utils.repos.KeyValueRepo
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.IdChatIdentifier
 import kotlin.Boolean
+import kotlinx.serialization.json.Json
 import org.koin.core.Koin
 import org.koin.core.definition.Definition
 import org.koin.core.definition.KoinDefinition
@@ -93,3 +94,22 @@ public fun Module.languagesRepoSingle(createdAtStart: Boolean = false,
     definition: Definition<KeyValueRepo<IdChatIdentifier, IetfLanguageCode>>):
     KoinDefinition<KeyValueRepo<IdChatIdentifier, IetfLanguageCode>> =
     single(named("languagesRepo"), createdAtStart = createdAtStart, definition = definition)
+
+/**
+ * @return Definition by key "statesJson"
+ */
+public val Scope.statesJson: Json
+  get() = get(named("statesJson"))
+
+/**
+ * @return Definition by key "statesJson"
+ */
+public val Koin.statesJson: Json
+  get() = get(named("statesJson"))
+
+/**
+ * Will register [definition] with [org.koin.core.module.Module.single] and key "statesJson"
+ */
+public fun Module.statesJsonSingle(createdAtStart: Boolean = false, definition: Definition<Json>):
+    KoinDefinition<Json> = single(named("statesJson"), createdAtStart = createdAtStart, definition =
+    definition)

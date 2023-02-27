@@ -46,6 +46,7 @@ microutils-koin-generator = { module = "dev.inmo:micro_utils.koin.generator", ve
 microutils-repos-common = { module = "dev.inmo:micro_utils.repos.common", version.ref = "microutils" }
 microutils-repos-cache = { module = "dev.inmo:micro_utils.repos.cache", version.ref = "microutils" }
 microutils-repos-generator = { module = "dev.inmo:micro_utils.repos.generator", version.ref = "microutils" }
+microutils-fsm-repos-common = { module = "dev.inmo:micro_utils.fsm.repos.common", version.ref = "microutils" }
 
 tgbotapi-libraries-resender = { module = "dev.inmo:tgbotapi.libraries.resender", version.ref = "tgbotapi-libraries" }
 tgbotapi = { module = "dev.inmo:tgbotapi", version.ref = "tgbotapi" }

@@ -1,5 +1,6 @@
 package center.sciprog.tasks_bot.common.utils
 
+import dev.inmo.micro_utils.common.alsoIfFalse
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.language_codes.IetfLanguageCode
 import dev.inmo.micro_utils.repos.KeyValueRepo
@@ -23,6 +24,14 @@ suspend fun KeyValueRepo<IdChatIdentifier, IetfLanguageCode>.getChatLanguage(
         ietf
     }
 }
+suspend fun KeyValueRepo<IdChatIdentifier, IetfLanguageCode>.checkChatLanguage(
+    user: CommonUser
+) {
+    contains(user.id).alsoIfFalse {
+        val ietf = user.ietfLanguageCode ?: IetfLanguageCode.English
+        set(user.id, ietf)
+    }
+}
 
 suspend fun KeyValueRepo<IdChatIdentifier, IetfLanguageCode>.getChatLanguage(
     chatIdentifier: IdChatIdentifier
@@ -36,4 +45,14 @@ suspend fun KeyValueRepo<IdChatIdentifier, IetfLanguageCode>.getChatLanguage(
     return message.whenFromUserMessage {
         getChatLanguage(it.user.commonUserOrNull() ?: return@whenFromUserMessage null)
     } ?: getChatLanguage(message.chat.id)
+}
+
+suspend fun KeyValueRepo<IdChatIdentifier, IetfLanguageCode>.checkChatLanguage(
+    message: Message
+) {
+    if (contains(message.chat.id)) return
+
+    message.whenFromUserMessage {
+        checkChatLanguage(it.user.commonUserOrNull() ?: return@whenFromUserMessage null)
+    } ?: set(message.chat.id, IetfLanguageCode.English)
 }

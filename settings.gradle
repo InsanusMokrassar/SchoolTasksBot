@@ -5,6 +5,7 @@ String[] includes = [
     ":launcher",
     ":teachers",
     ":courses",
+    ":students",
 ]
 
 

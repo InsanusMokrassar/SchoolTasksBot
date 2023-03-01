@@ -1,3 +1,4 @@
+@file:GenerateKoinDefinition("courseSubscribersRepo", KeyValuesRepo::class, CourseId::class, InternalUserId::class, nullable = false, generateFactory = false)
 package center.sciprog.tasks_bot.courses
 
 import center.sciprog.tasks_bot.common.common_resources
@@ -7,14 +8,18 @@ import center.sciprog.tasks_bot.common.supervisorIetfLanguageCode
 import center.sciprog.tasks_bot.common.utils.checkChatLanguage
 import center.sciprog.tasks_bot.common.utils.getChatLanguage
 import center.sciprog.tasks_bot.common.utils.locale
+import center.sciprog.tasks_bot.courses.models.CourseId
 import center.sciprog.tasks_bot.courses.models.CourseRegistrationLink
 import center.sciprog.tasks_bot.courses.models.NewCourse
 import center.sciprog.tasks_bot.courses.repos.CoursesRepo
 import center.sciprog.tasks_bot.teachers.repos.ReadTeachersRepo
 import center.sciprog.tasks_bot.teachers.repos.TeachersRepo
+import center.sciprog.tasks_bot.users.models.InternalUserId
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.fsm.common.State
+import dev.inmo.micro_utils.koin.annotations.GenerateKoinDefinition
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
+import dev.inmo.micro_utils.repos.KeyValuesRepo
 import dev.inmo.micro_utils.repos.create
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plagubot.plugins.commands.full

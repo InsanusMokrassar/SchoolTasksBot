@@ -27,6 +27,10 @@ object JvmPlugin : Plugin {
                 base
             }
         }
+
+        courseSubscribersRepoSingle {
+
+        }
     }
 
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {

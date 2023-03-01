@@ -12,6 +12,7 @@ kotlin {
         commonMain {
             dependencies {
                 api project(":tasks_bot.common")
+                api project(":tasks_bot.users")
                 api libs.moko.resources
             }
         }

@@ -5,6 +5,7 @@ import center.sciprog.tasks_bot.common.supervisorIetfLanguageCode
 import center.sciprog.tasks_bot.common.utils.locale
 import center.sciprog.tasks_bot.teachers.models.NewTeacher
 import center.sciprog.tasks_bot.teachers.repos.TeachersRepo
+import center.sciprog.tasks_bot.users.userRetriever
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
@@ -43,6 +44,7 @@ object CommonPlugin : Plugin {
         val supervisorId = koin.supervisorId
         val teachersRepo = koin.get<TeachersRepo>()
         val supervisorLocale = koin.supervisorIetfLanguageCode.locale
+        val userRetriever = koin.userRetriever
 
         val requestNewTeacherId = RequestId("add_teacher".hashCode().absoluteValue)
 
@@ -64,7 +66,7 @@ object CommonPlugin : Plugin {
         onUserShared(initialFilter = { it.chatEvent.requestId == requestNewTeacherId && it.chat.id == supervisorId }) {
             runCatchingSafely {
                 teachersRepo.create(
-                    NewTeacher(it.chatEvent.userId)
+                    NewTeacher(userRetriever(it.chatEvent.userId).id)
                 )
             }.onSuccess { created ->
                 if (created.isNotEmpty()) {

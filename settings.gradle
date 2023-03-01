@@ -5,8 +5,8 @@ String[] includes = [
     ":launcher",
     ":teachers",
     ":courses",
-    ":students",
-    ":students:courses",
+    ":users",
+//    ":users:courses",
 ]
 
 

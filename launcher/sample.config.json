@@ -10,7 +10,7 @@
     "center.sciprog.tasks_bot.common.JvmPlugin",
     "center.sciprog.tasks_bot.teachers.JvmPlugin",
     "center.sciprog.tasks_bot.courses.JvmPlugin",
-    "center.sciprog.tasks_bot.students.JvmPlugin",
+    "center.sciprog.tasks_bot.users.JvmPlugin",
     "dev.inmo.plagubot.plugins.commands.CommandsPlugin"
   ],
   "supervisor": 123456789,

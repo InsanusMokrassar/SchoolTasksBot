@@ -1,8 +1,8 @@
-package center.sciprog.tasks_bot.students.repos
+package center.sciprog.tasks_bot.users.repos
 
-import center.sciprog.tasks_bot.students.models.NewStudent
-import center.sciprog.tasks_bot.students.models.RegisteredStudent
-import center.sciprog.tasks_bot.students.models.StudentId
+import center.sciprog.tasks_bot.users.models.NewUser
+import center.sciprog.tasks_bot.users.models.RegisteredUser
+import center.sciprog.tasks_bot.users.models.InternalUserId
 import dev.inmo.micro_utils.repos.exposed.AbstractExposedCRUDRepo
 import dev.inmo.micro_utils.repos.exposed.initTable
 import dev.inmo.tgbotapi.types.UserId
@@ -15,23 +15,23 @@ import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class ExposedStudentsRepo(
+class ExposedUsersRepo(
     override val database: Database
-) : StudentsRepo, AbstractExposedCRUDRepo<RegisteredStudent, StudentId, NewStudent>(
-    tableName = "students"
+) : UsersRepo, AbstractExposedCRUDRepo<RegisteredUser, InternalUserId, NewUser>(
+    tableName = "users"
 ) {
     val idColumn = long("id").autoIncrement()
     private val userIdColumn = long("userId").uniqueIndex()
 
     override val primaryKey: PrimaryKey = PrimaryKey(idColumn)
 
-    override val selectById: ISqlExpressionBuilder.(StudentId) -> Op<Boolean> = {
+    override val selectById: ISqlExpressionBuilder.(InternalUserId) -> Op<Boolean> = {
         idColumn.eq(it.long)
     }
-    override val ResultRow.asId: StudentId
-        get() = StudentId(get(idColumn))
-    override val ResultRow.asObject: RegisteredStudent
-        get() = RegisteredStudent(
+    override val ResultRow.asId: InternalUserId
+        get() = InternalUserId(get(idColumn))
+    override val ResultRow.asObject: RegisteredUser
+        get() = RegisteredUser(
             asId,
             UserId(get(userIdColumn))
         )
@@ -40,16 +40,16 @@ class ExposedStudentsRepo(
         initTable()
     }
 
-    override fun update(id: StudentId?, value: NewStudent, it: UpdateBuilder<Int>) {
+    override fun update(id: InternalUserId?, value: NewUser, it: UpdateBuilder<Int>) {
         it[userIdColumn] = value.userId.chatId
     }
 
-    override fun InsertStatement<Number>.asObject(value: NewStudent): RegisteredStudent = RegisteredStudent(
-        StudentId(get(idColumn)),
+    override fun InsertStatement<Number>.asObject(value: NewUser): RegisteredUser = RegisteredUser(
+        InternalUserId(get(idColumn)),
         UserId(get(userIdColumn))
     )
 
-    override suspend fun getById(userId: UserId): RegisteredStudent? = transaction(database) {
+    override suspend fun getById(userId: UserId): RegisteredUser? = transaction(database) {
         select { userIdColumn.eq(userId.chatId) }.limit(1).firstOrNull() ?.asObject
     }
 }

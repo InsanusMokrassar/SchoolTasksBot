@@ -28,5 +28,5 @@ ksp {
 
 multiplatformResources {
     multiplatformResourcesPackage = "$group.${project.name}" // required
-    multiplatformResourcesClassName = "students_resources" // optional, default MR
+    multiplatformResourcesClassName = "users_resources" // optional, default MR
 }

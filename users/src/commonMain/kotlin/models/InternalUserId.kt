@@ -1,9 +1,9 @@
-package center.sciprog.tasks_bot.students.models
+package center.sciprog.tasks_bot.users.models
 
 import kotlinx.serialization.Serializable
 
 @Serializable
 @JvmInline
-value class StudentId(
+value class InternalUserId(
     val long: Long
 )

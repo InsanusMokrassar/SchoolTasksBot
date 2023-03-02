@@ -8,4 +8,5 @@
     <string name="coursesListTeacher">Teacher:</string>
     <string name="coursesListStudent">Student:</string>
     <string name="coursesListEmpty">You have no any courses</string>
+    <string name="coursesListText">Your courses:</string>
 </resources>

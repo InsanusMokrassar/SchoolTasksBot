@@ -8,4 +8,5 @@
     <string name="coursesListTeacher">Преподаватель:</string>
     <string name="coursesListStudent">Студент:</string>
     <string name="coursesListEmpty">У вас нет доступных курсов</string>
+    <string name="coursesListText">Ваши курсы:</string>
 </resources>

@@ -13,6 +13,7 @@ import center.sciprog.tasks_bot.courses.models.NewCourse
 import center.sciprog.tasks_bot.courses.repos.CoursesRepo
 import center.sciprog.tasks_bot.teachers.repos.ReadTeachersRepo
 import center.sciprog.tasks_bot.users.models.InternalUserId
+import center.sciprog.tasks_bot.users.models.RegisteredUser
 import center.sciprog.tasks_bot.users.repos.ReadUsersRepo
 import center.sciprog.tasks_bot.users.userRetriever
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
@@ -20,12 +21,13 @@ import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.annotations.GenerateKoinDefinition
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
+import dev.inmo.micro_utils.pagination.Pagination
 import dev.inmo.micro_utils.pagination.firstPageWithOneElementPagination
 import dev.inmo.micro_utils.pagination.utils.getAllByWithNextPaging
+import dev.inmo.micro_utils.pagination.utils.paginate
 import dev.inmo.micro_utils.repos.KeyValuesRepo
 import dev.inmo.micro_utils.repos.add
 import dev.inmo.micro_utils.repos.create
-import dev.inmo.micro_utils.repos.set
 import dev.inmo.plagubot.Plugin
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.api.delete
@@ -40,17 +42,20 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.oneOf
 import dev.inmo.tgbotapi.extensions.behaviour_builder.parallel
 import dev.inmo.tgbotapi.extensions.behaviour_builder.strictlyOn
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
-import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onDeepLink
+import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessageDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.utils.chatIdOrNull
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameChat
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.formatting.makeTelegramDeepLink
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
+import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
 import dev.inmo.tgbotapi.types.IdChatIdentifier
+import dev.inmo.tgbotapi.types.buttons.InlineKeyboardMarkup
 import dev.inmo.tgbotapi.types.chat.ExtendedBot
 import dev.inmo.tgbotapi.types.toChatId
 import dev.inmo.tgbotapi.utils.link
+import dev.inmo.tgbotapi.utils.row
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
@@ -75,6 +80,19 @@ object CommonPlugin : Plugin {
             }
         }
     }
+
+    private const val dataButtonDataPrefix = "course "
+    private val CourseId.dataButtonData
+        get() = "$dataButtonDataPrefix$long"
+    private val String.extractDataButtonCourseId
+        get() = removePrefix(dataButtonDataPrefix).toLongOrNull() ?.let(::CourseId)
+
+    private const val dataButtonCoursesPageDataPrefix = "courses_page "
+    private val Int.dataButtonCoursesPageData
+        get() = "$dataButtonCoursesPageDataPrefix$this"
+    private val String.extractDataButtonCoursePage
+        get() = removePrefix(dataButtonCoursesPageDataPrefix).toIntOrNull()
+
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {
         val me = koin.getOrNull<ExtendedBot>() ?: getMe()
         val coursesRepo = koin.get<CoursesRepo>()
@@ -171,37 +189,65 @@ object CommonPlugin : Plugin {
             send(message.chat, courses_resources.strings.registeredOnCourseMessageTextTemplate.localized(chatLanguage).format(course.title))
         }
 
-        onCommand("courses") {
-            val internalUser = usersRepo.getById(it.chat.id.chatIdOrNull() ?: return@onCommand) ?: return@onCommand
+        suspend fun buildCoursesButtons(user: RegisteredUser, page: Int = 0): InlineKeyboardMarkup? {
+            val internalUser = usersRepo.getById(user.id) ?: return null
             val teacher = teachersRepo.getById(internalUser.id)
             val userCourses = courseUsersRepo.getAllByWithNextPaging {
                 keys(internalUser.id, it)
-            }.mapNotNull {
-                coursesRepo.getById(it)
             }
             val teacherCourses = teacher ?.let {
                 coursesRepo.getCoursesIds(it.id)
-            } ?.mapNotNull {
+            }
+
+            val coursesPagination = ((teacherCourses ?: emptyList()) + userCourses).distinct().paginate(Pagination(page, 10))
+            val courses = coursesPagination.results.mapNotNull {
                 coursesRepo.getById(it)
             }
-            val chatLanguage = languagesRepo.getChatLanguage(it.chat.id).locale
 
-            when {
-                userCourses.isEmpty() && teacherCourses.isNullOrEmpty() -> {
-                    reply(
-                        it,
-                        courses_resources.strings.coursesListEmpty.localized(chatLanguage)
-                    )
-                }
-                userCourses.isEmpty() || teacherCourses.isNullOrEmpty() -> {
-                    reply(it) {
-                        (teacherCourses ?.takeIf { it.isNotEmpty() } ?: userCourses).forEach {
-                            +"• ${it.title}\n"
+            return inlineKeyboard {
+                if (coursesPagination.pagesNumber > 1) {
+                    row {
+                        if (page > 0) {
+                            dataButton("<", (page - 1).dataButtonCoursesPageData)
+                        }
+                        if (page > 0) {
+                            dataButton("\uD83D\uDDD8", page.dataButtonCoursesPageData)
+                        }
+                        if (page < coursesPagination.pagesNumber - 1) {
+                            dataButton(">", (page + 1).dataButtonCoursesPageData)
                         }
                     }
                 }
-                else -> {
+                courses.chunked(2).forEach {
+                    row {
+                        it.forEach {
+                            dataButton(it.title.take(10), it.id.dataButtonData)
+                        }
+                    }
+                }
+            }
+        }
 
+        onMessageDataCallbackQuery(Regex("^$dataButtonCoursesPageDataPrefix")) {
+            val page = it.data.extractDataButtonCoursePage ?: return@onMessageDataCallbackQuery
+            val user = usersRepo.getById(it.user.id) ?: return@onMessageDataCallbackQuery
+
+            edit(it.message, replyMarkup = buildCoursesButtons(user, page))
+        }
+
+        onCommand("courses") {
+            val internalUser = usersRepo.getById(it.chat.id.chatIdOrNull() ?: return@onCommand) ?: return@onCommand
+            val coursesButtons = buildCoursesButtons(internalUser)
+            val chatLanguage = languagesRepo.getChatLanguage(internalUser.userId).locale
+
+            reply(
+                it,
+                replyMarkup = coursesButtons
+            ) {
+                if (coursesButtons == null) {
+                    courses_resources.strings.coursesListEmpty.localized(chatLanguage)
+                } else {
+                    courses_resources.strings.coursesListText.localized(chatLanguage)
                 }
             }
         }

@@ -39,6 +39,7 @@ android-test-junit = { module = "androidx.test.ext:junit", version.ref = "test_e
 android-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso_core" }
 
 plagubot-plugin = { module = "dev.inmo:plagubot.plugin", version.ref = "plagubot" }
+plagubot-plugins = { module = "dev.inmo:plagubot.plugin", version.ref = "plagubot" }
 plagubot-bot = { module = "dev.inmo:plagubot.bot", version.ref = "plagubot" }
 
 microutils-koin = { module = "dev.inmo:micro_utils.koin", version.ref = "microutils" }
@@ -51,6 +52,7 @@ microutils-fsm-repos-common = { module = "dev.inmo:micro_utils.fsm.repos.common"
 tgbotapi-libraries-resender = { module = "dev.inmo:tgbotapi.libraries.resender", version.ref = "tgbotapi-libraries" }
 tgbotapi = { module = "dev.inmo:tgbotapi", version.ref = "tgbotapi" }
 plagubot-plugins-commands = { module = "dev.inmo:plagubot.plugins.commands", version.ref = "plagubot-plugins" }
+plagubot-plugins-inline-buttons = { module = "dev.inmo:plagubot.plugins.inline.buttons", version.ref = "plagubot-plugins" }
 
 psql = { module = "org.postgresql:postgresql", version.ref = "psql" }
 

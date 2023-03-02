@@ -3,4 +3,9 @@
     <string name="suggestAddTitleForCourse">Хорошо, отправьте название нового курса или нажмите кнопку отмены</string>
     <string name="unableCreateCourseText">Не получилось создать новый курс. Попробуйте позже</string>
     <string name="courseCreatingSuccessTemplate">Курс "%s" был успешно создан</string>
+    <string name="courseCreatingSuccessInviteLinkTextTemplate">Пригласительная ссылка</string>
+    <string name="registeredOnCourseMessageTextTemplate">Вы зарегистрированы на курс "%s"</string>
+    <string name="coursesListTeacher">Преподаватель:</string>
+    <string name="coursesListStudent">Студент:</string>
+    <string name="coursesListEmpty">У вас нет доступных курсов</string>
 </resources>

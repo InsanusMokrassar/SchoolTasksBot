@@ -20,8 +20,7 @@ import org.jetbrains.exposed.sql.statements.UpdateBuilder
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class ExposedTeachersRepo(
-    override val database: Database,
-    private val usersRepo: ReadUsersRepo
+    override val database: Database
 ) : TeachersRepo,
     AbstractExposedCRUDRepo<RegisteredTeacher, TeacherId, NewTeacher>(tableName = "teachers") {
     val idColumn = long("id").autoIncrement()
@@ -53,9 +52,7 @@ class ExposedTeachersRepo(
         InternalUserId(get(userIdColumn))
     )
 
-    override suspend fun getById(tgUserId: UserId): RegisteredTeacher? = usersRepo.getById(tgUserId) ?.let {
-        transaction(database) {
-            select { userIdColumn.eq(it.id.long) }.firstOrNull() ?.asObject
-        }
+    override suspend fun getById(internalUserId: InternalUserId): RegisteredTeacher? = transaction(database) {
+        select { userIdColumn.eq(internalUserId.long) }.firstOrNull() ?.asObject
     }
 }

@@ -14,8 +14,10 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.ISqlExpressionBuilder
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
+import org.jetbrains.exposed.sql.transactions.transaction
 
 class ExposedCoursesRepo(
     override val database: Database
@@ -53,4 +55,8 @@ class ExposedCoursesRepo(
         TeacherId(get(teacherIdColumn)),
         get(titleColumn)
     )
+
+    override suspend fun getCoursesIds(teacherId: TeacherId): List<CourseId> = transaction(database) {
+        select { teacherIdColumn.eq(teacherId.long) }.map { it.asId }
+    }
 }

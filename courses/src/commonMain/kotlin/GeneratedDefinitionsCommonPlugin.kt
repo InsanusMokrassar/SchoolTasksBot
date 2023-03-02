@@ -4,6 +4,7 @@
 package center.sciprog.tasks_bot.courses
 
 import center.sciprog.tasks_bot.courses.models.CourseId
+import center.sciprog.tasks_bot.courses.models.CourseLink
 import center.sciprog.tasks_bot.users.models.InternalUserId
 import dev.inmo.micro_utils.repos.KeyValuesRepo
 import kotlin.Boolean
@@ -18,18 +19,38 @@ import org.koin.core.scope.Scope
  * @return Definition by key "courseSubscribersRepo"
  */
 public val Scope.courseSubscribersRepo: KeyValuesRepo<CourseId, InternalUserId>
-  get() = get(named("courseSubscribersRepo"))
+    get() = get(named("courseSubscribersRepo"))
 
 /**
  * @return Definition by key "courseSubscribersRepo"
  */
 public val Koin.courseSubscribersRepo: KeyValuesRepo<CourseId, InternalUserId>
-  get() = get(named("courseSubscribersRepo"))
+    get() = get(named("courseSubscribersRepo"))
 
 /**
  * Will register [definition] with [org.koin.core.module.Module.single] and key
  * "courseSubscribersRepo"
  */
 public fun Module.courseSubscribersRepoSingle(createdAtStart: Boolean = false,
-    definition: Definition<KeyValuesRepo<CourseId, InternalUserId>>): KoinDefinition<KeyValuesRepo<CourseId, InternalUserId>> =
+                                              definition: Definition<KeyValuesRepo<CourseId, InternalUserId>>): KoinDefinition<KeyValuesRepo<CourseId, InternalUserId>> =
     single(named("courseSubscribersRepo"), createdAtStart = createdAtStart, definition = definition)
+
+/**
+ * @return Definition by key "courseKeywordsRepo"
+ */
+public val Scope.courseKeywordsRepo: KeyValuesRepo<CourseId, CourseLink>
+  get() = get(named("courseKeywordsRepo"))
+
+/**
+ * @return Definition by key "courseKeywordsRepo"
+ */
+public val Koin.courseKeywordsRepo: KeyValuesRepo<CourseId, CourseLink>
+  get() = get(named("courseKeywordsRepo"))
+
+/**
+ * Will register [definition] with [org.koin.core.module.Module.single] and key "courseKeywordsRepo"
+ */
+public fun Module.courseKeywordsRepoSingle(createdAtStart: Boolean = false,
+    definition: Definition<KeyValuesRepo<CourseId, CourseLink>>):
+    KoinDefinition<KeyValuesRepo<CourseId, CourseLink>> = single(named("courseKeywordsRepo"),
+    createdAtStart = createdAtStart, definition = definition)

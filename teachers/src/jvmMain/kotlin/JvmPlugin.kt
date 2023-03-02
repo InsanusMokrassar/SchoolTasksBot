@@ -17,12 +17,12 @@ object JvmPlugin : Plugin {
     override fun Module.setupDI(database: Database, params: JsonObject) {
         with(CommonPlugin) { setupDI(database, params) }
 
-        single { ExposedTeachersRepo(get(), get()) }
+        single { ExposedTeachersRepo(get()) }
 
         singleWithBinds<TeachersRepo> {
             val base = get<ExposedTeachersRepo>()
             if (useCache) {
-                CachedTeachersRepo(base, get(), get())
+                CachedTeachersRepo(base, get())
             } else {
                 base
             }

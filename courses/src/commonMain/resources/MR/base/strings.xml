@@ -3,4 +3,9 @@
     <string name="suggestAddTitleForCourse">Ok, write me a title for new course or press cancel button</string>
     <string name="unableCreateCourseText">Unable to create new course</string>
     <string name="courseCreatingSuccessTemplate">The course "%s" has been created successfully</string>
+    <string name="courseCreatingSuccessInviteLinkTextTemplate">Invite link</string>
+    <string name="registeredOnCourseMessageTextTemplate">You has been registered onto course "%s"</string>
+    <string name="coursesListTeacher">Teacher:</string>
+    <string name="coursesListStudent">Student:</string>
+    <string name="coursesListEmpty">You have no any courses</string>
 </resources>

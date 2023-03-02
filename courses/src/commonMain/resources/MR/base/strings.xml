@@ -9,4 +9,14 @@
     <string name="coursesListStudent">Student:</string>
     <string name="coursesListEmpty">You have no any courses</string>
     <string name="coursesListText">Your courses:</string>
+    <string name="courseManagementTextTemplate">Available actions for the course "%s":</string>
+    <string name="courseManagementIsEmptyText">Currently you can't do anything with that course</string>
+    <string name="backToCoursesList">Back to courses</string>
+    <string name="courseRenameButtonText">Rename</string>
+    <string name="suggestChangeTitleForCourseTemplate">Ok, type new title for the course currently named as "%s"</string>
+    <string name="unableChangeCourseTitleText">Unable to update course title</string>
+    <string name="courseChangeTitleSuccessTemplate">Successfully updated title of course from "%s" to "%s"</string>
+    <string name="courseSubscribersLink">Students link</string>
+    <string name="courseShareLinkButtonText">Share students link</string>
+    <string name="courseLinkInlineQuery">Students link</string>
 </resources>

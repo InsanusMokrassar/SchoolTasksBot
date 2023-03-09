@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 sealed interface TaskAnswerPart {
     @Serializable
     data class Text(
-        @Serializable(ClosedRangeSerializer::class)
+        @Serializable(ClosedRangeSerializer.Companion.Integer::class)
         val lengthRange: IntRange? = null
     )
 }

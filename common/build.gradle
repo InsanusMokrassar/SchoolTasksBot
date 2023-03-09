@@ -16,6 +16,7 @@ kotlin {
                 api libs.microutils.repos.common
                 api libs.microutils.repos.cache
                 api libs.microutils.fsm.repos.common
+                api libs.microutils.serialization.mapper
                 api libs.tgbotapi
                 api libs.plagubot.plugins.commands
                 api libs.moko.resources

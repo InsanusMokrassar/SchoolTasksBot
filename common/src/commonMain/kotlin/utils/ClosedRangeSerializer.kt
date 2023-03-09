@@ -1,7 +1,9 @@
 package center.sciprog.tasks_bot.common.utils
 
+import dev.inmo.micro_utils.serialization.mapper.MapperSerializer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -28,6 +30,10 @@ class ClosedRangeSerializer<T : Comparable<T>>(
     }
 
     companion object {
-
+        object Integer : MapperSerializer<ClosedRange<Int>, IntRange>(
+            ClosedRangeSerializer(Int.serializer()),
+            { it },
+            { IntRange(it.start, it.endInclusive) }
+        )
     }
 }

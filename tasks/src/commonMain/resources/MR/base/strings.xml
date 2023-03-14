@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-    <string name="courseNameTemplate">Course name: %s</string>
+    <string name="createDraftWithId">Open or create task draft</string>
+    <string name="courseNamePrefix">Course name: </string>
+    <string name="descriptionPrefix">Task: </string>
+    <string name="assignmentDatePrefix">Assignment: </string>
+    <string name="deadlineDatePrefix">Deadline: </string>
     <string name="courseChangeBtnTitle">Change course</string>
+    <string name="descriptionChangeBtnTitle">Change description</string>
+    <string name="answersFormatsChangeBtnTitle">Change answer formats</string>
+    <string name="assignmentDateChangeBtnTitle">Change assignment date</string>
+    <string name="deadlineDateChangeBtnTitle">Change answers deadline</string>
     <string name="tasksListTitle">Tasks:</string>
     <string name="taskAnswerVariantListItemTemplate">• %s</string>
     <string name="taskAnswerVariantTextTemplate">Text message, length: %s</string>
     <string name="taskAnswerVariantTextSymbolsTemplate">%d-%d symbols</string>
+    <string name="taskAnswerParameterNotSpecified">Not specified</string>
+    <string name="dateTimeFormat">dd.MM.yyyy, hh:mm</string>
 </resources>

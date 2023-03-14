@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @JvmInline
-value class AnswerVariantPartInfoId(
+value class AnswerFormatInfoId(
     val long: Long
 )

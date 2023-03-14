@@ -5,28 +5,28 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed interface AnswerVariantPart {
+sealed interface AnswerFormat {
     @Serializable
-    @SerialName("AnswerVariantPart.Text")
+    @SerialName("AnswerFormat.Text")
     data class Text(
         @Serializable(ClosedRangeSerializer.Companion.Integer::class)
         val lengthRange: IntRange? = null
-    ) : AnswerVariantPart
+    ) : AnswerFormat
 
     @Serializable
-    @SerialName("AnswerVariantPart.Link")
+    @SerialName("AnswerFormat.Link")
     data class Link(
         val regexString: String
-    ) : AnswerVariantPart {
+    ) : AnswerFormat {
         val regex: Regex by lazy {
             Regex(regexString)
         }
     }
 
     @Serializable
-    @SerialName("AnswerVariantPart.File")
+    @SerialName("AnswerFormat.File")
     data class File(
         val extension: String,
         val useDescription: Boolean = false
-    ): AnswerVariantPart
+    ): AnswerFormat
 }

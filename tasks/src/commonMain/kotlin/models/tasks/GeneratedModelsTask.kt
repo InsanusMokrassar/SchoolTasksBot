@@ -6,6 +6,7 @@ package center.sciprog.tasks_bot.tasks.models.tasks
 import center.sciprog.tasks_bot.common.utils.serializers.DateTimeSerializer
 import center.sciprog.tasks_bot.courses.models.CourseId
 import com.soywiz.klock.DateTime
+import dev.inmo.tgbotapi.types.message.textsources.TextSourcesList
 import kotlin.collections.List
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -14,7 +15,8 @@ import kotlinx.serialization.Serializable
 @SerialName(value = "NewTask")
 public data class NewTask(
   public override val courseId: CourseId,
-  public override val taskPartsIds: List<AnswerVariantPartInfoId>,
+  public override val textSources: TextSourcesList,
+  public override val taskPartsIds: List<AnswerFormatInfoId>,
   @Serializable(DateTimeSerializer::class)
   public override val assignmentDateTime: DateTime?,
   @Serializable(DateTimeSerializer::class)
@@ -26,15 +28,16 @@ public data class NewTask(
 public data class RegisteredTask(
   public override val id: TaskId,
   public override val courseId: CourseId,
-  public override val taskPartsIds: List<AnswerVariantPartInfoId>,
+  public override val textSources: TextSourcesList,
+  public override val taskPartsIds: List<AnswerFormatInfoId>,
   @Serializable(DateTimeSerializer::class)
   public override val assignmentDateTime: DateTime?,
   @Serializable(DateTimeSerializer::class)
   public override val answersAcceptingDeadLine: DateTime?,
 ) : Task, IRegisteredTask
 
-public fun Task.asNew(): NewTask = NewTask(courseId, taskPartsIds, assignmentDateTime,
+public fun Task.asNew(): NewTask = NewTask(courseId, textSources, taskPartsIds, assignmentDateTime,
     answersAcceptingDeadLine)
 
-public fun Task.asRegistered(id: TaskId): RegisteredTask = RegisteredTask(id, courseId,
+public fun Task.asRegistered(id: TaskId): RegisteredTask = RegisteredTask(id, courseId, textSources,
     taskPartsIds, assignmentDateTime, answersAcceptingDeadLine)

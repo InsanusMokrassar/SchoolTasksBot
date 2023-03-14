@@ -4,6 +4,7 @@
 package center.sciprog.tasks_bot.tasks
 
 import center.sciprog.tasks_bot.tasks.models.tasks.TaskDraft
+import center.sciprog.tasks_bot.teachers.models.TeacherId
 import center.sciprog.tasks_bot.users.models.InternalUserId
 import dev.inmo.micro_utils.repos.KeyValueRepo
 import dev.inmo.tgbotapi.types.ChatId
@@ -18,19 +19,19 @@ import org.koin.core.scope.Scope
 /**
  * @return Definition by key "tasksDraftsRepo"
  */
-public val Scope.tasksDraftsRepo: KeyValueRepo<InternalUserId, TaskDraft>?
-  get() = getOrNull(named("tasksDraftsRepo"))
+public val Scope.tasksDraftsRepo: KeyValueRepo<TeacherId, TaskDraft>
+  get() = get(named("tasksDraftsRepo"))
 
 /**
  * @return Definition by key "tasksDraftsRepo"
  */
-public val Koin.tasksDraftsRepo: KeyValueRepo<InternalUserId, TaskDraft>?
-  get() = getOrNull(named("tasksDraftsRepo"))
+public val Koin.tasksDraftsRepo: KeyValueRepo<TeacherId, TaskDraft>
+  get() = get(named("tasksDraftsRepo"))
 
 /**
  * Will register [definition] with [org.koin.core.module.Module.single] and key "tasksDraftsRepo"
  */
 public fun Module.tasksDraftsRepoSingle(createdAtStart: Boolean = false,
-    definition: Definition<KeyValueRepo<InternalUserId, TaskDraft>>):
-    KoinDefinition<KeyValueRepo<InternalUserId, TaskDraft>> = single(named("tasksDraftsRepo"),
+    definition: Definition<KeyValueRepo<TeacherId, TaskDraft>>):
+    KoinDefinition<KeyValueRepo<TeacherId, TaskDraft>> = single(named("tasksDraftsRepo"),
     createdAtStart = createdAtStart, definition = definition)

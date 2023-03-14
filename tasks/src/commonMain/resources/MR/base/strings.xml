@@ -1,3 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
+    <string name="courseNameTemplate">Course name: %s</string>
+    <string name="courseChangeBtnTitle">Change course</string>
+    <string name="tasksListTitle">Tasks:</string>
+    <string name="taskAnswerVariantListItemTemplate">• %s</string>
+    <string name="taskAnswerVariantTextTemplate">Text message, length: %s</string>
+    <string name="taskAnswerVariantTextSymbolsTemplate">%d-%d symbols</string>
 </resources>

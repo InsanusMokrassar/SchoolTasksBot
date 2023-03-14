@@ -5,12 +5,12 @@ kotlin-serialization = "1.5.0"
 
 dokka = "1.8.10"
 
-microutils = "0.17.4"
+microutils = "0.17.5"
 
-tgbotapi = "6.1.0"
-tgbotapi-libraries = "0.9.4"
-plagubot = "4.1.0"
-plagubot-plugins = "0.9.3"
+tgbotapi = "7.0.0"
+tgbotapi-libraries = "0.10.0"
+plagubot = "5.0.0"
+plagubot-plugins = "0.10.0"
 
 psql = "42.5.0"
 

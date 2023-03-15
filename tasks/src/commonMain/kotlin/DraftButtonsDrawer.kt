@@ -10,24 +10,49 @@ import center.sciprog.tasks_bot.courses.models.RegisteredCourse
 import center.sciprog.tasks_bot.tasks.models.tasks.TaskDraft
 import center.sciprog.tasks_bot.teachers.repos.TeachersRepo
 import center.sciprog.tasks_bot.users.repos.UsersRepo
+import dev.inmo.micro_utils.common.joinTo
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.repos.set
 import dev.inmo.plagubot.Plugin
 import dev.inmo.tgbotapi.extensions.api.answers.answer
+import dev.inmo.tgbotapi.extensions.api.delete
 import dev.inmo.tgbotapi.extensions.api.edit.edit
+import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
+import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitAnyContentMessage
+import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitCommandMessage
+import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitContentMessage
+import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitMessageDataCallbackQuery
+import dev.inmo.tgbotapi.extensions.behaviour_builder.oneOf
+import dev.inmo.tgbotapi.extensions.behaviour_builder.parallel
+import dev.inmo.tgbotapi.extensions.behaviour_builder.strictlyOn
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessageDataCallbackQuery
+import dev.inmo.tgbotapi.extensions.utils.commonMessages
 import dev.inmo.tgbotapi.extensions.utils.contentMessageOrNull
+import dev.inmo.tgbotapi.extensions.utils.formatting.makeLinkToMessage
+import dev.inmo.tgbotapi.extensions.utils.textContentOrNull
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
+import dev.inmo.tgbotapi.extensions.utils.updates.hasNoCommands
 import dev.inmo.tgbotapi.extensions.utils.withContentOrNull
+import dev.inmo.tgbotapi.libraries.resender.MessageMetaInfo
+import dev.inmo.tgbotapi.libraries.resender.invoke
+import dev.inmo.tgbotapi.types.UserId
+import dev.inmo.tgbotapi.types.chat.Bot
 import dev.inmo.tgbotapi.types.message.abstracts.Message
+import dev.inmo.tgbotapi.types.message.textsources.BotCommandTextSource
 import dev.inmo.tgbotapi.utils.bold
+import dev.inmo.tgbotapi.utils.botCommand
+import dev.inmo.tgbotapi.utils.link
 import dev.inmo.tgbotapi.utils.regular
 import dev.inmo.tgbotapi.utils.row
 import dev.inmo.tgbotapi.utils.underline
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
+import kotlinx.serialization.Serializable
 import org.koin.core.Koin
 import java.util.*
 
@@ -39,6 +64,11 @@ internal object DraftButtonsDrawer : Plugin {
     const val changeAnswerDeadlineDateTimeButtonData = "tasks_draft_changeAnswerDeadlineDateTimeButton"
 
     const val createNewDraftButtonData = "tasks_draft_createNewDraft"
+
+    @Serializable
+    internal data class DescriptionMessagesRegistration(
+        override val context: UserId
+    ) : State
 
     private fun buildDraftKeyboard(
         locale: Locale
@@ -72,6 +102,7 @@ internal object DraftButtonsDrawer : Plugin {
     }
 
     suspend fun BehaviourContext.drawDraftInfoOnMessage(
+        me: Bot,
         course: RegisteredCourse,
         locale: Locale,
         message: Message,
@@ -84,8 +115,16 @@ internal object DraftButtonsDrawer : Plugin {
             +tasks_resources.strings.courseNamePrefix.localized(locale) + underline(course.title) + "\n\n"
 
             +tasks_resources.strings.descriptionPrefix.localized(locale)
-            if (draft.descriptionTextSources.isNotEmpty()) {
-                +draft.descriptionTextSources
+            if (draft.descriptionMessages.isNotEmpty()) {
+                draft.descriptionMessages.forEachIndexed { i, it ->
+                    link(i.toString(), makeLinkToMessage(me.username, it.messageId))
+
+                    if (i == draft.descriptionMessages.lastIndex) {
+                        return@forEachIndexed
+                    }
+
+                    regular(", ")
+                }
             } else {
                 bold {
                     +tasks_resources.strings.taskAnswerParameterNotSpecified.localized(locale) + " "
@@ -139,7 +178,7 @@ internal object DraftButtonsDrawer : Plugin {
                     courseId = it.courseId
                 ) ?: TaskDraft(
                     courseId = it.courseId,
-                    descriptionTextSources = emptyList(),
+                    descriptionMessages = emptyList(),
                     taskPartsIds = emptyList(),
                     assignmentDateTime = null,
                     answersAcceptingDeadLine = null
@@ -153,17 +192,60 @@ internal object DraftButtonsDrawer : Plugin {
         }
 
         onMessageDataCallbackQuery(changeCourseButtonData) {
-            val locale = languagesRepo.getChatLanguage(it.user).locale
             val user = usersRepo.getById(it.user.id) ?: answer(it).let {
                 return@onMessageDataCallbackQuery
             }
-            val teacherInfo = teachersRepo.getById(
+            teachersRepo.getById(
                 user.id
             ) ?: answer(it).let {
                 return@onMessageDataCallbackQuery
             }
 
             coursesButtonsDrawer.attachCoursesButtons(user, this, it.message)
+        }
+
+        strictlyOn { state: DescriptionMessagesRegistration ->
+            val locale = languagesRepo.getChatLanguage(state.context).locale
+            val user = usersRepo.getById(state.context) ?: return@strictlyOn null
+            teachersRepo.getById(user.id) ?: return@strictlyOn null
+
+            val sentMessage = send(state.context) {
+                +tasks_resources.strings.descriptionMessageSendingOfferPrefix.localized(locale)
+                +" " + botCommand("done")
+            }
+
+            val received = oneOf(
+                async {
+                    waitAnyContentMessage().filter {
+                        it.hasNoCommands()
+                    }.first()
+                },
+                async {
+                    waitCommandMessage("done").first()
+                }
+            )
+
+            delete(sentMessage)
+            when {
+                received.content.textContentOrNull() ?.textSources ?.contains(
+                    BotCommandTextSource("done")
+                ) == true -> {
+                    null
+                }
+                else -> {
+                    val teacher = teachersRepo.getById(user.id) ?: return@strictlyOn null
+                    val draft = draftsRepo.get(teacher.id) ?: return@strictlyOn null
+                    draftsRepo.set(
+                        teacher.id,
+                        draft.copy(
+                            descriptionMessages = draft.descriptionMessages + listOf(
+                                MessageMetaInfo(received)
+                            )
+                        )
+                    )
+                    state
+                }
+            }
         }
 
         coursesButtonsDrawer.enable(this)

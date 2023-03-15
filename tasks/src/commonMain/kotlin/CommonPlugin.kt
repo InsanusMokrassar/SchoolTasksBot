@@ -25,12 +25,16 @@ import dev.inmo.micro_utils.repos.mappers.withMapper
 import dev.inmo.micro_utils.repos.set
 import dev.inmo.plagubot.Plugin
 import dev.inmo.tgbotapi.extensions.api.answers.answer
+import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessageDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
+import dev.inmo.tgbotapi.types.chat.Bot
+import dev.inmo.tgbotapi.types.chat.ExtendedBot
 import dev.inmo.tgbotapi.utils.row
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.modules.SerializersModule
 import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
 import org.koin.core.module.Module
@@ -76,8 +80,15 @@ object CommonPlugin : Plugin {
                 }
             }
         }
+        singleWithRandomQualifier<SerializersModule> {
+            SerializersModule {
+                polymorphic(State::class, DraftButtonsDrawer.DescriptionMessagesRegistration::class, DraftButtonsDrawer.DescriptionMessagesRegistration.serializer())
+                polymorphic(Any::class, DraftButtonsDrawer.DescriptionMessagesRegistration::class, DraftButtonsDrawer.DescriptionMessagesRegistration.serializer())
+            }
+        }
     }
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {
+        val me = koin.getOrNull<ExtendedBot>() ?: getMe()
         with(DraftButtonsDrawer) {
             setupBotPlugin(koin)
         }
@@ -109,7 +120,7 @@ object CommonPlugin : Plugin {
                     it.courseId != courseId
                 } ?: TaskDraft(
                     courseId = course.id,
-                    descriptionTextSources = emptyList(),
+                    descriptionMessages = emptyList(),
                     taskPartsIds = emptyList(),
                     assignmentDateTime = null,
                     answersAcceptingDeadLine = null
@@ -122,6 +133,7 @@ object CommonPlugin : Plugin {
 
                 with(DraftButtonsDrawer) {
                     drawDraftInfoOnMessage(
+                        me,
                         course,
                         locale,
                         it.message,

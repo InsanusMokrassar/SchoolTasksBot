@@ -19,6 +19,7 @@ kotlin {
                 api libs.microutils.serialization.mapper
                 api libs.tgbotapi
                 api libs.plagubot.plugins.commands
+                api libs.tgbotapi.libraries.resender
                 api libs.moko.resources
             }
         }

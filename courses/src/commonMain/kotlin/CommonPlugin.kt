@@ -51,6 +51,7 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onComman
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessageDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.utils.chatIdOrNull
 import dev.inmo.tgbotapi.extensions.utils.commonUserOrThrow
+import dev.inmo.tgbotapi.extensions.utils.extensions.fromChat
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameChat
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.formatting.makeTelegramDeepLink
@@ -238,9 +239,7 @@ object CommonPlugin : Plugin {
                     null
                 },
                 parallel {
-                    val newTitle = waitTextMessage().filter {
-                        it.sameChat(sentMessage)
-                    }.first()
+                    val newTitle = waitTextMessage().fromChat(sentMessage.chat).first()
                     edit(sentMessage, sentMessage.content.textSources)
                     newTitle.content.text
                 }
@@ -311,9 +310,7 @@ object CommonPlugin : Plugin {
                     null
                 },
                 parallel {
-                    val newTitle = waitTextMessage().filter {
-                        it.sameChat(sentMessage)
-                    }.first()
+                    val newTitle = waitTextMessage().fromChat(sentMessage.chat).first()
                     edit(sentMessage, sentMessage.content.textSources)
                     newTitle.content.text
                 }

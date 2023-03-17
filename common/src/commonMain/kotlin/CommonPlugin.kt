@@ -83,5 +83,6 @@ object CommonPlugin : Plugin {
         }
     }
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {
+        MessagesRegistrar.enable(this, koin)
     }
 }

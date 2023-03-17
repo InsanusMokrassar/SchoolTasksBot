@@ -7,10 +7,10 @@ dokka = "1.8.10"
 
 microutils = "0.17.5"
 
-tgbotapi = "7.0.1-branch_7.0.1-build1562"
-tgbotapi-libraries = "0.10.0"
-plagubot = "5.0.0"
-plagubot-plugins = "0.10.0"
+tgbotapi = "7.0.1"
+tgbotapi-libraries = "0.10.1"
+plagubot = "5.0.1"
+plagubot-plugins = "0.10.1"
 
 psql = "42.5.0"
 

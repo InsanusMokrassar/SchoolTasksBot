@@ -11,7 +11,6 @@ import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitAnyContentMessage
-import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitMessageDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.behaviour_builder.oneOf
 import dev.inmo.tgbotapi.extensions.behaviour_builder.parallel
@@ -34,10 +33,10 @@ import org.koin.core.qualifier.StringQualifier
 /**
  * This object contains logic related to registration of collection of messages from user or chat. How to use:
  *
- * 1. Register in [Koin] instance of [MessagesRegistrarHandler] with your unique [StringQualifier]
- * 2. When you need, use [dev.inmo.micro_utils.fsm.common.StatesMachine.startChain] with [MessagesRegistrarState] and
+ * 1. Register in [Koin] instance of [Handler] with your unique [StringQualifier]
+ * 2. When you need, use [dev.inmo.micro_utils.fsm.common.StatesMachine.startChain] with [FSMState] and
  * pass [StringQualifier] you have registered on step 1.
- * 3. Handle steps inside of your [MessagesRegistrarHandler]
+ * 3. Handle steps inside of your [Handler]
  */
 object MessagesRegistrar {
     /**
@@ -48,7 +47,7 @@ object MessagesRegistrar {
      * cancelling messages registration
      */
     @Serializable
-    data class MessagesRegistrarState(
+    data class FSMState(
         override val context: IdChatIdentifier,
         @Serializable(StringQualifierSerializer::class)
         val handlerQualifier: StringQualifier,
@@ -58,36 +57,45 @@ object MessagesRegistrar {
         val cancelMessage: String? = null
     ) : State
 
-    fun interface MessagesRegistrarHandler {
+    fun interface Handler {
         /**
          * Main method. Will be called when user will push the done button
          */
-        suspend fun onSave(registeredMessages: List<MessageMetaInfo>)
+        suspend fun BehaviourContextWithFSM<State>.onSave(
+            contextChatId: IdChatIdentifier,
+            registeredMessages: List<MessageMetaInfo>
+        )
 
         /**
          * Optional method. Will be called when user will push the cancel button
          */
-        suspend fun onCancel(registeredMessages: List<MessageMetaInfo>) {}
+        suspend fun BehaviourContextWithFSM<State>.onCancel(
+            contextChatId: IdChatIdentifier,
+            registeredMessages: List<MessageMetaInfo>
+        ) {}
 
         /**
          * Use this method to filter the messages you wish to receive to
          *
          * @return Error message which should be sent to user on error or null if message is ok
          */
-        suspend fun checkMessage(message: ContentMessage<*>): String? = null
+        suspend fun BehaviourContextWithFSM<State>.checkMessage(
+            contextChatId: IdChatIdentifier,
+            message: ContentMessage<*>
+        ): String? = null
     }
 
     suspend fun enable(
-        behaviourBuilder: BehaviourContextWithFSM<State>,
+        behaviourBuilder: BehaviourContextWithFSM<dev.inmo.micro_utils.fsm.common.State>,
         koin: Koin
     ) {
         val languagesRepo = koin.languagesRepo
         val doneButtonData = "messages_registrar_done"
         val cancelButtonData = "messages_registrar_cancel"
         with (behaviourBuilder) {
-            strictlyOn { state: MessagesRegistrarState ->
+            strictlyOn { state: FSMState ->
                 val locale = languagesRepo.getChatLanguage(state.context).locale
-                val handler = koin.getOrNull<MessagesRegistrarHandler>(state.handlerQualifier) ?: return@strictlyOn null
+                val handler = koin.getOrNull<Handler>(state.handlerQualifier) ?: return@strictlyOn null
 
                 val sent = send(
                     state.context,
@@ -108,9 +116,16 @@ object MessagesRegistrar {
                 val receivedMessage = oneOf(
                     parallel {
                         waitAnyContentMessage().fromChat(state.context).filter {
-                            handler.checkMessage(it) ?.also { errorMessage ->
-                                reply(it, errorMessage)
-                            } == null
+                            val errorMessage = with(handler) {
+                                checkMessage(state.context, it)
+                            }
+
+                            if (errorMessage == null) {
+                                true
+                            } else {
+                                runCatchingSafely { reply(it, errorMessage) }
+                                false
+                            }
                         }.first()
                     },
                     parallel {
@@ -143,11 +158,15 @@ object MessagesRegistrar {
                         )
                     }
                     isCancelling -> {
-                        handler.onCancel(state.registeredMessages)
+                        with (handler) {
+                            onCancel(state.context, state.registeredMessages)
+                        }
                         null
                     }
                     else -> {
-                        handler.onSave(state.registeredMessages)
+                        with (handler) {
+                            onSave(state.context, state.registeredMessages)
+                        }
                         null
                     }
                 }.also {

@@ -18,4 +18,6 @@
     <string name="dateTimeFormat">dd.MM.yyyy, hh:mm</string>
 
     <string name="descriptionMessageSendingOfferPrefix">Ok, send me your message or </string>
+
+    <string name="newDescriptionHasBeenSavedMessageText">Your description has been saved. You may edit these messages and those editions will be available</string>
 </resources>

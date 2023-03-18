@@ -1,5 +1,6 @@
 package center.sciprog.tasks_bot.tasks
 
+import center.sciprog.tasks_bot.common.MessagesRegistrar
 import center.sciprog.tasks_bot.common.common_resources
 import center.sciprog.tasks_bot.common.languagesRepo
 import center.sciprog.tasks_bot.common.utils.getChatLanguage
@@ -10,7 +11,6 @@ import center.sciprog.tasks_bot.courses.models.RegisteredCourse
 import center.sciprog.tasks_bot.tasks.models.tasks.TaskDraft
 import center.sciprog.tasks_bot.teachers.repos.TeachersRepo
 import center.sciprog.tasks_bot.users.repos.UsersRepo
-import dev.inmo.micro_utils.common.joinTo
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.repos.set
@@ -23,13 +23,9 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitAnyContentMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitCommandMessage
-import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitContentMessage
-import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitMessageDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.behaviour_builder.oneOf
-import dev.inmo.tgbotapi.extensions.behaviour_builder.parallel
 import dev.inmo.tgbotapi.extensions.behaviour_builder.strictlyOn
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessageDataCallbackQuery
-import dev.inmo.tgbotapi.extensions.utils.commonMessages
 import dev.inmo.tgbotapi.extensions.utils.contentMessageOrNull
 import dev.inmo.tgbotapi.extensions.utils.formatting.makeLinkToMessage
 import dev.inmo.tgbotapi.extensions.utils.textContentOrNull
@@ -39,10 +35,12 @@ import dev.inmo.tgbotapi.extensions.utils.updates.hasNoCommands
 import dev.inmo.tgbotapi.extensions.utils.withContentOrNull
 import dev.inmo.tgbotapi.libraries.resender.MessageMetaInfo
 import dev.inmo.tgbotapi.libraries.resender.invoke
+import dev.inmo.tgbotapi.types.IdChatIdentifier
 import dev.inmo.tgbotapi.types.UserId
 import dev.inmo.tgbotapi.types.chat.Bot
 import dev.inmo.tgbotapi.types.message.abstracts.Message
 import dev.inmo.tgbotapi.types.message.textsources.BotCommandTextSource
+import dev.inmo.tgbotapi.types.toChatId
 import dev.inmo.tgbotapi.utils.bold
 import dev.inmo.tgbotapi.utils.botCommand
 import dev.inmo.tgbotapi.utils.link
@@ -53,7 +51,11 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
+import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
+import org.koin.core.module.Module
+import org.koin.core.qualifier.StringQualifier
 import java.util.*
 
 internal object DraftButtonsDrawer : Plugin {
@@ -62,6 +64,8 @@ internal object DraftButtonsDrawer : Plugin {
     const val changeAnswerFormatsButtonData = "tasks_draft_changeAnswerFormats"
     const val changeAssignmentDateTimeButtonData = "tasks_draft_changeAssignmentDateTimeButton"
     const val changeAnswerDeadlineDateTimeButtonData = "tasks_draft_changeAnswerDeadlineDateTimeButton"
+
+    private val draftDescriptionMessagesRegistrarQualifier = StringQualifier("draftDescriptionMessagesRegistrar")
 
     const val createNewDraftButtonData = "tasks_draft_createNewDraft"
 
@@ -146,6 +150,37 @@ internal object DraftButtonsDrawer : Plugin {
         }
     }
 
+    override fun Module.setupDI(database: Database, params: JsonObject) {
+        single<MessagesRegistrar.Handler>(draftDescriptionMessagesRegistrarQualifier) {
+            val usersRepo = get<UsersRepo>()
+            val teachersRepo = get<TeachersRepo>()
+            val draftsRepo = tasksDraftsRepo
+            val languagesRepo = languagesRepo
+            object : MessagesRegistrar.Handler {
+                override suspend fun BehaviourContextWithFSM<State>.onSave(
+                    contextChatId: IdChatIdentifier,
+                    registeredMessages: List<MessageMetaInfo>
+                ) {
+                    val locale = languagesRepo.getChatLanguage(contextChatId).locale
+                    val user = usersRepo.getById(contextChatId.toChatId()) ?: let { return }
+                    val teacherInfo = teachersRepo.getById(
+                        user.id
+                    ) ?: let { return }
+
+                    val draft = draftsRepo.get(teacherInfo.id) ?: return
+                    draftsRepo.set(
+                        teacherInfo.id,
+                        draft.copy(
+                            descriptionMessages = registeredMessages
+                        )
+                    )
+
+                    send(contextChatId, tasks_resources.strings.newDescriptionHasBeenSavedMessageText.localized(locale))
+                }
+            }
+        }
+    }
+
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {
         val usersRepo = koin.get<UsersRepo>()
         val teachersRepo = koin.get<TeachersRepo>()
@@ -202,6 +237,29 @@ internal object DraftButtonsDrawer : Plugin {
             }
 
             coursesButtonsDrawer.attachCoursesButtons(user, this, it.message)
+        }
+
+        onMessageDataCallbackQuery(changeDescriptionButtonData) {
+            val user = usersRepo.getById(it.user.id) ?: answer(it).let {
+                return@onMessageDataCallbackQuery
+            }
+            val teacher = teachersRepo.getById(
+                user.id
+            ) ?: answer(it).let {
+                return@onMessageDataCallbackQuery
+            }
+            val draft = draftsRepo.get(teacher.id)
+
+            if (draft == null) {
+                coursesButtonsDrawer.attachCoursesButtons(user, this, it.message)
+            } else {
+                startChain(
+                    MessagesRegistrar.FSMState(
+                        it.user.id,
+                        draftDescriptionMessagesRegistrarQualifier
+                    )
+                )
+            }
         }
 
         strictlyOn { state: DescriptionMessagesRegistration ->

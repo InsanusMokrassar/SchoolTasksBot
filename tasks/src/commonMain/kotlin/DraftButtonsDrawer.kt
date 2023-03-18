@@ -34,6 +34,7 @@ import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
 import dev.inmo.tgbotapi.extensions.utils.updates.hasNoCommands
 import dev.inmo.tgbotapi.extensions.utils.withContentOrNull
 import dev.inmo.tgbotapi.libraries.resender.MessageMetaInfo
+import dev.inmo.tgbotapi.libraries.resender.MessagesResender
 import dev.inmo.tgbotapi.libraries.resender.invoke
 import dev.inmo.tgbotapi.types.IdChatIdentifier
 import dev.inmo.tgbotapi.types.UserId
@@ -60,7 +61,10 @@ import java.util.*
 
 internal object DraftButtonsDrawer : Plugin {
     const val changeCourseButtonData = "tasks_draft_changeCourse"
+    const val manageDraftButtonData = "tasks_draft_manage"
+    const val manageDescriptionButtonData = "tasks_draft_ManageDescription"
     const val changeDescriptionButtonData = "tasks_draft_changeDescription"
+    const val resendDescriptionButtonData = "tasks_draft_resendDescription"
     const val changeAnswerFormatsButtonData = "tasks_draft_changeAnswerFormats"
     const val changeAssignmentDateTimeButtonData = "tasks_draft_changeAssignmentDateTimeButton"
     const val changeAnswerDeadlineDateTimeButtonData = "tasks_draft_changeAnswerDeadlineDateTimeButton"
@@ -84,7 +88,7 @@ internal object DraftButtonsDrawer : Plugin {
             )
             dataButton(
                 tasks_resources.strings.descriptionChangeBtnTitle.localized(locale),
-                changeDescriptionButtonData
+                manageDescriptionButtonData
             )
         }
         row {
@@ -194,6 +198,8 @@ internal object DraftButtonsDrawer : Plugin {
             prefix = "tasks_drafts",
             backButtonData = CommonPlugin.openDraftWithCourseIdBtnData
         )
+        val resender = koin.get<MessagesResender>()
+
         coursesButtonsDrawer.onChosen.subscribeSafelyWithoutExceptions(this) {
             val locale = languagesRepo.getChatLanguage(it.query.user).locale
             val user = usersRepo.getById(it.query.user.id) ?: answer(it.query).let {
@@ -239,7 +245,8 @@ internal object DraftButtonsDrawer : Plugin {
             coursesButtonsDrawer.attachCoursesButtons(user, this, it.message)
         }
 
-        onMessageDataCallbackQuery(changeDescriptionButtonData) {
+        onMessageDataCallbackQuery(manageDescriptionButtonData) {
+            val locale = languagesRepo.getChatLanguage(it.user).locale
             val user = usersRepo.getById(it.user.id) ?: answer(it).let {
                 return@onMessageDataCallbackQuery
             }
@@ -250,16 +257,48 @@ internal object DraftButtonsDrawer : Plugin {
             }
             val draft = draftsRepo.get(teacher.id)
 
-            if (draft == null) {
-                coursesButtonsDrawer.attachCoursesButtons(user, this, it.message)
-            } else {
-                startChain(
+            when {
+                draft == null -> coursesButtonsDrawer.attachCoursesButtons(user, this, it.message)
+                draft.descriptionMessages.isEmpty() -> startChain(
                     MessagesRegistrar.FSMState(
                         it.user.id,
                         draftDescriptionMessagesRegistrarQualifier
                     )
                 )
+                else -> edit(
+                    it.message,
+                    replyMarkup = inlineKeyboard {
+                        row {
+                            dataButton(common_resources.strings.back.localized(locale), manageDraftButtonData)
+                        }
+                        row {
+                            dataButton(tasks_resources.strings.getDraftDescriptionMessagesButtonText.localized(locale), resendDescriptionButtonData)
+                            dataButton(tasks_resources.strings.setDraftDescriptionMessagesButtonText.localized(locale), changeDescriptionButtonData)
+                        }
+                    }
+                )
             }
+        }
+
+        onMessageDataCallbackQuery(changeDescriptionButtonData) {
+            startChain(MessagesRegistrar.FSMState(it.user.id, draftDescriptionMessagesRegistrarQualifier))
+        }
+
+        onMessageDataCallbackQuery(resendDescriptionButtonData) {
+            val user = usersRepo.getById(it.user.id) ?: answer(it).let {
+                return@onMessageDataCallbackQuery
+            }
+            val teacher = teachersRepo.getById(
+                user.id
+            ) ?: answer(it).let {
+                return@onMessageDataCallbackQuery
+            }
+            val draft = draftsRepo.get(teacher.id) ?: return@onMessageDataCallbackQuery
+
+            resender.resend(
+                it.user.id,
+                draft.descriptionMessages
+            )
         }
 
         strictlyOn { state: DescriptionMessagesRegistration ->
@@ -304,6 +343,29 @@ internal object DraftButtonsDrawer : Plugin {
                     state
                 }
             }
+        }
+
+        onMessageDataCallbackQuery(manageDraftButtonData) {
+            val locale = languagesRepo.getChatLanguage(it.user).locale
+            val user = usersRepo.getById(it.user.id) ?: answer(it).let {
+                return@onMessageDataCallbackQuery
+            }
+            val teacher = teachersRepo.getById(
+                user.id
+            ) ?: answer(it).let {
+                return@onMessageDataCallbackQuery
+            }
+            val draft = draftsRepo.get(teacher.id)
+
+            if (draft == null) {
+                coursesButtonsDrawer.attachCoursesButtons(user, this@setupBotPlugin, it.message)
+            } else {
+                edit(
+                    it.message,
+                    replyMarkup = buildDraftKeyboard(locale)
+                )
+            }
+
         }
 
         coursesButtonsDrawer.enable(this)

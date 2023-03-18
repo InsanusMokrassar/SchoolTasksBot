@@ -15,6 +15,7 @@
     "dev.inmo.plagubot.plugins.commands.CommandsPlugin"
   ],
   "supervisor": 123456789,
+  "cacheChatId": 123456789,
   "supervisor_locale": "ru",
   "useCache": true
 }

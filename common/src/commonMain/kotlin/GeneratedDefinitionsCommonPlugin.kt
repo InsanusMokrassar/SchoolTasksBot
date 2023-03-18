@@ -113,3 +113,22 @@ public val Koin.statesJson: Json
 public fun Module.statesJsonSingle(createdAtStart: Boolean = false, definition: Definition<Json>):
     KoinDefinition<Json> = single(named("statesJson"), createdAtStart = createdAtStart, definition =
     definition)
+
+/**
+ * @return Definition by key "cacheChatId"
+ */
+public val Scope.cacheChatId: IdChatIdentifier
+  get() = get(named("cacheChatId"))
+
+/**
+ * @return Definition by key "cacheChatId"
+ */
+public val Koin.cacheChatId: IdChatIdentifier
+  get() = get(named("cacheChatId"))
+
+/**
+ * Will register [definition] with [org.koin.core.module.Module.single] and key "cacheChatId"
+ */
+public fun Module.cacheChatIdSingle(createdAtStart: Boolean = false,
+    definition: Definition<IdChatIdentifier>): KoinDefinition<IdChatIdentifier> =
+    single(named("cacheChatId"), createdAtStart = createdAtStart, definition = definition)

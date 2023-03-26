@@ -15,7 +15,7 @@
     <string name="taskAnswerVariantTextTemplate">Text message, length: %s</string>
     <string name="taskAnswerVariantTextSymbolsTemplate">%d-%d symbols</string>
     <string name="taskAnswerParameterNotSpecified">Not specified</string>
-    <string name="dateTimeFormat">dd.MM.yyyy, hh:mm</string>
+    <string name="dateTimeFormat">dd.MM.yyyy, HH:mm</string>
 
     <string name="descriptionMessageSendingOfferPrefix">Ok, send me your message or use the button below to finish your description</string>
 

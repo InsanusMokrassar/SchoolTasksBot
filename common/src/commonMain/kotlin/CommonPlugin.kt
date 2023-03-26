@@ -21,6 +21,7 @@ import dev.inmo.micro_utils.koin.singleWithRandomQualifier
 import dev.inmo.micro_utils.language_codes.IetfLanguageCode
 import dev.inmo.micro_utils.repos.KeyValueRepo
 import dev.inmo.plagubot.Plugin
+import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import dev.inmo.tgbotapi.libraries.resender.MessagesResender
 import dev.inmo.tgbotapi.types.ChatId
@@ -45,6 +46,7 @@ import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
 import org.koin.core.module.Module
 import org.koin.core.qualifier.qualifier
+import org.koin.dsl.module
 
 object CommonPlugin : Plugin {
     override fun Module.setupDI(database: Database, params: JsonObject) {
@@ -107,6 +109,14 @@ object CommonPlugin : Plugin {
         }
     }
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {
+        val me = getMe()
+        koin.loadModules(
+            listOf(
+                module {
+                    single { me }
+                }
+            )
+        )
         with(DateTimePicker) { setupBotPlugin(koin) }
         MessagesRegistrar.enable(this, koin)
     }

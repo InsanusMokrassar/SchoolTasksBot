@@ -76,7 +76,7 @@ object DateTimePicker : Plugin {
         ) : FSMState
 
         @Serializable
-        data class InProgress internal constructor(
+        data class InProgress(
             override val context: IdChatIdentifier,
             val messageId: MessageId,
             @Serializable(DateTimeSerializer::class)

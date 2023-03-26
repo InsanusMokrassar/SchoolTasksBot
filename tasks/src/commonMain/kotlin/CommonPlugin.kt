@@ -6,10 +6,8 @@ import center.sciprog.tasks_bot.common.useCache
 import center.sciprog.tasks_bot.common.utils.getChatLanguage
 import center.sciprog.tasks_bot.common.utils.locale
 import center.sciprog.tasks_bot.courses.CourseButtonsProvider
-import center.sciprog.tasks_bot.courses.courses_resources
 import center.sciprog.tasks_bot.courses.models.CourseId
 import center.sciprog.tasks_bot.courses.repos.ReadCoursesRepo
-import center.sciprog.tasks_bot.tasks.DraftButtonsDrawer.setupBotPlugin
 import center.sciprog.tasks_bot.tasks.models.tasks.TaskDraft
 import center.sciprog.tasks_bot.teachers.models.TeacherId
 import center.sciprog.tasks_bot.teachers.repos.ReadTeachersRepo
@@ -29,7 +27,6 @@ import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessageDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
-import dev.inmo.tgbotapi.types.chat.Bot
 import dev.inmo.tgbotapi.types.chat.ExtendedBot
 import dev.inmo.tgbotapi.utils.row
 import kotlinx.serialization.json.Json
@@ -123,7 +120,7 @@ object CommonPlugin : Plugin {
                     descriptionMessages = emptyList(),
                     taskPartsIds = emptyList(),
                     assignmentDateTime = null,
-                    answersAcceptingDeadLine = null
+                    deadLineDateTime = null
                 ).also {
                     draftsRepo.set(
                         teacherInfo.id,
@@ -136,7 +133,8 @@ object CommonPlugin : Plugin {
                         me,
                         course,
                         locale,
-                        it.message,
+                        it.message.chat.id,
+                        it.message.messageId,
                         draft
                     )
                 }

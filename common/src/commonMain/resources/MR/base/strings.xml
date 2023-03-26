@@ -8,4 +8,18 @@
     <string name="messagesRegistrarDefaultSuggestSendMessage">Ok, send me your content message</string>
     <string name="messagesRegistrarDefaultDoneMessage">Finish</string>
     <string name="messagesRegistrarDefaultCancelMessage">Cancel</string>
+
+    <string name="defaultDateTimePickerMessageText">Choose date</string>
+    <string name="defaultDateTimePickerTimeBtnText">Time (hh mm)</string>
+    <string name="defaultDateTimePickerDateBtnText">Date (dd mm yyyy)</string>
+    <string name="defaultDateTimePickerSaveText">✅</string>
+    <string name="defaultDateTimePickerCancelText">❌</string>
+    <string name="defaultDateTimePickerTimeHintText">Use the buttons to the right to set post publishing time (hh:mm)</string>
+    <string name="defaultDateTimePickerDateHintText">Use the buttons to the right to set post publishing date (dd.MM.yyyy)</string>
+
+    <string name="defaultDateTimePickerChooseHourText">Choose new hour</string>
+    <string name="defaultDateTimePickerChooseMinuteText">Choose new minute</string>
+    <string name="defaultDateTimePickerChooseDayText">Choose new day</string>
+    <string name="defaultDateTimePickerChooseMonthText">Choose new month</string>
+    <string name="defaultDateTimePickerChooseYearText">Choose new year</string>
 </resources>

@@ -8,6 +8,12 @@ package center.sciprog.tasks_bot.common
 
 import center.sciprog.tasks_bot.common.utils.serializers.ChatIdSerializer
 import center.sciprog.tasks_bot.common.utils.serializers.ChatIdWithThreadIdSerializer
+import com.soywiz.klock.DateTime
+import com.soywiz.klock.months
+import com.soywiz.klock.years
+import dev.inmo.kslog.common.KSLog
+import dev.inmo.kslog.common.d
+import dev.inmo.kslog.common.e
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.annotations.GenerateKoinDefinition
 import dev.inmo.micro_utils.koin.getAllDistinct
@@ -38,9 +44,11 @@ import kotlinx.serialization.modules.SerializersModule
 import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
 import org.koin.core.module.Module
+import org.koin.core.qualifier.qualifier
 
 object CommonPlugin : Plugin {
     override fun Module.setupDI(database: Database, params: JsonObject) {
+        with(DateTimePicker) { setupDI(database, params) }
         supervisorIdSingle {
             UserId(params["supervisor"] ?.jsonPrimitive ?.long ?: error("Unable to load supervisor id"))
         }
@@ -99,6 +107,7 @@ object CommonPlugin : Plugin {
         }
     }
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {
+        with(DateTimePicker) { setupBotPlugin(koin) }
         MessagesRegistrar.enable(this, koin)
     }
 }

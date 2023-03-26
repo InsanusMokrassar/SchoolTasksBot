@@ -14,7 +14,7 @@ plagubot-plugins = "0.10.1"
 
 psql = "42.5.0"
 
-moko-resources = "0.20.1"
+moko-resources = "0.21.1"
 ksp = "1.8.10-1.0.9"
 
 dexcount = "3.1.0"

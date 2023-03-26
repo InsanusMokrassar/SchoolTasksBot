@@ -34,6 +34,6 @@ ksp {
 }
 
 multiplatformResources {
-    multiplatformResourcesPackage = "$group.${project.name}" // required
+//    multiplatformResourcesPackage = "$group.${project.name}" // required
     multiplatformResourcesClassName = "common_resources" // optional, default MR
 }

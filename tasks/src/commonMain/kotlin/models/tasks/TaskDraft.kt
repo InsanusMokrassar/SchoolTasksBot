@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 data class TaskDraft(
     val courseId: CourseId,
     val descriptionMessages: List<MessageMetaInfo>,
-    val taskPartsIds: List<NewAnswerFormatInfo>,
+    val newAnswersFormats: List<NewAnswerFormatInfo>,
     @Serializable(DateTimeSerializer::class)
     val assignmentDateTime: DateTime?,
     @Serializable(DateTimeSerializer::class)

@@ -4,6 +4,6 @@ import dev.inmo.micro_utils.repos.annotations.GenerateCRUDModel
 
 @GenerateCRUDModel(IRegisteredAnswerFormatInfo::class)
 sealed interface AnswerFormatInfo {
-    val part: AnswerFormat
+    val format: AnswerFormat
     val required: Boolean
 }

@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName(value = "NewAnswerVariantPartInfo")
 public data class NewAnswerFormatInfo(
-    public override val part: AnswerFormat,
+    public override val format: AnswerFormat,
     public override val required: Boolean,
 ) : AnswerFormatInfo
 
@@ -18,12 +18,12 @@ public data class NewAnswerFormatInfo(
 @SerialName(value = "RegisteredAnswerVariantPartInfo")
 public data class RegisteredAnswerFormatInfo(
     public override val id: AnswerFormatInfoId,
-    public override val part: AnswerFormat,
+    public override val format: AnswerFormat,
     public override val required: Boolean,
 ) : AnswerFormatInfo, IRegisteredAnswerFormatInfo
 
-public fun AnswerFormatInfo.asNew(): NewAnswerFormatInfo = NewAnswerFormatInfo(part,
+public fun AnswerFormatInfo.asNew(): NewAnswerFormatInfo = NewAnswerFormatInfo(format,
     required)
 
 public fun AnswerFormatInfo.asRegistered(id: AnswerFormatInfoId):
-    RegisteredAnswerFormatInfo = RegisteredAnswerFormatInfo(id, part, required)
+    RegisteredAnswerFormatInfo = RegisteredAnswerFormatInfo(id, format, required)

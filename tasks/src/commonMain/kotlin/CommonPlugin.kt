@@ -118,7 +118,7 @@ object CommonPlugin : Plugin {
                 } ?: TaskDraft(
                     courseId = course.id,
                     descriptionMessages = emptyList(),
-                    taskPartsIds = emptyList(),
+                    newAnswersFormats = emptyList(),
                     assignmentDateTime = null,
                     deadLineDateTime = null
                 ).also {

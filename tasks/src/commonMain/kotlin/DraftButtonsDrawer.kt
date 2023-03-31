@@ -200,7 +200,7 @@ internal object DraftButtonsDrawer : Plugin {
             } ?: TaskDraft(
                 courseId = course.id,
                 descriptionMessages = emptyList(),
-                taskPartsIds = emptyList(),
+                newAnswersFormats = emptyList(),
                 assignmentDateTime = null,
                 deadLineDateTime = null
             ).also {
@@ -412,7 +412,7 @@ internal object DraftButtonsDrawer : Plugin {
                 ) ?: TaskDraft(
                     courseId = it.courseId,
                     descriptionMessages = emptyList(),
-                    taskPartsIds = emptyList(),
+                    newAnswersFormats = emptyList(),
                     assignmentDateTime = null,
                     deadLineDateTime = null
                 )

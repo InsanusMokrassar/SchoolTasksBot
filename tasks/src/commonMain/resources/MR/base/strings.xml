@@ -24,7 +24,13 @@
     <string name="setDraftDescriptionMessagesButtonText">Set new description</string>
 
     <string name="newAnswersFormatsText">Here your draft answers</string>
+    <string name="newAnswersFormatAddBtnText">Add asnswer format</string>
     <string name="answerFormatTitleFile">File</string>
     <string name="answerFormatTitleText">Text</string>
     <string name="answerFormatTitleLink">Link</string>
+
+    <string name="answerFormatFileChangeExtension">Change extension</string>
+
+    <string name="answerFormatTextUnsetRangeExtension">Unset limits</string>
+    <string name="answerFormatTextSetRangeExtension">Add limits</string>
 </resources>

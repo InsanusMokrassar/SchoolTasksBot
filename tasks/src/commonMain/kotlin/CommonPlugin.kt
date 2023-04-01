@@ -38,9 +38,15 @@ import org.koin.core.module.Module
 
 object CommonPlugin : Plugin {
     internal const val openDraftWithCourseIdBtnData = "tasks_draft_open"
+    private val newAnswerDrawer by lazy {
+        NewAnswerDrawer(DraftButtonsDrawer.changeAnswerFormatsButtonData, DraftButtonsDrawer.manageDraftButtonData)
+    }
 
     override fun Module.setupDI(database: Database, params: JsonObject) {
         with(DraftButtonsDrawer) {
+            setupDI(database, params)
+        }
+        with(newAnswerDrawer) {
             setupDI(database, params)
         }
         tasksDraftsRepoSingle {
@@ -87,6 +93,9 @@ object CommonPlugin : Plugin {
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {
         val me = koin.getOrNull<ExtendedBot>() ?: getMe()
         with(DraftButtonsDrawer) {
+            setupBotPlugin(koin)
+        }
+        with(newAnswerDrawer) {
             setupBotPlugin(koin)
         }
 

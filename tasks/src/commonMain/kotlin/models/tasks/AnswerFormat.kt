@@ -16,7 +16,7 @@ sealed interface AnswerFormat {
     @Serializable
     @SerialName("AnswerFormat.Link")
     data class Link(
-        val regexString: String
+        val regexString: String = ".*"
     ) : AnswerFormat {
         val regex: Regex by lazy {
             Regex(regexString)
@@ -26,7 +26,7 @@ sealed interface AnswerFormat {
     @Serializable
     @SerialName("AnswerFormat.File")
     data class File(
-        val extension: String,
+        val extension: String? = null,
         val useDescription: Boolean = false
     ): AnswerFormat
 }

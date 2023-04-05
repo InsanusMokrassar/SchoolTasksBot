@@ -4,6 +4,7 @@
     <string name="back">Back</string>
     <string name="link">Link</string>
     <string name="required">Required</string>
+    <string name="updated">Updated</string>
 
     <string name="messagesRegistrarDefaultSuggestSendMessage">Ok, send me your content message</string>
     <string name="messagesRegistrarDefaultDoneMessage">Finish</string>

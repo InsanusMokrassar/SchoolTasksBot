@@ -9,7 +9,9 @@ import center.sciprog.tasks_bot.tasks.models.tasks.NewAnswerFormatInfo
 import center.sciprog.tasks_bot.tasks.models.tasks.TaskDraft
 import center.sciprog.tasks_bot.teachers.repos.ReadTeachersRepo
 import center.sciprog.tasks_bot.users.repos.ReadUsersRepo
+import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.fsm.common.State
+import dev.inmo.micro_utils.koin.singleWithRandomQualifier
 import dev.inmo.micro_utils.language_codes.IetfLanguageCode
 import dev.inmo.micro_utils.pagination.Pagination
 import dev.inmo.micro_utils.pagination.SimplePagination
@@ -17,22 +19,41 @@ import dev.inmo.micro_utils.pagination.utils.paginate
 import dev.inmo.micro_utils.repos.set
 import dev.inmo.plagubot.Plugin
 import dev.inmo.tgbotapi.extensions.api.edit.edit
-import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
-import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
+import dev.inmo.tgbotapi.extensions.api.send.reply
+import dev.inmo.tgbotapi.extensions.api.send.send
+import dev.inmo.tgbotapi.extensions.behaviour_builder.*
+import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitCommandMessage
+import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitTextMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessageDataCallbackQuery
-import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
-import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
+import dev.inmo.tgbotapi.extensions.utils.extensions.sameChat
+import dev.inmo.tgbotapi.extensions.utils.types.buttons.*
+import dev.inmo.tgbotapi.extensions.utils.updates.hasNoCommands
 import dev.inmo.tgbotapi.extensions.utils.withContentOrThrow
 import dev.inmo.tgbotapi.types.MessageId
 import dev.inmo.tgbotapi.types.UserId
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardMarkup
+import dev.inmo.tgbotapi.utils.buildEntities
 import dev.inmo.tgbotapi.utils.row
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.modules.SerializersModule
+import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
+import org.koin.core.module.Module
 
 internal class NewAnswerDrawer(
     private val changeAnswersButtonData: String,
     private val backButtonData: String,
 ) : Plugin {
+    @Serializable
+    private data class OnChangeFileExtensionState(
+        override val context: UserId,
+        val i: Int,
+        val messageId: MessageId
+    ) : State
+
     fun newAnswerFormatSmallTitle(
         newAnswerFormatInfo: NewAnswerFormatInfo,
         ietfLanguageCode: IetfLanguageCode
@@ -88,9 +109,9 @@ internal class NewAnswerDrawer(
         }
     }
 
-    private suspend fun BehaviourContext.refreshAnswerInfoOnMessage(
+    private suspend fun BehaviourContext.putAnswerInfo(
         userId: UserId,
-        messageId: MessageId,
+        messageId: MessageId?,
         i: Int,
         draftInfoPack: DraftInfoPack
     ) {
@@ -98,52 +119,71 @@ internal class NewAnswerDrawer(
         val answerItem = draft.newAnswersFormats.getOrNull(i) ?: return
         val locale = draftInfoPack.ietfLanguageCode.locale
 
-        edit(
-            userId,
-            messageId,
-            replyMarkup = inlineKeyboard {
-                when (val format = answerItem.format) {
-                    is AnswerFormat.File -> {
+        val keyboard = inlineKeyboard {
+            when (val format = answerItem.format) {
+                is AnswerFormat.File -> {
+                    row {
+                        dataButton(
+                            tasks_resources.strings.answerFormatFileChangeExtension.localized(locale),
+                            "${newAnswerChangeIndexFileExtensionDataPrefix}$i"
+                        )
+                    }
+                }
+                is AnswerFormat.Link -> TODO()
+                is AnswerFormat.Text -> {
+                    row {
+                        format.lengthRange ?.also {
+                            dataButton(
+                                it.first.toString(),
+                                "${newAnswerChangeIndexTextMinLengthExtensionDataPrefix}$i"
+                            )
+                            dataButton(
+                                it.last.toString(),
+                                "${newAnswerChangeIndexTextMaxLengthExtensionDataPrefix}$i"
+                            )
+                        } ?: dataButton(
+                            tasks_resources.strings.answerFormatTextSetRangeExtension.localized(locale),
+                            "${newAnswerChangeIndexTextSetRangeExtensionDataPrefix}$i"
+                        )
+                    }
+                    format.lengthRange ?.let {
                         row {
                             dataButton(
-                                tasks_resources.strings.answerFormatFileChangeExtension.localized(locale),
-                                "${newAnswerChangeIndexFileExtensionDataPrefix}$i"
+                                tasks_resources.strings.answerFormatTextUnsetRangeExtension.localized(locale),
+                                "${newAnswerChangeIndexTextUnsetRangeExtensionDataPrefix}$i"
                             )
                         }
                     }
-                    is AnswerFormat.Link -> TODO()
-                    is AnswerFormat.Text -> {
-                        row {
-                            format.lengthRange ?.also {
-                                dataButton(
-                                    it.first.toString(),
-                                    "${newAnswerChangeIndexTextMinLengthExtensionDataPrefix}$i"
-                                )
-                                dataButton(
-                                    it.last.toString(),
-                                    "${newAnswerChangeIndexTextMaxLengthExtensionDataPrefix}$i"
-                                )
-                            } ?: dataButton(
-                                tasks_resources.strings.answerFormatTextSetRangeExtension.localized(locale),
-                                "${newAnswerChangeIndexTextSetRangeExtensionDataPrefix}$i"
-                            )
-                        }
-                        format.lengthRange ?.let {
-                            row {
-                                dataButton(
-                                    tasks_resources.strings.answerFormatTextUnsetRangeExtension.localized(locale),
-                                    "${newAnswerChangeIndexTextUnsetRangeExtensionDataPrefix}$i"
-                                )
-                            }
-                        }
-                    }
-                }
-                row {
-                    dataButton(common_resources.strings.back.localized(locale), newAnswersOpenAnswersList)
                 }
             }
-        ) {
+            row {
+                dataButton(common_resources.strings.back.localized(locale), newAnswersOpenAnswersList)
+            }
+        }
+        val entities = buildEntities {
             +newAnswerFormatSmallTitle(answerItem, draftInfoPack.ietfLanguageCode)
+        }
+
+        messageId ?.let {
+            edit(
+                userId,
+                messageId,
+                entities = entities,
+                replyMarkup = keyboard
+            )
+        } ?: send(
+            userId,
+            entities = entities,
+            replyMarkup = keyboard
+        )
+    }
+
+    override fun Module.setupDI(database: Database, params: JsonObject) {
+        singleWithRandomQualifier {
+            SerializersModule {
+                polymorphic(State::class, OnChangeFileExtensionState::class, OnChangeFileExtensionState.serializer())
+                polymorphic(Any::class, OnChangeFileExtensionState::class, OnChangeFileExtensionState.serializer())
+            }
         }
     }
 
@@ -188,7 +228,7 @@ internal class NewAnswerDrawer(
                 draftsRepo
             ) ?: return@onMessageDataCallbackQuery
 
-            refreshAnswerInfoOnMessage(
+            putAnswerInfo(
                 it.user.id,
                 it.message.messageId,
                 i,
@@ -235,7 +275,7 @@ internal class NewAnswerDrawer(
                 val newDraftInfoPack = draftInfoPack.copy(
                     draft = newDraftInfo
                 )
-                refreshAnswerInfoOnMessage(
+                putAnswerInfo(
                     it.user.id,
                     it.message.messageId,
                     newDraftInfoPack.draft ?.newAnswersFormats ?.lastIndex ?: return@onMessageDataCallbackQuery,
@@ -255,6 +295,120 @@ internal class NewAnswerDrawer(
                         }
                     }
                 )
+            }
+        }
+
+        strictlyOn { state: OnChangeFileExtensionState ->
+            val draftInfoPack = DraftInfoPack(
+                state.context,
+                languagesRepo,
+                usersRepo,
+                teachersRepo,
+                draftsRepo
+            ) ?: return@strictlyOn null
+
+            val format = draftInfoPack.draft ?.newAnswersFormats ?.getOrNull(state.i) ?.format as? AnswerFormat.File ?: return@strictlyOn null
+
+            runCatchingSafely {
+                send(
+                    state.context,
+                    replyMarkup = flatReplyKeyboard(
+                        oneTimeKeyboard = true,
+                        resizeKeyboard = true
+                    ) {
+                        simpleButton("pdf")
+                        simpleButton("txt")
+                        simpleButton("docx")
+                    }
+                ) {
+                    +tasks_resources.strings.answerFormatFileCurrentExtensionTemplate.localized(draftInfoPack.ietfLanguageCode.locale).format(format.extension ?: "*")
+                }
+            }
+
+            oneOf(
+                parallel {
+                    waitCommandMessage("cancel").filter {
+                        it.sameChat(state.context)
+                    }.first()
+
+                    val freshDraftInfoPack = DraftInfoPack(
+                        state.context,
+                        languagesRepo,
+                        usersRepo,
+                        teachersRepo,
+                        draftsRepo
+                    ) ?: return@parallel
+
+                    putAnswerInfo(
+                        state.context,
+                        state.messageId,
+                        state.i,
+                        freshDraftInfoPack
+                    )
+                },
+                parallel {
+                    val newExtension = waitTextMessage().filter { it.sameChat(state.context) && it.hasNoCommands() }.first {
+                        val content = it.content.text.split(Regex("\\s"))
+
+                        if (content.size == 1 && content.first().isNotBlank()) {
+                            true
+                        } else {
+                            reply(it) {
+                                +tasks_resources.strings.answerFormatFileCurrentWrongNewExtension.localized(draftInfoPack.ietfLanguageCode.locale)
+                            }
+                            false
+                        }
+                    }.content.text
+
+                    val freshDraftInfoPack = DraftInfoPack(
+                        state.context,
+                        languagesRepo,
+                        usersRepo,
+                        teachersRepo,
+                        draftsRepo
+                    ) ?: return@parallel
+                    val draft = freshDraftInfoPack.draft ?: return@parallel
+                    val newDraft = freshDraftInfoPack.draft.copy(
+                        newAnswersFormats = draft.newAnswersFormats.let {
+                            it.toMutableList().apply {
+                                val old = get(state.i)
+                                set(state.i, old.copy(format = AnswerFormat.File(newExtension)))
+                            }.toList()
+                        }
+                    )
+
+                    draftsRepo.set(
+                        freshDraftInfoPack.teacher.id,
+                        newDraft
+                    )
+
+                    putAnswerInfo(
+                        state.context,
+                        null,
+                        state.i,
+                        freshDraftInfoPack.copy(
+                            draft = newDraft
+                        )
+                    )
+                }
+            )
+
+            null
+        }
+
+        onMessageDataCallbackQuery(Regex("${newAnswerChangeIndexFileExtensionDataPrefix}\\d+")) {
+            val i = it.data.removePrefix(newAnswerChangeIndexFileExtensionDataPrefix).toIntOrNull() ?: return@onMessageDataCallbackQuery
+
+            val draftInfoPack = DraftInfoPack(
+                it.user.id,
+                languagesRepo,
+                usersRepo,
+                teachersRepo,
+                draftsRepo
+            ) ?: return@onMessageDataCallbackQuery
+
+            if (draftInfoPack.draft ?.newAnswersFormats ?.getOrNull(i) ?.format is AnswerFormat.File) {
+                startChain(OnChangeFileExtensionState(it.user.id, i, it.message.messageId))
             }
         }
     }

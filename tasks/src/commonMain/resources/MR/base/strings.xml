@@ -33,4 +33,7 @@
 
     <string name="answerFormatTextUnsetRangeExtension">Unset limits</string>
     <string name="answerFormatTextSetRangeExtension">Add limits</string>
+
+    <string name="answerFormatFileCurrentExtensionTemplate">You are editing file extension. Current file extension: %s.\n\nSend me any message with one word, it will be used as new extension\n\nOr send me /cancel to cancel current action</string>
+    <string name="answerFormatFileCurrentWrongNewExtension">Please, send me one word with file extension</string>
 </resources>

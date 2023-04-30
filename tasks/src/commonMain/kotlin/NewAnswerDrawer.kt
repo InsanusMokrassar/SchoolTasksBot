@@ -9,12 +9,14 @@ import center.sciprog.tasks_bot.tasks.models.tasks.NewAnswerFormatInfo
 import center.sciprog.tasks_bot.tasks.models.tasks.TaskDraft
 import center.sciprog.tasks_bot.teachers.repos.ReadTeachersRepo
 import center.sciprog.tasks_bot.users.repos.ReadUsersRepo
+import com.benasher44.uuid.uuid4
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
 import dev.inmo.micro_utils.language_codes.IetfLanguageCode
 import dev.inmo.micro_utils.pagination.Pagination
 import dev.inmo.micro_utils.pagination.SimplePagination
+import dev.inmo.micro_utils.pagination.firstIndex
 import dev.inmo.micro_utils.pagination.utils.paginate
 import dev.inmo.micro_utils.repos.set
 import dev.inmo.plagubot.Plugin
@@ -24,9 +26,11 @@ import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.*
 import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitCommandMessage
+import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitMessageDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitTextMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessageDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameChat
+import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.*
 import dev.inmo.tgbotapi.extensions.utils.updates.hasNoCommands
 import dev.inmo.tgbotapi.extensions.utils.withContentOrThrow
@@ -110,7 +114,8 @@ internal class NewAnswerDrawer(
             resultPagination.results.withIndex().chunked(2).forEach {
                 row {
                     it.forEach { (i, it) ->
-                        dataButton(newAnswerFormatSmallTitle(it, ietfLanguageCode), "${newAnswerOpenIndexAnswerDataPrefix}$i")
+                        val index = resultPagination.firstIndex + i
+                        dataButton(newAnswerFormatSmallTitle(it, ietfLanguageCode), "${newAnswerOpenIndexAnswerDataPrefix}$index")
                     }
                 }
             }
@@ -168,6 +173,9 @@ internal class NewAnswerDrawer(
             row {
                 dataButton(common_resources.strings.back.localized(locale), newAnswersOpenAnswersList)
             }
+            row {
+                dataButton(common_resources.strings.delete.localized(locale), "${newAnswerDeleteIndexDataPrefix}$i")
+            }
         }
         val entities = buildEntities {
             +newAnswerFormatSmallTitle(answerItem, draftInfoPack.ietfLanguageCode)
@@ -204,6 +212,28 @@ internal class NewAnswerDrawer(
         }
     }
 
+    private suspend fun BehaviourContextWithFSM<State>.updateMessageWithAnswerFormats(
+        userId: UserId,
+        messageId: MessageId,
+        page: Int,
+        draftInfoPack: DraftInfoPack
+    ) {
+        val draft = draftInfoPack.draft ?: return
+        val pagination = SimplePagination(page, 6)
+
+        edit(
+            userId,
+            messageId,
+            replyMarkup = createAnswersFormatKeyboardByPage(
+                draftInfoPack.ietfLanguageCode,
+                draft,
+                pagination
+            )
+        ) {
+            +tasks_resources.strings.newAnswersFormatsText.localized(draftInfoPack.ietfLanguageCode.locale)
+        }
+    }
+
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {
         val languagesRepo = koin.languagesRepo
         val usersRepo = koin.get<ReadUsersRepo>()
@@ -211,27 +241,18 @@ internal class NewAnswerDrawer(
         val draftsRepo = koin.tasksDraftsRepo
 
         onMessageDataCallbackQuery(Regex("(${newAnswersOpenAnswersList}\\d*)|($changeAnswersButtonData)")) {
-            val draftInfoPack = DraftInfoPack(
+            updateMessageWithAnswerFormats(
                 it.user.id,
-                languagesRepo,
-                usersRepo,
-                teachersRepo,
-                draftsRepo
-            ) ?: return@onMessageDataCallbackQuery
-            val draft = draftInfoPack.draft ?: return@onMessageDataCallbackQuery
-            val page = it.data.removePrefix(newAnswersOpenAnswersList).toIntOrNull() ?: 0
-            val pagination = SimplePagination(page, 6)
-
-            edit(
-                it.message.withContentOrThrow(),
-                replyMarkup = createAnswersFormatKeyboardByPage(
-                    draftInfoPack.ietfLanguageCode,
-                    draft,
-                    pagination
-                )
-            ) {
-                +tasks_resources.strings.newAnswersFormatsText.localized(draftInfoPack.ietfLanguageCode.locale)
-            }
+                it.message.messageId,
+                it.data.removePrefix(newAnswersOpenAnswersList).toIntOrNull() ?: 0,
+                DraftInfoPack(
+                    it.user.id,
+                    languagesRepo,
+                    usersRepo,
+                    teachersRepo,
+                    draftsRepo
+                ) ?: return@onMessageDataCallbackQuery
+            )
         }
 
         onMessageDataCallbackQuery(Regex("${newAnswerOpenIndexAnswerDataPrefix}\\d+")) {
@@ -697,6 +718,82 @@ internal class NewAnswerDrawer(
                 startChain(OnChangeTextLimitsState(it.user.id, i, it.message.messageId, changeMax = false))
             }
         }
+
+        onMessageDataCallbackQuery(Regex("${newAnswerDeleteIndexDataPrefix}\\d+")) {
+            val i = it.data.removePrefix(newAnswerDeleteIndexDataPrefix).toIntOrNull() ?: return@onMessageDataCallbackQuery
+
+            val draftInfoPack = DraftInfoPack(
+                it.user.id,
+                languagesRepo,
+                usersRepo,
+                teachersRepo,
+                draftsRepo
+            ) ?: return@onMessageDataCallbackQuery
+
+            val answerPart = draftInfoPack.draft ?.newAnswersFormats ?.get(i)
+
+            if (answerPart != null) {
+                val deleteButtonInfo = "delete"
+                val cancelButtonInfo = "cancel"
+                val edited = edit(
+                    it.message.withContentOrThrow(),
+                    replyMarkup = flatInlineKeyboard {
+                        dataButton(common_resources.strings.yes.localized(draftInfoPack.ietfLanguageCode.locale), deleteButtonInfo)
+                        dataButton(common_resources.strings.cancel.localized(draftInfoPack.ietfLanguageCode.locale), cancelButtonInfo)
+                    }
+                ) {
+                    +tasks_resources.strings.answerFormatDeleteSureTemplate.localized(draftInfoPack.ietfLanguageCode.locale).format(
+                        i + 1,
+                        newAnswerFormatSmallTitle(answerPart, draftInfoPack.ietfLanguageCode)
+                    )
+                }
+
+                val pushedButton = waitMessageDataCallbackQuery().filter { it.message.sameMessage(edited) }.first()
+                if (pushedButton.data == deleteButtonInfo) {
+                    val freshDraftInfoPack = DraftInfoPack(
+                        pushedButton.user.id,
+                        languagesRepo,
+                        usersRepo,
+                        teachersRepo,
+                        draftsRepo
+                    ) ?: return@onMessageDataCallbackQuery
+
+                    val newDraft = freshDraftInfoPack.draft ?.copy(
+                        newAnswersFormats = draftInfoPack.draft.newAnswersFormats - answerPart
+                    ) ?: return@onMessageDataCallbackQuery
+
+                    draftsRepo.set(
+                        freshDraftInfoPack.teacher.id,
+                        newDraft
+                    )
+
+                    updateMessageWithAnswerFormats(
+                        it.user.id,
+                        it.message.messageId,
+                        0,
+                        freshDraftInfoPack.copy(
+                            draft = newDraft
+                        )
+                    )
+
+                    return@onMessageDataCallbackQuery
+                }
+            }
+
+            updateMessageWithAnswerFormats(
+                it.user.id,
+                it.message.messageId,
+                0,
+                DraftInfoPack(
+                    it.user.id,
+                    languagesRepo,
+                    usersRepo,
+                    teachersRepo,
+                    draftsRepo
+                ) ?: return@onMessageDataCallbackQuery
+            )
+        }
+
     }
 
     companion object {
@@ -709,6 +806,7 @@ internal class NewAnswerDrawer(
         private const val newAnswerChangeIndexTextUnsetRangeExtensionDataPrefix = "nacitmxluredp_"
         private const val newAnswerChangeIndexTextSetRangeExtensionDataPrefix = "nacitmxlsredp_"
         private const val newAnswerChangeIndexLinkSetSiteExtensionDataPrefix = "nacilssredp_"
+        private const val newAnswerDeleteIndexDataPrefix = "nadidp_"
 
         private const val textAnswerFormatDataInfo = "text"
         private const val fileAnswerFormatDataInfo = "file"

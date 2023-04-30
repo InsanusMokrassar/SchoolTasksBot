@@ -45,4 +45,6 @@
     <string name="answerFormatTextCurrentMinTemplate">You are editing minimal size of text. Current minimal size of text: %d.\n\nAvailable values: %d - %d\n\nSend me any message with the number, it will be used as new maximum\n\nOr send me /cancel to cancel current action</string>
     <string name="answerFormatTextLengthLimitsErrorTemplate">You have passed wrong size. It must be number in range from %d to %d</string>
 
+    <string name="answerFormatDeleteSureTemplate">Are you sure you want to delete answer with number %d and format %s?</string>
+
 </resources>

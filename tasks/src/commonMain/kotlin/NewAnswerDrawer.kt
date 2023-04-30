@@ -18,6 +18,7 @@ import dev.inmo.micro_utils.pagination.SimplePagination
 import dev.inmo.micro_utils.pagination.utils.paginate
 import dev.inmo.micro_utils.repos.set
 import dev.inmo.plagubot.Plugin
+import dev.inmo.tgbotapi.extensions.api.delete
 import dev.inmo.tgbotapi.extensions.api.edit.edit
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.send
@@ -42,6 +43,7 @@ import kotlinx.serialization.modules.SerializersModule
 import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
 import org.koin.core.module.Module
+import kotlin.math.ceil
 
 internal class NewAnswerDrawer(
     private val changeAnswersButtonData: String,
@@ -52,6 +54,19 @@ internal class NewAnswerDrawer(
         override val context: UserId,
         val i: Int,
         val messageId: MessageId
+    ) : State
+    @Serializable
+    private data class OnChangeLinkRegexState(
+        override val context: UserId,
+        val i: Int,
+        val messageId: MessageId
+    ) : State
+    @Serializable
+    private data class OnChangeTextLimitsState(
+        override val context: UserId,
+        val i: Int,
+        val messageId: MessageId,
+        val changeMax: Boolean
     ) : State
 
     fun newAnswerFormatSmallTitle(
@@ -129,30 +144,24 @@ internal class NewAnswerDrawer(
                         )
                     }
                 }
-                is AnswerFormat.Link -> TODO()
-                is AnswerFormat.Text -> {
+                is AnswerFormat.Link -> {
                     row {
-                        format.lengthRange ?.also {
-                            dataButton(
-                                it.first.toString(),
-                                "${newAnswerChangeIndexTextMinLengthExtensionDataPrefix}$i"
-                            )
-                            dataButton(
-                                it.last.toString(),
-                                "${newAnswerChangeIndexTextMaxLengthExtensionDataPrefix}$i"
-                            )
-                        } ?: dataButton(
-                            tasks_resources.strings.answerFormatTextSetRangeExtension.localized(locale),
-                            "${newAnswerChangeIndexTextSetRangeExtensionDataPrefix}$i"
+                        dataButton(
+                            tasks_resources.strings.answerFormatLinkSetSiteExtension.localized(locale),
+                            "${newAnswerChangeIndexLinkSetSiteExtensionDataPrefix}$i"
                         )
                     }
-                    format.lengthRange ?.let {
-                        row {
-                            dataButton(
-                                tasks_resources.strings.answerFormatTextUnsetRangeExtension.localized(locale),
-                                "${newAnswerChangeIndexTextUnsetRangeExtensionDataPrefix}$i"
-                            )
-                        }
+                }
+                is AnswerFormat.Text -> {
+                    row {
+                        dataButton(
+                            format.lengthRange.first.toString(),
+                            "${newAnswerChangeIndexTextMinLengthExtensionDataPrefix}$i"
+                        )
+                        dataButton(
+                            format.lengthRange.last.toString(),
+                            "${newAnswerChangeIndexTextMaxLengthExtensionDataPrefix}$i"
+                        )
                     }
                 }
             }
@@ -165,12 +174,14 @@ internal class NewAnswerDrawer(
         }
 
         messageId ?.let {
-            edit(
-                userId,
-                messageId,
-                entities = entities,
-                replyMarkup = keyboard
-            )
+            runCatchingSafely {
+                edit(
+                    userId,
+                    messageId,
+                    entities = entities,
+                    replyMarkup = keyboard
+                )
+            }
         } ?: send(
             userId,
             entities = entities,
@@ -183,6 +194,12 @@ internal class NewAnswerDrawer(
             SerializersModule {
                 polymorphic(State::class, OnChangeFileExtensionState::class, OnChangeFileExtensionState.serializer())
                 polymorphic(Any::class, OnChangeFileExtensionState::class, OnChangeFileExtensionState.serializer())
+
+                polymorphic(State::class, OnChangeLinkRegexState::class, OnChangeLinkRegexState.serializer())
+                polymorphic(Any::class, OnChangeLinkRegexState::class, OnChangeLinkRegexState.serializer())
+
+                polymorphic(State::class, OnChangeTextLimitsState::class, OnChangeTextLimitsState.serializer())
+                polymorphic(Any::class, OnChangeTextLimitsState::class, OnChangeTextLimitsState.serializer())
             }
         }
     }
@@ -309,7 +326,7 @@ internal class NewAnswerDrawer(
 
             val format = draftInfoPack.draft ?.newAnswersFormats ?.getOrNull(state.i) ?.format as? AnswerFormat.File ?: return@strictlyOn null
 
-            runCatchingSafely {
+            val sentMessage = runCatchingSafely {
                 send(
                     state.context,
                     replyMarkup = flatReplyKeyboard(
@@ -393,6 +410,227 @@ internal class NewAnswerDrawer(
                 }
             )
 
+            runCatchingSafely { sentMessage.getOrNull() ?.let { delete(it) } }
+            null
+        }
+
+        strictlyOn { state: OnChangeLinkRegexState ->
+            val draftInfoPack = DraftInfoPack(
+                state.context,
+                languagesRepo,
+                usersRepo,
+                teachersRepo,
+                draftsRepo
+            ) ?: return@strictlyOn null
+
+            val format = draftInfoPack.draft ?.newAnswersFormats ?.getOrNull(state.i) ?.format as? AnswerFormat.Link ?: return@strictlyOn null
+
+            val sentMessage = runCatchingSafely {
+                send(
+                    state.context,
+                ) {
+                    +tasks_resources.strings.answerFormatLinkCurrentRegexTemplate.localized(draftInfoPack.ietfLanguageCode.locale).format(format.regexString)
+                }
+            }
+
+            oneOf(
+                parallel {
+                    waitCommandMessage("cancel").filter {
+                        it.sameChat(state.context)
+                    }.first()
+
+                    val freshDraftInfoPack = DraftInfoPack(
+                        state.context,
+                        languagesRepo,
+                        usersRepo,
+                        teachersRepo,
+                        draftsRepo
+                    ) ?: return@parallel
+
+                    putAnswerInfo(
+                        state.context,
+                        state.messageId,
+                        state.i,
+                        freshDraftInfoPack
+                    )
+                },
+                parallel {
+                    val newUrlRegex = waitTextMessage().filter { it.sameChat(state.context) && it.hasNoCommands() }.first {
+                        val content = it.content.text.split(Regex("\\s"))
+
+                        if (content.size == 1 && content.first().isNotBlank()) {
+                            true
+                        } else {
+                            reply(it) {
+                                +tasks_resources.strings.answerFormatLinkCurrentWrongNewExtension.localized(draftInfoPack.ietfLanguageCode.locale)
+                            }
+                            false
+                        }
+                    }.content.text
+
+                    val freshDraftInfoPack = DraftInfoPack(
+                        state.context,
+                        languagesRepo,
+                        usersRepo,
+                        teachersRepo,
+                        draftsRepo
+                    ) ?: return@parallel
+                    val draft = freshDraftInfoPack.draft ?: return@parallel
+                    val newDraft = freshDraftInfoPack.draft.copy(
+                        newAnswersFormats = draft.newAnswersFormats.let {
+                            it.toMutableList().apply {
+                                val old = get(state.i)
+                                set(state.i, old.copy(format = AnswerFormat.Link("$newUrlRegex.*")))
+                            }.toList()
+                        }
+                    )
+
+                    draftsRepo.set(
+                        freshDraftInfoPack.teacher.id,
+                        newDraft
+                    )
+
+                    putAnswerInfo(
+                        state.context,
+                        null,
+                        state.i,
+                        freshDraftInfoPack.copy(
+                            draft = newDraft
+                        )
+                    )
+                }
+            )
+
+            runCatchingSafely { sentMessage.getOrNull() ?.let { delete(it) } }
+            null
+        }
+
+        strictlyOn { state: OnChangeTextLimitsState ->
+            val draftInfoPack = DraftInfoPack(
+                state.context,
+                languagesRepo,
+                usersRepo,
+                teachersRepo,
+                draftsRepo
+            ) ?: return@strictlyOn null
+
+            val format = draftInfoPack.draft ?.newAnswersFormats ?.getOrNull(state.i) ?.format as? AnswerFormat.Text ?: return@strictlyOn null
+
+            val limits = if (state.changeMax) {
+                (format.lengthRange.first + 1) .. AnswerFormat.Text.limits.last
+            } else {
+                AnswerFormat.Text.limits.first until format.lengthRange.last
+            }
+
+            val sentMessage = runCatchingSafely {
+                send(
+                    state.context,
+                    replyMarkup = replyKeyboard(
+                        resizeKeyboard = true,
+                        oneTimeKeyboard = true
+                    ) {
+                        val buttons = (
+                            (limits.first .. limits.last) step ceil((limits.last - limits.first).toFloat() / 4).coerceAtLeast(1f).toInt()
+                        ).distinct()
+                        row {
+                            buttons.forEach {
+                                simpleButton(it.toString())
+                            }
+                        }
+                    }
+                ) {
+                    if (state.changeMax) {
+                        +tasks_resources.strings.answerFormatTextCurrentMaxTemplate.localized(draftInfoPack.ietfLanguageCode.locale).format(format.lengthRange.last, limits.first, limits.last)
+                    } else {
+                        +tasks_resources.strings.answerFormatTextCurrentMinTemplate.localized(draftInfoPack.ietfLanguageCode.locale).format(format.lengthRange.first, limits.first, limits.last)
+                    }
+                }
+            }
+
+            oneOf(
+                parallel {
+                    waitCommandMessage("cancel").filter {
+                        it.sameChat(state.context)
+                    }.first()
+
+                    val freshDraftInfoPack = DraftInfoPack(
+                        state.context,
+                        languagesRepo,
+                        usersRepo,
+                        teachersRepo,
+                        draftsRepo
+                    ) ?: return@parallel
+
+                    putAnswerInfo(
+                        state.context,
+                        state.messageId,
+                        state.i,
+                        freshDraftInfoPack
+                    )
+                },
+                parallel {
+                    val newLimit = waitTextMessage().filter { it.sameChat(state.context) && it.hasNoCommands() }.first {
+                        val content = it.content.text.split(Regex("\\s"))
+
+                        if (content.size == 1 && content.first().isNotBlank() && content.first().toIntOrNull() in limits) {
+                            true
+                        } else {
+                            reply(it) {
+                                +tasks_resources.strings.answerFormatTextLengthLimitsErrorTemplate.localized(draftInfoPack.ietfLanguageCode.locale).format(
+                                    limits.first, limits.last
+                                )
+                            }
+                            false
+                        }
+                    }.content.text
+                    val newLimitInt = newLimit.toInt()
+
+                    val freshDraftInfoPack = DraftInfoPack(
+                        state.context,
+                        languagesRepo,
+                        usersRepo,
+                        teachersRepo,
+                        draftsRepo
+                    ) ?: return@parallel
+                    val draft = freshDraftInfoPack.draft ?: return@parallel
+                    val newDraft = freshDraftInfoPack.draft.copy(
+                        newAnswersFormats = draft.newAnswersFormats.let {
+                            it.toMutableList().apply {
+                                val old = get(state.i)
+                                val oldTextFormat = (old.format as? AnswerFormat.Text) ?: return@parallel
+                                set(
+                                    state.i,
+                                    old.copy(
+                                        format = oldTextFormat.copy(
+                                            lengthRange = if (state.changeMax) {
+                                                oldTextFormat.lengthRange.first .. newLimitInt
+                                            } else {
+                                                newLimitInt .. oldTextFormat.lengthRange.last
+                                            }
+                                        )
+                                    )
+                                )
+                            }.toList()
+                        }
+                    )
+
+                    draftsRepo.set(
+                        freshDraftInfoPack.teacher.id,
+                        newDraft
+                    )
+
+                    putAnswerInfo(
+                        state.context,
+                        null,
+                        state.i,
+                        freshDraftInfoPack.copy(
+                            draft = newDraft
+                        )
+                    )
+                }
+            )
+
+            runCatchingSafely { sentMessage.getOrNull() ?.let { delete(it) } }
             null
         }
 
@@ -411,6 +649,54 @@ internal class NewAnswerDrawer(
                 startChain(OnChangeFileExtensionState(it.user.id, i, it.message.messageId))
             }
         }
+
+        onMessageDataCallbackQuery(Regex("${newAnswerChangeIndexLinkSetSiteExtensionDataPrefix}\\d+")) {
+            val i = it.data.removePrefix(newAnswerChangeIndexLinkSetSiteExtensionDataPrefix).toIntOrNull() ?: return@onMessageDataCallbackQuery
+
+            val draftInfoPack = DraftInfoPack(
+                it.user.id,
+                languagesRepo,
+                usersRepo,
+                teachersRepo,
+                draftsRepo
+            ) ?: return@onMessageDataCallbackQuery
+
+            if (draftInfoPack.draft ?.newAnswersFormats ?.getOrNull(i) ?.format is AnswerFormat.Link) {
+                startChain(OnChangeLinkRegexState(it.user.id, i, it.message.messageId))
+            }
+        }
+
+        onMessageDataCallbackQuery(Regex("${newAnswerChangeIndexTextMaxLengthExtensionDataPrefix}\\d+")) {
+            val i = it.data.removePrefix(newAnswerChangeIndexTextMaxLengthExtensionDataPrefix).toIntOrNull() ?: return@onMessageDataCallbackQuery
+
+            val draftInfoPack = DraftInfoPack(
+                it.user.id,
+                languagesRepo,
+                usersRepo,
+                teachersRepo,
+                draftsRepo
+            ) ?: return@onMessageDataCallbackQuery
+
+            if (draftInfoPack.draft ?.newAnswersFormats ?.getOrNull(i) ?.format is AnswerFormat.Text) {
+                startChain(OnChangeTextLimitsState(it.user.id, i, it.message.messageId, changeMax = true))
+            }
+        }
+
+        onMessageDataCallbackQuery(Regex("${newAnswerChangeIndexTextMinLengthExtensionDataPrefix}\\d+")) {
+            val i = it.data.removePrefix(newAnswerChangeIndexTextMinLengthExtensionDataPrefix).toIntOrNull() ?: return@onMessageDataCallbackQuery
+
+            val draftInfoPack = DraftInfoPack(
+                it.user.id,
+                languagesRepo,
+                usersRepo,
+                teachersRepo,
+                draftsRepo
+            ) ?: return@onMessageDataCallbackQuery
+
+            if (draftInfoPack.draft ?.newAnswersFormats ?.getOrNull(i) ?.format is AnswerFormat.Text) {
+                startChain(OnChangeTextLimitsState(it.user.id, i, it.message.messageId, changeMax = false))
+            }
+        }
     }
 
     companion object {
@@ -422,6 +708,7 @@ internal class NewAnswerDrawer(
         private const val newAnswerChangeIndexTextMaxLengthExtensionDataPrefix = "nacitmxledp_"
         private const val newAnswerChangeIndexTextUnsetRangeExtensionDataPrefix = "nacitmxluredp_"
         private const val newAnswerChangeIndexTextSetRangeExtensionDataPrefix = "nacitmxlsredp_"
+        private const val newAnswerChangeIndexLinkSetSiteExtensionDataPrefix = "nacilssredp_"
 
         private const val textAnswerFormatDataInfo = "text"
         private const val fileAnswerFormatDataInfo = "file"

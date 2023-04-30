@@ -1,6 +1,8 @@
 package center.sciprog.tasks_bot.tasks.models.tasks
 
 import center.sciprog.tasks_bot.common.utils.ClosedRangeSerializer
+import dev.inmo.tgbotapi.types.messageField
+import dev.inmo.tgbotapi.types.textLength
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -10,8 +12,12 @@ sealed interface AnswerFormat {
     @SerialName("AnswerFormat.Text")
     data class Text(
         @Serializable(ClosedRangeSerializer.Companion.Integer::class)
-        val lengthRange: IntRange? = null
-    ) : AnswerFormat
+        val lengthRange: IntRange = limits
+    ) : AnswerFormat {
+        companion object {
+            val limits = textLength
+        }
+    }
 
     @Serializable
     @SerialName("AnswerFormat.Link")

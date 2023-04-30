@@ -36,4 +36,13 @@
 
     <string name="answerFormatFileCurrentExtensionTemplate">You are editing file extension. Current file extension: %s.\n\nSend me any message with one word, it will be used as new extension\n\nOr send me /cancel to cancel current action</string>
     <string name="answerFormatFileCurrentWrongNewExtension">Please, send me one word with file extension</string>
+
+    <string name="answerFormatLinkCurrentRegexTemplate">You are editing url link. Current url extension: %s.\n\nSend me any message with url, it will be used as new site url\n\nOr send me /cancel to cancel current action</string>
+    <string name="answerFormatLinkCurrentWrongNewExtension">Please, send me one word with url beginning</string>
+    <string name="answerFormatLinkSetSiteExtension">Change url template</string>
+
+    <string name="answerFormatTextCurrentMaxTemplate">You are editing maximal size of text. Current maximal size of text: %d.\n\nAvailable values: %d - %d\n\nSend me any message with the number, it will be used as new maximum\n\nOr send me /cancel to cancel current action</string>
+    <string name="answerFormatTextCurrentMinTemplate">You are editing minimal size of text. Current minimal size of text: %d.\n\nAvailable values: %d - %d\n\nSend me any message with the number, it will be used as new maximum\n\nOr send me /cancel to cancel current action</string>
+    <string name="answerFormatTextLengthLimitsErrorTemplate">You have passed wrong size. It must be number in range from %d to %d</string>
+
 </resources>

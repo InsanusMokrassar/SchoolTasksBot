@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-    <string name="createDraftWithId">Open or create task draft</string>
-    <string name="courseNamePrefix">Course name: </string>
-    <string name="descriptionPrefix">Task: </string>
-    <string name="assignmentDatePrefix">Assignment: </string>
-    <string name="deadlineDatePrefix">Deadline: </string>
+    <string name="createDraftWithId">Открыть или создать проект задания</string>
+    <string name="courseNamePrefix">Название курса: </string>
+    <string name="descriptionPrefix">Задание: </string>
+    <string name="assignmentDatePrefix">Задание: </string>
+    <string name="deadlineDatePrefix">Время сдачи: </string>
     <string name="courseChangeBtnTitle">Change course</string>
-    <string name="descriptionChangeBtnTitle">Change description</string>
-    <string name="answersFormatsChangeBtnTitle">Change answer formats</string>
-    <string name="assignmentDateChangeBtnTitle">Change assignment date</string>
-    <string name="deadlineDateChangeBtnTitle">Change answers deadline</string>
-    <string name="tasksListTitle">Tasks:</string>
+    <string name="descriptionChangeBtnTitle">Изменить описание</string>
+    <string name="answersFormatsChangeBtnTitle">Изменить формат ответа</string>
+    <string name="assignmentDateChangeBtnTitle">Изменить дату задания</string>
+    <string name="deadlineDateChangeBtnTitle">Изменить дедлайн ответа</string>
+    <string name="tasksListTitle">Задания:</string>
     <string name="taskAnswerVariantListItemTemplate">• %s</string>
-    <string name="taskAnswerVariantTextTemplate">Text message, length: %s</string>
-    <string name="taskAnswerVariantTextSymbolsTemplate">%d-%d symbols</string>
-    <string name="taskAnswerParameterNotSpecified">Not specified</string>
-    <string name="dateTimeFormat">dd.MM.yyyy, HH:mm</string>
+    <string name="taskAnswerVariantTextTemplate">Текстовое сообщение, длина: %s</string>
+    <string name="taskAnswerVariantTextSymbolsTemplate">%d-%d символы</string>
+    <string name="taskAnswerParameterNotSpecified">Не указано</string>
+    <string name="dateTimeFormat">дд.ММ.гггг, ЧЧ:мм</string>
 
-    <string name="descriptionMessageSendingOfferPrefix">Ok, send me your message or use the button below to finish your description</string>
+    <string name="descriptionMessageSendingOfferPrefix">Отправьте сообщение или используйте кнопку ниже, чтобы закончить описание</string>
 
-    <string name="newDescriptionHasBeenSavedMessageText">Your description has been saved. You may edit these messages and those editions will be available</string>
-    <string name="getDraftDescriptionMessagesButtonText">Show description</string>
-    <string name="setDraftDescriptionMessagesButtonText">Set new description</string>
+    <string name="newDescriptionHasBeenSavedMessageText">Описание было сохранено. Вы можете отредактировать сообщения, и эти изменения будут доступны</string>
+    <string name="getDraftDescriptionMessagesButtonText">Показать описание</string>
+    <string name="setDraftDescriptionMessagesButtonText">Изменить описание</string>
 </resources>

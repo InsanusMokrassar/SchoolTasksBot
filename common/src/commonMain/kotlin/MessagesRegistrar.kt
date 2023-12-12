@@ -1,10 +1,12 @@
 package center.sciprog.tasks_bot.common
 
+import center.sciprog.tasks_bot.common.strings.CommonStrings
 import center.sciprog.tasks_bot.common.utils.StringQualifierSerializer
 import center.sciprog.tasks_bot.common.utils.getChatLanguage
 import center.sciprog.tasks_bot.common.utils.locale
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.fsm.common.State
+import dev.inmo.micro_utils.strings.translation
 import dev.inmo.tgbotapi.extensions.api.delete
 import dev.inmo.tgbotapi.extensions.api.edit.edit
 import dev.inmo.tgbotapi.extensions.api.send.reply
@@ -99,14 +101,14 @@ object MessagesRegistrar {
 
                 val sent = send(
                     state.context,
-                    state.suggestionMessage ?: common_resources.strings.messagesRegistrarDefaultSuggestSendMessage.localized(locale),
+                    state.suggestionMessage ?: CommonStrings.messagesRegistrarDefaultSuggestSendMessage.translation(locale),
                     replyMarkup = flatInlineKeyboard {
                         dataButton(
-                            state.cancelMessage ?: common_resources.strings.messagesRegistrarDefaultCancelMessage.localized(locale),
+                            state.cancelMessage ?: CommonStrings.messagesRegistrarDefaultCancelMessage.translation(locale),
                             cancelButtonData
                         )
                         dataButton(
-                            state.suggestionMessage ?: common_resources.strings.messagesRegistrarDefaultDoneMessage.localized(locale),
+                            state.suggestionMessage ?: CommonStrings.messagesRegistrarDefaultDoneMessage.translation(locale),
                             doneButtonData
                         )
                     }

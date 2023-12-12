@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<resources>
-    <string name="addTeacherCommandDescription">Добавление нового преподавателя</string>
-    <string name="addTeacherCommandReplyText">Хорошо, нажми на клавишу для добавления нового преподавателя</string>
-    <string name="addTeacherCommandReplyButtonText">Добавить преподавателя</string>
-    <string name="addTeacherSuccessText">Преподаватель успешно добавлен. Попросите этого пользователя начать диалог со мной, чтобы я мог корректно с ним работать</string>
-    <string name="addTeacherFailureText">Не получилось добавить преподавателя в базу</string>
-    <string name="startWelcome">Доброго времени суток, вы были добавлены как преподаватель</string>
-</resources>

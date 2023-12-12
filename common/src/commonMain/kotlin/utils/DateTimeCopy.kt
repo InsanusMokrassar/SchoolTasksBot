@@ -1,7 +1,7 @@
 package center.sciprog.tasks_bot.common.utils
 
-import com.soywiz.klock.DateTime
-import com.soywiz.klock.Month
+import korlibs.time.DateTime
+import korlibs.time.Month
 
 fun DateTime.copy(
     hours: Int = this.hours,

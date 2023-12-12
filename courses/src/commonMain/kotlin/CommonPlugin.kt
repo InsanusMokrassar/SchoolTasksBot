@@ -2,8 +2,8 @@
 @file:GenerateKoinDefinition("courseKeywordsRepo", KeyValuesRepo::class, CourseId::class, CourseLink::class, nullable = false, generateFactory = false)
 package center.sciprog.tasks_bot.courses
 
-import center.sciprog.tasks_bot.common.common_resources
 import center.sciprog.tasks_bot.common.languagesRepo
+import center.sciprog.tasks_bot.common.strings.CommonStrings
 import center.sciprog.tasks_bot.common.utils.checkChatLanguage
 import center.sciprog.tasks_bot.common.utils.getChatLanguage
 import center.sciprog.tasks_bot.common.utils.locale
@@ -13,6 +13,7 @@ import center.sciprog.tasks_bot.courses.models.NewCourse
 import center.sciprog.tasks_bot.courses.models.RegisteredCourse
 import center.sciprog.tasks_bot.courses.models.asNew
 import center.sciprog.tasks_bot.courses.repos.CoursesRepo
+import center.sciprog.tasks_bot.courses.resources.CoursesStrings
 import center.sciprog.tasks_bot.teachers.repos.ReadTeachersRepo
 import center.sciprog.tasks_bot.users.models.InternalUserId
 import center.sciprog.tasks_bot.users.models.RegisteredUser
@@ -24,6 +25,7 @@ import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.annotations.GenerateKoinDefinition
 import dev.inmo.micro_utils.koin.getAllDistinct
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
+import dev.inmo.micro_utils.language_codes.IetfLanguageCode
 import dev.inmo.micro_utils.pagination.Pagination
 import dev.inmo.micro_utils.pagination.firstPageWithOneElementPagination
 import dev.inmo.micro_utils.pagination.utils.getAllByWithNextPaging
@@ -31,6 +33,7 @@ import dev.inmo.micro_utils.pagination.utils.paginate
 import dev.inmo.micro_utils.repos.KeyValuesRepo
 import dev.inmo.micro_utils.repos.add
 import dev.inmo.micro_utils.repos.create
+import dev.inmo.micro_utils.strings.translation
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plagubot.plugins.commands.CommandsPlugin.setupBotPlugin
 import dev.inmo.tgbotapi.extensions.api.answers.answer
@@ -128,11 +131,11 @@ object CommonPlugin : Plugin {
                 if (teachersRepo.getById(user.id) ?.id == course.teacherId) {
                     row {
                         dataButton(
-                            courses_resources.strings.courseRenameButtonText.localized(chatLanguage),
+                            CoursesStrings.courseRenameButtonText.translation(chatLanguage),
                             course.id.dataButtonCourseRenameData
                         )
                         inlineQueryButton(
-                            courses_resources.strings.courseShareLinkButtonText.localized(chatLanguage),
+                            CoursesStrings.courseShareLinkButtonText.translation(chatLanguage),
                             course.title
                         )
                     }
@@ -194,7 +197,7 @@ object CommonPlugin : Plugin {
             }
         }
 
-        suspend fun buildCourseButtons(course: RegisteredCourse, user: RegisteredUser, chatLanguage: Locale): InlineKeyboardMarkup {
+        suspend fun buildCourseButtons(course: RegisteredCourse, user: RegisteredUser, chatLanguage: IetfLanguageCode): InlineKeyboardMarkup {
             return inlineKeyboard {
                 val subkeyboards = courseButtonsProviders.mapNotNull {
                     inlineKeyboard {
@@ -205,7 +208,7 @@ object CommonPlugin : Plugin {
                 if (subkeyboards.isNotEmpty()) {
                     row {
                         dataButton(
-                            courses_resources.strings.backToCoursesList.localized(chatLanguage),
+                            CoursesStrings.backToCoursesList.translation(chatLanguage),
                             0.dataButtonCoursesPageData
                         )
                     }
@@ -224,9 +227,9 @@ object CommonPlugin : Plugin {
             val chatLanguage = languagesRepo.getChatLanguage(chatId).locale
             val sentMessage = send(
                 chatId,
-                courses_resources.strings.suggestAddTitleForCourse.localized(chatLanguage),
+                CoursesStrings.suggestAddTitleForCourse.translation(chatLanguage),
                 replyMarkup = flatInlineKeyboard {
-                    dataButton(common_resources.strings.cancel.localized(chatLanguage), cancelButtonData)
+                    dataButton(CommonStrings.cancel.translation(chatLanguage), cancelButtonData)
                 }
             )
 
@@ -267,20 +270,20 @@ object CommonPlugin : Plugin {
             }
 
             if (created == null) {
-                send(chatId, courses_resources.strings.unableCreateCourseText.localized(chatLanguage))
+                send(chatId, CoursesStrings.unableCreateCourseText.translation(chatLanguage))
             } else {
                 send(
                     chatId,
                 ) {
-                    +courses_resources.strings.courseCreatingSuccessTemplate.localized(
+                    +CoursesStrings.courseCreatingSuccessTemplate.translation(
                         chatLanguage
                     ).format(created.title)
                     +"\n"
                     link(
-                        courses_resources.strings.courseCreatingSuccessInviteLinkTextTemplate.localized(
+                        CoursesStrings.courseCreatingSuccessInviteLinkTextTemplate.translation(
                             chatLanguage
                         ),
-                        makeTelegramDeepLink(me.username, "$deepLinkPrefix${deepLink?.string}")
+                        makeTelegramDeepLink(me.username!!, "$deepLinkPrefix${deepLink?.string}")
                     )
                 }
             }
@@ -289,14 +292,14 @@ object CommonPlugin : Plugin {
 
         strictlyOn { state: InnerState.RenameCourse ->
             val chatId = state.context
-            val chatLanguage = languagesRepo.getChatLanguage(chatId).locale
+            val chatLanguage = languagesRepo.getChatLanguage(chatId)
             val course = coursesRepo.getById(state.courseId) ?: return@strictlyOn null
             val sentMessage = edit(
                 chatId,
                 state.messageId,
-                courses_resources.strings.suggestChangeTitleForCourseTemplate.localized(chatLanguage).format(course.title),
+                CoursesStrings.suggestChangeTitleForCourseTemplate.translation(chatLanguage).format(course.title),
                 replyMarkup = flatInlineKeyboard {
-                    dataButton(common_resources.strings.cancel.localized(chatLanguage), cancelButtonData)
+                    dataButton(CommonStrings.cancel.translation(chatLanguage), cancelButtonData)
                 }
             )
             val user = usersRepo.getById(chatId.toChatId()) ?: return@strictlyOn null
@@ -331,14 +334,14 @@ object CommonPlugin : Plugin {
                     sentMessage,
                     replyMarkup = buildCourseButtons(course, user, chatLanguage)
                 ) {
-                    +courses_resources.strings.unableChangeCourseTitleText.localized(chatLanguage)
+                    +CoursesStrings.unableChangeCourseTitleText.translation(chatLanguage)
                 }
             } else {
                 edit(
                     sentMessage,
                     replyMarkup = buildCourseButtons(course, user, chatLanguage)
                 ) {
-                    +courses_resources.strings.courseChangeTitleSuccessTemplate.localized(
+                    +CoursesStrings.courseChangeTitleSuccessTemplate.translation(
                         chatLanguage
                     ).format(course.title, changed.title)
                 }
@@ -357,7 +360,7 @@ object CommonPlugin : Plugin {
 
             courseUsersRepo.add(courseId, user.id)
 
-            send(message.chat, courses_resources.strings.registeredOnCourseMessageTextTemplate.localized(chatLanguage).format(course.title))
+            send(message.chat, CoursesStrings.registeredOnCourseMessageTextTemplate.translation(chatLanguage).format(course.title))
         }
 
         onMessageDataCallbackQuery(Regex("^$dataButtonCoursesPageDataPrefix\\d+")) {
@@ -373,9 +376,9 @@ object CommonPlugin : Plugin {
                 replyMarkup = coursesButtons
             ) {
                 if (coursesButtons == null) {
-                    +courses_resources.strings.coursesListEmpty.localized(chatLanguage)
+                    +CoursesStrings.coursesListEmpty.translation(chatLanguage)
                 } else {
-                    +courses_resources.strings.coursesListText.localized(chatLanguage)
+                    +CoursesStrings.coursesListText.translation(chatLanguage)
                 }
             }
         }
@@ -386,15 +389,13 @@ object CommonPlugin : Plugin {
             if (!courseUsersRepo.contains(courseId, user.id)) {
                 return@onMessageDataCallbackQuery
             }
-            val chatLanguage = languagesRepo.getChatLanguage(it.user.id).locale
+            val chatLanguage = languagesRepo.getChatLanguage(it.user.id)
 
             val markup = buildCourseButtons(course, user, chatLanguage)
             if (markup.keyboard.isEmpty()) {
                 answer(
                     it,
-                    courses_resources.strings.courseManagementIsEmptyText.localized(
-                        chatLanguage
-                    ),
+                    CoursesStrings.courseManagementIsEmptyText.translation(chatLanguage),
                     showAlert = true,
                     cachedTimeSeconds = 0
                 )
@@ -403,7 +404,7 @@ object CommonPlugin : Plugin {
                     it.message.withContentOrThrow(),
                     replyMarkup = markup
                 ) {
-                    +courses_resources.strings.courseManagementTextTemplate.localized(
+                    +CoursesStrings.courseManagementTextTemplate.translation(
                         chatLanguage
                     ).format(course.title)
                 }
@@ -429,9 +430,9 @@ object CommonPlugin : Plugin {
                 replyMarkup = coursesButtons
             ) {
                 if (coursesButtons == null) {
-                    +courses_resources.strings.coursesListEmpty.localized(chatLanguage)
+                    +CoursesStrings.coursesListEmpty.translation(chatLanguage)
                 } else {
-                    +courses_resources.strings.coursesListText.localized(chatLanguage)
+                    +CoursesStrings.coursesListText.translation(chatLanguage)
                 }
             }
         }
@@ -476,10 +477,10 @@ object CommonPlugin : Plugin {
                         course.title,
                         InputTextMessageContent(
                             buildEntities {
-                                link(course.title, makeTelegramDeepLink(me.username, link.string))
+                                link(course.title, makeTelegramDeepLink(me.username!!, link.string))
                             }
                         ),
-                        description = courses_resources.strings.courseLinkInlineQuery.localized(chatLanguage)
+                        description = CoursesStrings.courseLinkInlineQuery.translation(chatLanguage)
                     )
                 },
                 cachedTime = 0,

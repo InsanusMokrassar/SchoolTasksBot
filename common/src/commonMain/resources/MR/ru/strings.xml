@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<resources>
-    <string name="cancel">Отмена</string>
-    <string name="back">Назад</string>
-    <string name="link">Ссылка</string>
-    <string name="updated">Обновлено</string>
-
-    <string name="defaultDateTimePickerMessageText">Выберите дату</string>
-</resources>

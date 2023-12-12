@@ -1,21 +1,22 @@
 [versions]
 
-kotlin = "1.8.21"
-kotlin-serialization = "1.5.0"
+kotlin = "1.9.21"
+kotlin-serialization = "1.6.2"
 
-dokka = "1.8.10"
+dokka = "1.9.10"
 
-microutils = "0.18.0"
+microutils = "0.20.21"
 
-tgbotapi = "7.1.0"
-tgbotapi-libraries = "0.11.0"
-plagubot = "5.1.0"
-plagubot-plugins = "0.11.0"
+tgbotapi = "9.4.2"
+tgbotapi-libraries = "0.17.1"
+plagubot = "7.4.1"
+plagubot-plugins = "0.17.1"
 
-psql = "42.5.0"
+psql = "42.6.0"
 
-moko-resources = "0.22.0"
-ksp = "1.8.21-1.0.11"
+moko-resources = "0.23.0"
+libres = "1.2.2-inmo"
+ksp = "1.9.21-1.0.15"
 
 junit_version = "4.12"
 
@@ -33,6 +34,7 @@ plagubot-plugins = { module = "dev.inmo:plagubot.plugin", version.ref = "plagubo
 plagubot-bot = { module = "dev.inmo:plagubot.bot", version.ref = "plagubot" }
 
 microutils-koin = { module = "dev.inmo:micro_utils.koin", version.ref = "microutils" }
+microutils-resources = { module = "dev.inmo:micro_utils.resources", version.ref = "microutils" }
 microutils-koin-generator = { module = "dev.inmo:micro_utils.koin.generator", version.ref = "microutils" }
 microutils-repos-common = { module = "dev.inmo:micro_utils.repos.common", version.ref = "microutils" }
 microutils-repos-cache = { module = "dev.inmo:micro_utils.repos.cache", version.ref = "microutils" }
@@ -58,6 +60,7 @@ kotlin-serialization-plugin = { module = "org.jetbrains.kotlin:kotlin-serializat
 kotlin-dokka-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 moko-resources-plugin = { module = "dev.icerock.moko:resources-generator", version.ref = "moko-resources" }
 kotlin-ksp-plugin = { module = "com.google.devtools.ksp:symbol-processing-gradle-plugin", version.ref = "ksp" }
+libres-plugin = { module = "io.github.skeptick.libres:gradle-plugin", version.ref = "libres" }
 
 [plugins]
 

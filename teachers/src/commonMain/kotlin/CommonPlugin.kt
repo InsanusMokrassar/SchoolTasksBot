@@ -5,11 +5,13 @@ import center.sciprog.tasks_bot.common.supervisorIetfLanguageCode
 import center.sciprog.tasks_bot.common.utils.locale
 import center.sciprog.tasks_bot.teachers.models.NewTeacher
 import center.sciprog.tasks_bot.teachers.repos.TeachersRepo
+import center.sciprog.tasks_bot.teachers.strings.TeachersStrings
 import center.sciprog.tasks_bot.users.userRetriever
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
 import dev.inmo.micro_utils.repos.create
+import dev.inmo.micro_utils.strings.translation
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plagubot.plugins.commands.full
 import dev.inmo.tgbotapi.extensions.api.send.reply
@@ -34,7 +36,7 @@ object CommonPlugin : Plugin {
         singleWithRandomQualifier {
             BotCommand(
                 "add_teacher",
-                teachers_resources.strings.addTeacherCommandDescription.localized(supervisorIetfLanguageCode.locale)
+                TeachersStrings.addTeacherCommandDescription.translation(supervisorIetfLanguageCode)
             ).full(
                 BotCommandScope.Chat(supervisorId)
             )
@@ -51,11 +53,11 @@ object CommonPlugin : Plugin {
         onCommand("add_teacher", initialFilter = { it.chat.id == supervisorId }) {
             reply(
                 it,
-                teachers_resources.strings.addTeacherCommandReplyText.localized(supervisorLocale),
+                TeachersStrings.addTeacherCommandReplyText.translation(supervisorLocale),
                 replyMarkup = replyKeyboard(resizeKeyboard = true, oneTimeKeyboard = true) {
                     row {
                         requestUserButton(
-                            teachers_resources.strings.addTeacherCommandReplyButtonText.localized(supervisorLocale),
+                            TeachersStrings.addTeacherCommandReplyButtonText.translation(supervisorLocale),
                             requestNewTeacherId,
                         )
                     }
@@ -72,19 +74,19 @@ object CommonPlugin : Plugin {
                 if (created.isNotEmpty()) {
                     send(
                         it.chat,
-                        teachers_resources.strings.addTeacherSuccessText.localized(supervisorLocale)
+                        TeachersStrings.addTeacherSuccessText.translation(supervisorLocale)
                     )
                 } else {
                     send(
                         it.chat,
-                        teachers_resources.strings.addTeacherFailureText.localized(supervisorLocale)
+                        TeachersStrings.addTeacherFailureText.translation(supervisorLocale)
                     )
                 }
             }.onFailure { e ->
                 send(
                     it.chat
                 ) {
-                    +teachers_resources.strings.addTeacherFailureText.localized(supervisorLocale)
+                    +TeachersStrings.addTeacherFailureText.translation(supervisorLocale)
                     +":\n${e.message}"
                 }
             }

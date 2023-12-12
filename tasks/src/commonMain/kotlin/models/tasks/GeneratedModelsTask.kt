@@ -5,7 +5,7 @@ package center.sciprog.tasks_bot.tasks.models.tasks
 
 import center.sciprog.tasks_bot.common.utils.serializers.DateTimeSerializer
 import center.sciprog.tasks_bot.courses.models.CourseId
-import com.soywiz.klock.DateTime
+import korlibs.time.DateTime
 import dev.inmo.tgbotapi.libraries.resender.MessageMetaInfo
 import dev.inmo.tgbotapi.types.message.textsources.TextSourcesList
 import kotlin.collections.List

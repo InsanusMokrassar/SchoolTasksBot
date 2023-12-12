@@ -9,6 +9,7 @@ import center.sciprog.tasks_bot.courses.CourseButtonsProvider
 import center.sciprog.tasks_bot.courses.models.CourseId
 import center.sciprog.tasks_bot.courses.repos.ReadCoursesRepo
 import center.sciprog.tasks_bot.tasks.models.tasks.TaskDraft
+import center.sciprog.tasks_bot.tasks.strings.TasksStrings
 import center.sciprog.tasks_bot.teachers.models.TeacherId
 import center.sciprog.tasks_bot.teachers.repos.ReadTeachersRepo
 import center.sciprog.tasks_bot.users.repos.ReadUsersRepo
@@ -16,11 +17,12 @@ import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.annotations.GenerateKoinDefinition
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
 import dev.inmo.micro_utils.repos.KeyValueRepo
-import dev.inmo.micro_utils.repos.cache.cache.FullKVCache
-import dev.inmo.micro_utils.repos.cache.cached
+import dev.inmo.micro_utils.repos.MapKeyValueRepo
+import dev.inmo.micro_utils.repos.cache.full.fullyCached
 import dev.inmo.micro_utils.repos.exposed.keyvalue.ExposedKeyValueRepo
 import dev.inmo.micro_utils.repos.mappers.withMapper
 import dev.inmo.micro_utils.repos.set
+import dev.inmo.micro_utils.strings.translation
 import dev.inmo.plagubot.Plugin
 import dev.inmo.tgbotapi.extensions.api.answers.answer
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
@@ -64,7 +66,7 @@ object CommonPlugin : Plugin {
             )
 
             if (useCache) {
-                repo.cached(FullKVCache(), get())
+                repo.fullyCached(MapKeyValueRepo(), get())
             } else {
                 repo
             }
@@ -76,7 +78,7 @@ object CommonPlugin : Plugin {
                 if (teachersRepo.getById(user.id) ?.id == course.teacherId) {
                     row {
                         dataButton(
-                            tasks_resources.strings.createDraftWithId.localized(chatLanguage),
+                            TasksStrings.createDraftWithId.translation(chatLanguage),
                             "$openDraftWithCourseIdBtnData ${course.id.long}"
                         )
                     }

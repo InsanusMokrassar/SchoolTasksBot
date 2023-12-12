@@ -18,7 +18,7 @@ class CachedTeachersRepo(
     parentRepo: TeachersRepo,
     scope: CoroutineScope,
     kvCache: FullKVCache<TeacherId, RegisteredTeacher> = FullKVCache()
-) : TeachersRepo, FullCRUDCacheRepo<RegisteredTeacher, TeacherId, NewTeacher>(parentRepo, kvCache, scope, { it.id }) {
+) : TeachersRepo, FullCRUDCacheRepo<RegisteredTeacher, TeacherId, NewTeacher>(parentRepo, kvCache, scope, idGetter = { it.id }) {
     init {
         scope.launchSafelyWithoutExceptions { invalidate() }
     }

@@ -3,6 +3,7 @@ package center.sciprog.tasks_bot.users.repos
 import center.sciprog.tasks_bot.users.models.NewUser
 import center.sciprog.tasks_bot.users.models.RegisteredUser
 import center.sciprog.tasks_bot.users.models.InternalUserId
+import dev.inmo.micro_utils.coroutines.SmartRWLocker
 import dev.inmo.micro_utils.coroutines.launchSafelyWithoutExceptions
 import dev.inmo.micro_utils.pagination.utils.doForAllWithNextPaging
 import dev.inmo.micro_utils.repos.cache.cache.FullKVCache
@@ -15,7 +16,7 @@ class CachedUsersRepo(
     original: UsersRepo,
     scope: CoroutineScope,
     kvCache: FullKVCache<InternalUserId, RegisteredUser> = FullKVCache()
-) : UsersRepo, FullCRUDCacheRepo<RegisteredUser, InternalUserId, NewUser>(original, kvCache, scope, { it.id }) {
+) : UsersRepo, FullCRUDCacheRepo<RegisteredUser, InternalUserId, NewUser>(original, kvCache, scope, idGetter = { it.id }) {
     init {
         scope.launchSafelyWithoutExceptions { invalidate() }
     }

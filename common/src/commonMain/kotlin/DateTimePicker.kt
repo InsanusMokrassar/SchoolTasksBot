@@ -1,18 +1,19 @@
 package center.sciprog.tasks_bot.common
 
+import center.sciprog.tasks_bot.common.strings.CommonStrings
 import center.sciprog.tasks_bot.common.utils.StringQualifierSerializer
 import center.sciprog.tasks_bot.common.utils.copy
 import center.sciprog.tasks_bot.common.utils.getChatLanguage
 import center.sciprog.tasks_bot.common.utils.locale
 import center.sciprog.tasks_bot.common.utils.serializers.DateTimeSerializer
-import com.soywiz.klock.DateFormat
-import com.soywiz.klock.DateTime
-import com.soywiz.klock.DateTimeTz
-import com.soywiz.klock.days
-import com.soywiz.klock.hours
-import com.soywiz.klock.minutes
-import com.soywiz.klock.months
-import com.soywiz.klock.years
+import korlibs.time.DateFormat
+import korlibs.time.DateTime
+import korlibs.time.DateTimeTz
+import korlibs.time.days
+import korlibs.time.hours
+import korlibs.time.minutes
+import korlibs.time.months
+import korlibs.time.years
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
@@ -158,13 +159,13 @@ object DateTimePicker : Plugin {
         val showDate: Boolean = true,
         val showTime: Boolean = true,
         val useLocal: Boolean = true,
-        val messageText: TextSourcesList = buildEntities { +common_resources.strings.defaultDateTimePickerMessageText.localized() },
-        val saveText: String = common_resources.strings.defaultDateTimePickerSaveText.localized(),
-        val cancelText: String = common_resources.strings.defaultDateTimePickerCancelText.localized(),
-        val timeButtonText: String = common_resources.strings.defaultDateTimePickerTimeBtnText.localized(),
-        val dateButtonText: String = common_resources.strings.defaultDateTimePickerDateBtnText.localized(),
+        val messageText: TextSourcesList = buildEntities { +CommonStrings.defaultDateTimePickerMessageText.default },
+        val saveText: String = CommonStrings.defaultDateTimePickerSaveText.default,
+        val cancelText: String = CommonStrings.defaultDateTimePickerCancelText.default,
+        val timeButtonText: String = CommonStrings.defaultDateTimePickerTimeBtnText.default,
+        val dateButtonText: String = CommonStrings.defaultDateTimePickerDateBtnText.default,
 
-    )
+        )
 
     interface Handler {
         suspend fun BehaviourContextWithFSM<State>.save(
@@ -424,7 +425,7 @@ object DateTimePicker : Plugin {
         createStrictlyUnified<FSMState.ChangePartTime.ChangeHours>(
             koin,
             languagesRepo,
-            { common_resources.strings.defaultDateTimePickerChooseHourText.localized(it.locale) },
+            { CommonStrings.defaultDateTimePickerChooseHourText.translation(it) },
             { _, _, -> 0 },
             { _, _, -> 23 },
             { params, dateTime ->
@@ -444,7 +445,7 @@ object DateTimePicker : Plugin {
         createStrictlyUnified<FSMState.ChangePartTime.ChangeMinutes>(
             koin,
             languagesRepo,
-            { common_resources.strings.defaultDateTimePickerChooseMinuteText.localized(it.locale) },
+            { CommonStrings.defaultDateTimePickerChooseMinuteText.translation(it) },
             { _, _, -> 0 },
             { _, _, -> 59 },
             { params, dateTime ->
@@ -464,7 +465,7 @@ object DateTimePicker : Plugin {
         createStrictlyUnified<FSMState.ChangePartTime.ChangeDays>(
             koin,
             languagesRepo,
-            { common_resources.strings.defaultDateTimePickerChooseDayText.localized(it.locale) },
+            { CommonStrings.defaultDateTimePickerChooseDayText.translation(it) },
             { _, _, -> 1 },
             { params, dateTime, ->
                 if (params.useLocal) {
@@ -491,7 +492,7 @@ object DateTimePicker : Plugin {
         createStrictlyUnified<FSMState.ChangePartTime.ChangeMonths>(
             koin,
             languagesRepo,
-            { common_resources.strings.defaultDateTimePickerChooseMonthText.localized(it.locale) },
+            { CommonStrings.defaultDateTimePickerChooseMonthText.translation(it) },
             { _, _, -> 1 },
             { _, _, -> 12 },
             { params, dateTime ->
@@ -513,7 +514,7 @@ object DateTimePicker : Plugin {
         createStrictlyUnified<FSMState.ChangePartTime.ChangeYears>(
             koin,
             languagesRepo,
-            { common_resources.strings.defaultDateTimePickerChooseYearText.localized(it.locale) },
+            { CommonStrings.defaultDateTimePickerChooseYearText.translation(it) },
             { params, dateTime, ->
                 if (params.useLocal) {
                     val dateTimeTz = dateTime.local
@@ -546,12 +547,12 @@ object DateTimePicker : Plugin {
 
         onMessageDataCallbackQuery(changeTimeHintData) {
             val language = languagesRepo.getChatLanguage(it.user)
-            answer(it, common_resources.strings.defaultDateTimePickerTimeHintText.localized(language.locale), showAlert = true)
+            answer(it, CommonStrings.defaultDateTimePickerTimeHintText.translation(language), showAlert = true)
         }
 
         onMessageDataCallbackQuery(changeDateHintData) {
             val language = languagesRepo.getChatLanguage(it.user)
-            answer(it, common_resources.strings.defaultDateTimePickerDateHintText.localized(language.locale), showAlert = true)
+            answer(it, CommonStrings.defaultDateTimePickerDateHintText.translation(language), showAlert = true)
         }
     }
 

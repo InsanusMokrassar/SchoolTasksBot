@@ -15,6 +15,9 @@ kotlin {
                 api libs.moko.resources
             }
         }
+        jvmMain {
+            dependsOn(commonMain)
+        }
     }
 }
 

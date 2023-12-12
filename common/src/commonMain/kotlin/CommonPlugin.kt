@@ -8,9 +8,9 @@ package center.sciprog.tasks_bot.common
 
 import center.sciprog.tasks_bot.common.utils.serializers.ChatIdSerializer
 import center.sciprog.tasks_bot.common.utils.serializers.ChatIdWithThreadIdSerializer
-import com.soywiz.klock.DateTime
-import com.soywiz.klock.months
-import com.soywiz.klock.years
+import korlibs.time.DateTime
+import korlibs.time.months
+import korlibs.time.years
 import dev.inmo.kslog.common.KSLog
 import dev.inmo.kslog.common.d
 import dev.inmo.kslog.common.e

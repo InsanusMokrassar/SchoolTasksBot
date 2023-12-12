@@ -11,8 +11,10 @@ import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.singleWithBinds
 import dev.inmo.micro_utils.pagination.firstPageWithOneElementPagination
 import dev.inmo.micro_utils.repos.KeyValuesRepo
+import dev.inmo.micro_utils.repos.MapKeyValueRepo
 import dev.inmo.micro_utils.repos.cache.cache.FullKVCache
 import dev.inmo.micro_utils.repos.cache.cached
+import dev.inmo.micro_utils.repos.cache.full.fullyCached
 import dev.inmo.micro_utils.repos.exposed.onetomany.ExposedKeyValuesRepo
 import dev.inmo.micro_utils.repos.mappers.withMapper
 import dev.inmo.plagubot.Plugin
@@ -52,7 +54,7 @@ object JvmPlugin : Plugin {
             )
 
             if (useCache) {
-                base.cached(FullKVCache(), get())
+                base.fullyCached(MapKeyValueRepo(), get())
             } else {
                 base
             }
@@ -72,7 +74,7 @@ object JvmPlugin : Plugin {
             )
 
             if (useCache) {
-                base.cached(FullKVCache(), get())
+                base.fullyCached(MapKeyValueRepo(), get())
             } else {
                 base
             }

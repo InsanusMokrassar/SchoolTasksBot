@@ -5,8 +5,10 @@ import dev.inmo.micro_utils.fsm.common.managers.DefaultStatesManager
 import dev.inmo.micro_utils.fsm.common.managers.DefaultStatesManagerRepo
 import dev.inmo.micro_utils.fsm.repos.common.KeyValueBasedDefaultStatesManagerRepo
 import dev.inmo.micro_utils.language_codes.IetfLanguageCode
+import dev.inmo.micro_utils.repos.MapKeyValueRepo
 import dev.inmo.micro_utils.repos.cache.cache.FullKVCache
 import dev.inmo.micro_utils.repos.cache.cached
+import dev.inmo.micro_utils.repos.cache.full.fullyCached
 import dev.inmo.micro_utils.repos.exposed.keyvalue.ExposedKeyValueRepo
 import dev.inmo.micro_utils.repos.mappers.withMapper
 import dev.inmo.plagubot.Plugin
@@ -36,7 +38,7 @@ object JvmPlugin : Plugin {
                 { code },
                 { json.decodeFromString(FullChatIdentifierSerializer, this) as IdChatIdentifier },
                 { IetfLanguageCode(this) }
-            ).cached(FullKVCache(), get())
+            ).fullyCached(MapKeyValueRepo(), get())
         }
 
         single<DefaultStatesManagerRepo<State>> {
@@ -54,7 +56,7 @@ object JvmPlugin : Plugin {
                     { json.encodeToString(statePolymorphic, this) },
                     { json.decodeFromString(anyPolymorphic, this) },
                     { json.decodeFromString(statePolymorphic, this) },
-                ).cached(FullKVCache(), get())
+                ).fullyCached(MapKeyValueRepo(), get())
             )
         }
     }

@@ -1,15 +1,15 @@
 package center.sciprog.tasks_bot.tasks
 
-import center.sciprog.tasks_bot.common.common_resources
 import center.sciprog.tasks_bot.common.languagesRepo
+import center.sciprog.tasks_bot.common.strings.CommonStrings
 import center.sciprog.tasks_bot.common.utils.locale
 import center.sciprog.tasks_bot.tasks.models.DraftInfoPack
 import center.sciprog.tasks_bot.tasks.models.tasks.AnswerFormat
 import center.sciprog.tasks_bot.tasks.models.tasks.NewAnswerFormatInfo
 import center.sciprog.tasks_bot.tasks.models.tasks.TaskDraft
+import center.sciprog.tasks_bot.tasks.strings.TasksStrings
 import center.sciprog.tasks_bot.teachers.repos.ReadTeachersRepo
 import center.sciprog.tasks_bot.users.repos.ReadUsersRepo
-import com.benasher44.uuid.uuid4
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
@@ -80,13 +80,13 @@ internal class NewAnswerDrawer(
         val locale = ietfLanguageCode.locale
         return when (val format = newAnswerFormatInfo.format) {
             is AnswerFormat.File -> {
-                "${tasks_resources.strings.answerFormatTitleFile.localized(locale)}: .${format.extension ?: "*"}"
+                "${TasksStrings.answerFormatTitleFile.translation(ietfLanguageCode)}: .${format.extension ?: "*"}"
             }
             is AnswerFormat.Link -> {
-                "${tasks_resources.strings.answerFormatTitleLink.localized(locale)}: ${format.regexString}"
+                "${TasksStrings.answerFormatTitleLink.translation(ietfLanguageCode)}: ${format.regexString}"
             }
             is AnswerFormat.Text -> {
-                "${tasks_resources.strings.answerFormatTitleText.localized(locale)}${format.lengthRange ?.let { ": ${it.first} - ${it.last}" } ?: ""}"
+                "${TasksStrings.answerFormatTitleText.translation(ietfLanguageCode)}${format.lengthRange ?.let { ": ${it.first} - ${it.last}" } ?: ""}"
             }
         }
     }
@@ -120,9 +120,9 @@ internal class NewAnswerDrawer(
                 }
             }
             row {
-                dataButton(common_resources.strings.back.localized(ietfLanguageCode.locale), backButtonData)
+                dataButton(CommonStrings.back.translation(ietfLanguageCode), backButtonData)
                 dataButton(
-                    tasks_resources.strings.newAnswersFormatAddBtnText.localized(ietfLanguageCode.locale),
+                    TasksStrings.newAnswersFormatAddBtnText.translation(ietfLanguageCode),
                     newAnswerCreateAnswerData
                 )
             }
@@ -137,14 +137,14 @@ internal class NewAnswerDrawer(
     ) {
         val draft = draftInfoPack.draft ?: return
         val answerItem = draft.newAnswersFormats.getOrNull(i) ?: return
-        val locale = draftInfoPack.ietfLanguageCode.locale
+        val ietfLanguageCode = draftInfoPack.ietfLanguageCode
 
         val keyboard = inlineKeyboard {
             when (val format = answerItem.format) {
                 is AnswerFormat.File -> {
                     row {
                         dataButton(
-                            tasks_resources.strings.answerFormatFileChangeExtension.localized(locale),
+                            TasksStrings.answerFormatFileChangeExtension.translation(ietfLanguageCode),
                             "${newAnswerChangeIndexFileExtensionDataPrefix}$i"
                         )
                     }
@@ -152,7 +152,7 @@ internal class NewAnswerDrawer(
                 is AnswerFormat.Link -> {
                     row {
                         dataButton(
-                            tasks_resources.strings.answerFormatLinkSetSiteExtension.localized(locale),
+                            TasksStrings.answerFormatLinkSetSiteExtension.translation(ietfLanguageCode),
                             "${newAnswerChangeIndexLinkSetSiteExtensionDataPrefix}$i"
                         )
                     }
@@ -171,10 +171,10 @@ internal class NewAnswerDrawer(
                 }
             }
             row {
-                dataButton(common_resources.strings.back.localized(locale), newAnswersOpenAnswersList)
+                dataButton(CommonStrings.back.translation(ietfLanguageCode), newAnswersOpenAnswersList)
             }
             row {
-                dataButton(common_resources.strings.delete.localized(locale), "${newAnswerDeleteIndexDataPrefix}$i")
+                dataButton(CommonStrings.delete.translation(ietfLanguageCode), "${newAnswerDeleteIndexDataPrefix}$i")
             }
         }
         val entities = buildEntities {
@@ -230,7 +230,7 @@ internal class NewAnswerDrawer(
                 pagination
             )
         ) {
-            +tasks_resources.strings.newAnswersFormatsText.localized(draftInfoPack.ietfLanguageCode.locale)
+            +TasksStrings.newAnswersFormatsText.translation(draftInfoPack.ietfLanguageCode)
         }
     }
 
@@ -324,12 +324,12 @@ internal class NewAnswerDrawer(
                     it.message,
                     replyMarkup = inlineKeyboard {
                         row {
-                            dataButton(tasks_resources.strings.answerFormatTitleFile.localized(draftInfoPack.ietfLanguageCode.locale), "${newAnswerCreateAnswerData}${fileAnswerFormatDataInfo}")
-                            dataButton(tasks_resources.strings.answerFormatTitleText.localized(draftInfoPack.ietfLanguageCode.locale), "${newAnswerCreateAnswerData}${textAnswerFormatDataInfo}")
-                            dataButton(tasks_resources.strings.answerFormatTitleLink.localized(draftInfoPack.ietfLanguageCode.locale), "${newAnswerCreateAnswerData}${linkAnswerFormatDataInfo}")
+                            dataButton(TasksStrings.answerFormatTitleFile.translation(draftInfoPack.ietfLanguageCode), "${newAnswerCreateAnswerData}${fileAnswerFormatDataInfo}")
+                            dataButton(TasksStrings.answerFormatTitleText.translation(draftInfoPack.ietfLanguageCode), "${newAnswerCreateAnswerData}${textAnswerFormatDataInfo}")
+                            dataButton(TasksStrings.answerFormatTitleLink.translation(draftInfoPack.ietfLanguageCode), "${newAnswerCreateAnswerData}${linkAnswerFormatDataInfo}")
                         }
                         row {
-                            dataButton(common_resources.strings.back.localized(draftInfoPack.ietfLanguageCode.locale), newAnswersOpenAnswersList)
+                            dataButton(CommonStrings.back.translation(draftInfoPack.ietfLanguageCode), newAnswersOpenAnswersList)
                         }
                     }
                 )
@@ -359,7 +359,7 @@ internal class NewAnswerDrawer(
                         simpleButton("docx")
                     }
                 ) {
-                    +tasks_resources.strings.answerFormatFileCurrentExtensionTemplate.localized(draftInfoPack.ietfLanguageCode.locale).format(format.extension ?: "*")
+                    +TasksStrings.answerFormatFileCurrentExtensionTemplate.translation(draftInfoPack.ietfLanguageCode).format(format.extension ?: "*")
                 }
             }
 
@@ -392,7 +392,7 @@ internal class NewAnswerDrawer(
                             true
                         } else {
                             reply(it) {
-                                +tasks_resources.strings.answerFormatFileCurrentWrongNewExtension.localized(draftInfoPack.ietfLanguageCode.locale)
+                                +TasksStrings.answerFormatFileCurrentWrongNewExtension.translation(draftInfoPack.ietfLanguageCode)
                             }
                             false
                         }
@@ -450,7 +450,7 @@ internal class NewAnswerDrawer(
                 send(
                     state.context,
                 ) {
-                    +tasks_resources.strings.answerFormatLinkCurrentRegexTemplate.localized(draftInfoPack.ietfLanguageCode.locale).format(format.regexString)
+                    +TasksStrings.answerFormatLinkCurrentRegexTemplate.translation(draftInfoPack.ietfLanguageCode).format(format.regexString)
                 }
             }
 
@@ -483,7 +483,7 @@ internal class NewAnswerDrawer(
                             true
                         } else {
                             reply(it) {
-                                +tasks_resources.strings.answerFormatLinkCurrentWrongNewExtension.localized(draftInfoPack.ietfLanguageCode.locale)
+                                +TasksStrings.answerFormatLinkCurrentWrongNewExtension.translation(draftInfoPack.ietfLanguageCode)
                             }
                             false
                         }
@@ -561,9 +561,9 @@ internal class NewAnswerDrawer(
                     }
                 ) {
                     if (state.changeMax) {
-                        +tasks_resources.strings.answerFormatTextCurrentMaxTemplate.localized(draftInfoPack.ietfLanguageCode.locale).format(format.lengthRange.last, limits.first, limits.last)
+                        +TasksStrings.answerFormatTextCurrentMaxTemplate.translation(draftInfoPack.ietfLanguageCode).format(format.lengthRange.last, limits.first, limits.last)
                     } else {
-                        +tasks_resources.strings.answerFormatTextCurrentMinTemplate.localized(draftInfoPack.ietfLanguageCode.locale).format(format.lengthRange.first, limits.first, limits.last)
+                        +TasksStrings.answerFormatTextCurrentMinTemplate.translation(draftInfoPack.ietfLanguageCode).format(format.lengthRange.first, limits.first, limits.last)
                     }
                 }
             }
@@ -597,7 +597,7 @@ internal class NewAnswerDrawer(
                             true
                         } else {
                             reply(it) {
-                                +tasks_resources.strings.answerFormatTextLengthLimitsErrorTemplate.localized(draftInfoPack.ietfLanguageCode.locale).format(
+                                +TasksStrings.answerFormatTextLengthLimitsErrorTemplate.translation(draftInfoPack.ietfLanguageCode).format(
                                     limits.first, limits.last
                                 )
                             }
@@ -738,11 +738,11 @@ internal class NewAnswerDrawer(
                 val edited = edit(
                     it.message.withContentOrThrow(),
                     replyMarkup = flatInlineKeyboard {
-                        dataButton(common_resources.strings.yes.localized(draftInfoPack.ietfLanguageCode.locale), deleteButtonInfo)
-                        dataButton(common_resources.strings.cancel.localized(draftInfoPack.ietfLanguageCode.locale), cancelButtonInfo)
+                        dataButton(CommonStrings.yes.translation(draftInfoPack.ietfLanguageCode), deleteButtonInfo)
+                        dataButton(CommonStrings.cancel.translation(draftInfoPack.ietfLanguageCode), cancelButtonInfo)
                     }
                 ) {
-                    +tasks_resources.strings.answerFormatDeleteSureTemplate.localized(draftInfoPack.ietfLanguageCode.locale).format(
+                    +TasksStrings.answerFormatDeleteSureTemplate.translation(draftInfoPack.ietfLanguageCode).format(
                         i + 1,
                         newAnswerFormatSmallTitle(answerPart, draftInfoPack.ietfLanguageCode)
                     )

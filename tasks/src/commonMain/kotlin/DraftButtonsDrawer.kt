@@ -2,8 +2,8 @@ package center.sciprog.tasks_bot.tasks
 
 import center.sciprog.tasks_bot.common.DateTimePicker
 import center.sciprog.tasks_bot.common.MessagesRegistrar
-import center.sciprog.tasks_bot.common.common_resources
 import center.sciprog.tasks_bot.common.languagesRepo
+import center.sciprog.tasks_bot.common.strings.CommonStrings
 import center.sciprog.tasks_bot.common.utils.copy
 import center.sciprog.tasks_bot.common.utils.getChatLanguage
 import center.sciprog.tasks_bot.common.utils.locale
@@ -11,9 +11,11 @@ import center.sciprog.tasks_bot.courses.CoursesDrawer
 import center.sciprog.tasks_bot.courses.courseSubscribersRepo
 import center.sciprog.tasks_bot.courses.models.CourseId
 import center.sciprog.tasks_bot.courses.models.RegisteredCourse
+import center.sciprog.tasks_bot.courses.repos.CoursesRepo
 import center.sciprog.tasks_bot.courses.repos.ReadCoursesRepo
 import center.sciprog.tasks_bot.tasks.models.DraftInfoPack
 import center.sciprog.tasks_bot.tasks.models.tasks.TaskDraft
+import center.sciprog.tasks_bot.tasks.strings.TasksStrings
 import center.sciprog.tasks_bot.teachers.models.RegisteredTeacher
 import center.sciprog.tasks_bot.teachers.models.TeacherId
 import center.sciprog.tasks_bot.teachers.repos.ReadTeachersRepo
@@ -21,13 +23,14 @@ import center.sciprog.tasks_bot.teachers.repos.TeachersRepo
 import center.sciprog.tasks_bot.users.models.RegisteredUser
 import center.sciprog.tasks_bot.users.repos.ReadUsersRepo
 import center.sciprog.tasks_bot.users.repos.UsersRepo
-import com.soywiz.klock.DateTime
-import com.soywiz.klock.days
+import korlibs.time.DateTime
+import korlibs.time.days
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.language_codes.IetfLanguageCode
 import dev.inmo.micro_utils.repos.KeyValueRepo
 import dev.inmo.micro_utils.repos.set
+import dev.inmo.micro_utils.strings.translation
 import dev.inmo.plagubot.Plugin
 import dev.inmo.tgbotapi.extensions.api.answers.answer
 import dev.inmo.tgbotapi.extensions.api.delete
@@ -84,6 +87,7 @@ internal object DraftButtonsDrawer : Plugin {
     const val changeDescriptionButtonData = "tasks_draft_changeDescription"
     const val resendDescriptionButtonData = "tasks_draft_resendDescription"
     const val changeAnswerFormatsButtonData = "tasks_draft_changeAnswerFormats"
+    const val refreshButtonData = "tasks_draft_refresh"
     const val changeAssignmentDateTimeButtonData = "tasks_draft_changeAssignmentDateTimeButton"
     const val changeAnswerDeadlineDateTimeButtonData = "tasks_draft_changeAnswerDeadlineDateTimeButton"
 
@@ -101,27 +105,33 @@ internal object DraftButtonsDrawer : Plugin {
     ) = inlineKeyboard {
         row {
             dataButton(
-                tasks_resources.strings.courseChangeBtnTitle.localized(locale),
+                CommonStrings.refresh.translation(locale),
+                refreshButtonData
+            )
+        }
+        row {
+            dataButton(
+                TasksStrings.courseChangeBtnTitle.translation(locale),
                 changeCourseButtonData
             )
             dataButton(
-                tasks_resources.strings.descriptionChangeBtnTitle.localized(locale),
+                TasksStrings.descriptionChangeBtnTitle.translation(locale),
                 manageDescriptionButtonData
             )
         }
         row {
             dataButton(
-                tasks_resources.strings.assignmentDateChangeBtnTitle.localized(locale),
+                TasksStrings.assignmentDateChangeBtnTitle.translation(locale),
                 changeAssignmentDateTimeButtonData
             )
             dataButton(
-                tasks_resources.strings.deadlineDateChangeBtnTitle.localized(locale),
+                TasksStrings.deadlineDateChangeBtnTitle.translation(locale),
                 changeAnswerDeadlineDateTimeButtonData
             )
         }
         row {
             dataButton(
-                tasks_resources.strings.answersFormatsChangeBtnTitle.localized(locale),
+                TasksStrings.answersFormatsChangeBtnTitle.translation(locale),
                 changeAnswerFormatsButtonData
             )
         }
@@ -140,12 +150,12 @@ internal object DraftButtonsDrawer : Plugin {
             messageId,
             replyMarkup = buildDraftKeyboard(locale)
         ) {
-            +tasks_resources.strings.courseNamePrefix.localized(locale) + underline(course.title) + "\n\n"
+            +TasksStrings.courseNamePrefix.translation(locale) + underline(course.title) + "\n\n"
 
-            +tasks_resources.strings.descriptionPrefix.localized(locale)
+            +TasksStrings.descriptionPrefix.translation(locale)
             if (draft.descriptionMessages.isNotEmpty()) {
                 draft.descriptionMessages.forEachIndexed { i, it ->
-                    link(i.toString(), makeLinkToMessage(me.username, it.messageId))
+                    link(i.toString(), makeLinkToMessage(me.username!!, it.messageId))
 
                     if (i == draft.descriptionMessages.lastIndex) {
                         return@forEachIndexed
@@ -155,22 +165,22 @@ internal object DraftButtonsDrawer : Plugin {
                 }
             } else {
                 bold {
-                    +tasks_resources.strings.taskAnswerParameterNotSpecified.localized(locale) + " "
-                    +"(" + underline(common_resources.strings.required.localized(locale)) + ")"
+                    +TasksStrings.taskAnswerParameterNotSpecified.translation(locale) + " "
+                    +"(" + underline(CommonStrings.required.translation(locale)) + ")"
                 }
             }
             +"\n\n"
 
-            +tasks_resources.strings.assignmentDatePrefix.localized(locale)
+            +TasksStrings.assignmentDatePrefix.translation(locale)
             draft.assignmentDateTime ?.local ?.let {
-                underline(it.format(tasks_resources.strings.dateTimeFormat.localized(locale)))
-            } ?: bold(tasks_resources.strings.taskAnswerParameterNotSpecified.localized(locale))
+                underline(it.format(TasksStrings.dateTimeFormat.translation(locale)))
+            } ?: bold(TasksStrings.taskAnswerParameterNotSpecified.translation(locale))
             +"\n\n"
 
-            +tasks_resources.strings.deadlineDatePrefix.localized(locale)
+            +TasksStrings.deadlineDatePrefix.translation(locale)
             draft.deadLineDateTime ?.local ?.let {
-                underline(it.format(tasks_resources.strings.dateTimeFormat.localized(locale)))
-            } ?: bold(tasks_resources.strings.taskAnswerParameterNotSpecified.localized(locale))
+                underline(it.format(TasksStrings.dateTimeFormat.translation(locale)))
+            } ?: bold(TasksStrings.taskAnswerParameterNotSpecified.translation(locale))
         }
     }
 
@@ -249,7 +259,7 @@ internal object DraftButtonsDrawer : Plugin {
                         ) ?: return
                     )
 
-                    send(contextChatId, tasks_resources.strings.newDescriptionHasBeenSavedMessageText.localized(pack.ietfLanguageCode.locale))
+                    send(contextChatId, TasksStrings.newDescriptionHasBeenSavedMessageText.translation(pack.ietfLanguageCode.locale))
                 }
             }
         }
@@ -382,15 +392,19 @@ internal object DraftButtonsDrawer : Plugin {
         val teachersRepo = koin.get<TeachersRepo>()
         val draftsRepo = koin.tasksDraftsRepo
         val languagesRepo = koin.languagesRepo
+        val coursesRepo = koin.get<CoursesRepo>()
         val coursesButtonsDrawer = CoursesDrawer(
             usersRepo = usersRepo,
             teachersRepo = teachersRepo,
             courseUsersRepo = koin.courseSubscribersRepo,
-            coursesRepo = koin.get(),
+            coursesRepo = coursesRepo,
             prefix = "tasks_drafts",
             backButtonData = CommonPlugin.openDraftWithCourseIdBtnData
         )
         val resender = koin.get<MessagesResender>()
+        val me by lazy {
+            koin.get<ExtendedBot>()
+        }
 
         coursesButtonsDrawer.onChosen.subscribeSafelyWithoutExceptions(this) {
             val locale = languagesRepo.getChatLanguage(it.query.user).locale
@@ -460,6 +474,11 @@ internal object DraftButtonsDrawer : Plugin {
             }
         }
 
+        standardOnMessageDataCallbackQuery(refreshButtonData) { it, locale, user, teacher, draft ->
+            val course = coursesRepo.getById(draft.courseId) ?: return@standardOnMessageDataCallbackQuery
+            drawDraftInfoOnMessage(me, course, locale, it.message.chat.id, it.message.messageId, draft)
+        }
+
         standardOnMessageDataCallbackQuery(manageDescriptionButtonData) { it, locale, user, teacher, draft ->
             when {
                 draft.descriptionMessages.isEmpty() -> startChain(
@@ -472,11 +491,11 @@ internal object DraftButtonsDrawer : Plugin {
                     it.message,
                     replyMarkup = inlineKeyboard {
                         row {
-                            dataButton(common_resources.strings.back.localized(locale), manageDraftButtonData)
+                            dataButton(CommonStrings.back.translation(locale), manageDraftButtonData)
                         }
                         row {
-                            dataButton(tasks_resources.strings.getDraftDescriptionMessagesButtonText.localized(locale), resendDescriptionButtonData)
-                            dataButton(tasks_resources.strings.setDraftDescriptionMessagesButtonText.localized(locale), changeDescriptionButtonData)
+                            dataButton(TasksStrings.getDraftDescriptionMessagesButtonText.translation(locale), resendDescriptionButtonData)
+                            dataButton(TasksStrings.setDraftDescriptionMessagesButtonText.translation(locale), changeDescriptionButtonData)
                         }
                     }
                 )
@@ -538,7 +557,7 @@ internal object DraftButtonsDrawer : Plugin {
             teachersRepo.getById(user.id) ?: return@strictlyOn null
 
             val sentMessage = send(state.context) {
-                +tasks_resources.strings.descriptionMessageSendingOfferPrefix.localized(locale)
+                +TasksStrings.descriptionMessageSendingOfferPrefix.translation(locale)
                 +" " + botCommand("done")
             }
 

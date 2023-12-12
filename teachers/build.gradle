@@ -4,7 +4,6 @@ plugins {
     id "com.google.devtools.ksp"
 }
 
-apply plugin: "dev.icerock.mobile.multiplatform-resources"
 apply from: "$mppJavaProjectPresetPath"
 
 kotlin {
@@ -13,7 +12,6 @@ kotlin {
             dependencies {
                 api project(":tasks_bot.common")
                 api project(":tasks_bot.users")
-                api libs.moko.resources
             }
         }
     }
@@ -25,9 +23,4 @@ dependencies {
 }
 
 ksp {
-}
-
-multiplatformResources {
-//    multiplatformResourcesPackage = "$group.${project.name}" // required
-    multiplatformResourcesClassName = "teachers_resources" // optional, default MR
 }

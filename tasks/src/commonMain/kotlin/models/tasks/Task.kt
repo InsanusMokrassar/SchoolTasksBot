@@ -1,6 +1,6 @@
 package center.sciprog.tasks_bot.tasks.models.tasks
 
-import com.soywiz.klock.DateTime
+import korlibs.time.DateTime
 import dev.inmo.micro_utils.repos.annotations.GenerateCRUDModel
 import dev.inmo.tgbotapi.libraries.resender.MessageMetaInfo
 

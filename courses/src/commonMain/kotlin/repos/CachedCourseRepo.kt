@@ -15,7 +15,7 @@ class CachedCoursesRepo(
     parentRepo: CoursesRepo,
     scope: CoroutineScope,
     kvCache: FullKVCache<CourseId, RegisteredCourse> = FullKVCache()
-) : CoursesRepo, FullCRUDCacheRepo<RegisteredCourse, CourseId, NewCourse>(parentRepo, kvCache, scope, { it.id }) {
+) : CoursesRepo, FullCRUDCacheRepo<RegisteredCourse, CourseId, NewCourse>(parentRepo, kvCache, scope, idGetter = { it.id }) {
     override suspend fun getCoursesIds(teacherId: TeacherId): List<CourseId> {
         val resultList = mutableListOf<CourseId>()
         kvCache.getAllByWithNextPaging {

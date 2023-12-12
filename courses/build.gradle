@@ -17,6 +17,9 @@ kotlin {
                 api libs.plagubot.plugins.inline.buttons
             }
         }
+        jvmMain {
+            dependsOn(commonMain)
+        }
     }
 }
 

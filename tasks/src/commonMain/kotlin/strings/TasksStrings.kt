@@ -121,4 +121,15 @@ object TasksStrings {
     val answerFormatDeleteSureTemplate = buildStringResource("Are you sure you want to delete answer with number %d and format %s?") {
         IetfLang.Russian variant "Вы уверенны, что хотите удалить ответ с номером %d и форматом %s?"
     }
+
+    val createTaskBtnTitle = buildStringResource(
+        "Create task"
+    ) {
+        IetfLang.Russian variant { "Создать задание" }
+    }
+    val createTaskConfirmationTemplate = buildStringResource(
+        "Please, check parameters of your draft:"
+    ) {
+        IetfLang.Russian variant { "Проверьте параметры черновика:" }
+    }
 }

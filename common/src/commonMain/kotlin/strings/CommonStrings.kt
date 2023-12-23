@@ -29,6 +29,9 @@ object CommonStrings {
     val yes = buildStringResource("Yes") {
         IetfLang.Russian variant "Да"
     }
+    val create = buildStringResource("Create") {
+        IetfLang.Russian variant "Создать"
+    }
 
     val messagesRegistrarDefaultSuggestSendMessage = buildStringResource("Ok, send me your content message") {
         IetfLang.Russian variant "Хорошо, отправьте мне сообщение с контентом"

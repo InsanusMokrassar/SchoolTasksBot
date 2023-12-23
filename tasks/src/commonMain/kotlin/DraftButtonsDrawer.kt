@@ -14,7 +14,10 @@ import center.sciprog.tasks_bot.courses.models.RegisteredCourse
 import center.sciprog.tasks_bot.courses.repos.CoursesRepo
 import center.sciprog.tasks_bot.courses.repos.ReadCoursesRepo
 import center.sciprog.tasks_bot.tasks.models.DraftInfoPack
+import center.sciprog.tasks_bot.tasks.models.tasks.NewTask
 import center.sciprog.tasks_bot.tasks.models.tasks.TaskDraft
+import center.sciprog.tasks_bot.tasks.repos.AnswersFormatsCRUDRepo
+import center.sciprog.tasks_bot.tasks.repos.TasksCRUDRepo
 import center.sciprog.tasks_bot.tasks.strings.TasksStrings
 import center.sciprog.tasks_bot.teachers.models.RegisteredTeacher
 import center.sciprog.tasks_bot.teachers.models.TeacherId
@@ -28,14 +31,15 @@ import korlibs.time.days
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.language_codes.IetfLang
-import dev.inmo.micro_utils.language_codes.IetfLanguageCode
 import dev.inmo.micro_utils.repos.KeyValueRepo
+import dev.inmo.micro_utils.repos.create
 import dev.inmo.micro_utils.repos.set
 import dev.inmo.micro_utils.strings.translation
 import dev.inmo.plagubot.Plugin
 import dev.inmo.tgbotapi.extensions.api.answers.answer
 import dev.inmo.tgbotapi.extensions.api.delete
 import dev.inmo.tgbotapi.extensions.api.edit.edit
+import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
@@ -58,14 +62,10 @@ import dev.inmo.tgbotapi.types.UserId
 import dev.inmo.tgbotapi.types.chat.Bot
 import dev.inmo.tgbotapi.types.chat.ExtendedBot
 import dev.inmo.tgbotapi.types.message.textsources.BotCommandTextSource
+import dev.inmo.tgbotapi.types.message.textsources.TextSourcesList
 import dev.inmo.tgbotapi.types.queries.callback.MessageDataCallbackQuery
 import dev.inmo.tgbotapi.types.toChatId
-import dev.inmo.tgbotapi.utils.bold
-import dev.inmo.tgbotapi.utils.botCommand
-import dev.inmo.tgbotapi.utils.link
-import dev.inmo.tgbotapi.utils.regular
-import dev.inmo.tgbotapi.utils.row
-import dev.inmo.tgbotapi.utils.underline
+import dev.inmo.tgbotapi.utils.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -88,13 +88,13 @@ internal object DraftButtonsDrawer : Plugin {
     const val changeDescriptionButtonData = "tasks_draft_changeDescription"
     const val resendDescriptionButtonData = "tasks_draft_resendDescription"
     const val changeAnswerFormatsButtonData = "tasks_draft_changeAnswerFormats"
+    const val createTaskButtonData = "tasks_draft_create"
+    const val createTaskApproveButtonData = "tasks_draft_create_approve"
     const val refreshButtonData = "tasks_draft_refresh"
     const val changeAssignmentDateTimeButtonData = "tasks_draft_changeAssignmentDateTimeButton"
     const val changeAnswerDeadlineDateTimeButtonData = "tasks_draft_changeAnswerDeadlineDateTimeButton"
 
     private val draftDescriptionMessagesRegistrarQualifier = StringQualifier("draftDescriptionMessagesRegistrar")
-
-    const val createNewDraftButtonData = "tasks_draft_createNewDraft"
 
     @Serializable
     internal data class DescriptionMessagesRegistration(
@@ -102,7 +102,8 @@ internal object DraftButtonsDrawer : Plugin {
     ) : State
 
     private fun buildDraftKeyboard(
-        locale: Locale
+        locale: Locale,
+        isReadyForCreation: Boolean
     ) = inlineKeyboard {
         row {
             dataButton(
@@ -136,21 +137,22 @@ internal object DraftButtonsDrawer : Plugin {
                 changeAnswerFormatsButtonData
             )
         }
+        row {
+            dataButton(
+                TasksStrings.createTaskBtnTitle.translation(locale),
+                createTaskButtonData
+            )
+        }
     }
 
-    suspend fun BehaviourContext.drawDraftInfoOnMessage(
-        me: Bot,
+    fun drawDraftInfoOnMessage(
+        me: ExtendedBot,
         course: RegisteredCourse,
         locale: Locale,
-        chatIdentifier: IdChatIdentifier,
-        messageId: MessageId,
         draft: TaskDraft
-    ) {
-        edit(
-            chatIdentifier,
-            messageId,
-            replyMarkup = buildDraftKeyboard(locale)
-        ) {
+    ): TextSourcesList {
+        return buildEntities {
+
             +TasksStrings.courseNamePrefix.translation(locale) + underline(course.title) + "\n\n"
 
             +TasksStrings.descriptionPrefix.translation(locale)
@@ -182,6 +184,28 @@ internal object DraftButtonsDrawer : Plugin {
             draft.deadLineDateTime ?.local ?.let {
                 underline(it.format(TasksStrings.dateTimeFormat.translation(locale)))
             } ?: bold(TasksStrings.taskAnswerParameterNotSpecified.translation(locale))
+        }
+    }
+
+    suspend fun BehaviourContext.drawDraftInfoOnMessage(
+        me: ExtendedBot,
+        course: RegisteredCourse,
+        locale: Locale,
+        chatIdentifier: IdChatIdentifier,
+        messageId: MessageId,
+        draft: TaskDraft
+    ) {
+        edit(
+            chatIdentifier,
+            messageId,
+            replyMarkup = buildDraftKeyboard(locale, draft.canBeCreated)
+        ) {
+            +drawDraftInfoOnMessage(
+                me,
+                course,
+                locale,
+                draft
+            )
         }
     }
 
@@ -403,6 +427,8 @@ internal object DraftButtonsDrawer : Plugin {
             backButtonData = CommonPlugin.openDraftWithCourseIdBtnData
         )
         val resender = koin.get<MessagesResender>()
+        val tasksRepo = koin.get<TasksCRUDRepo>()
+        val answerFormatsRepo = koin.get<AnswersFormatsCRUDRepo>()
         val me by lazy {
             koin.get<ExtendedBot>()
         }
@@ -435,7 +461,7 @@ internal object DraftButtonsDrawer : Plugin {
 
             edit(
                 it.query.message,
-                replyMarkup = buildDraftKeyboard(locale)
+                replyMarkup = buildDraftKeyboard(locale, draft ?.canBeCreated == true)
             )
         }
 
@@ -552,6 +578,77 @@ internal object DraftButtonsDrawer : Plugin {
             )
         }
 
+        onMessageDataCallbackQuery(createTaskButtonData) {
+            val user = usersRepo.getById(it.user.id) ?: answer(it).let {
+                return@onMessageDataCallbackQuery
+            }
+            val teacher = teachersRepo.getById(
+                user.id
+            ) ?: answer(it).let {
+                return@onMessageDataCallbackQuery
+            }
+            val draft = draftsRepo.get(teacher.id) ?: return@onMessageDataCallbackQuery
+            val course = coursesRepo.getById(draft.courseId) ?: return@onMessageDataCallbackQuery
+            val locale = languagesRepo.getChatLanguage(it.user).locale
+
+            if (draft.canBeCreated) {
+                reply(
+                    it.message,
+                    buildEntities {
+                        bold(TasksStrings.createTaskConfirmationTemplate.translation(locale)) + regular("\n\n")
+                        +drawDraftInfoOnMessage(
+                            me,
+                            course,
+                            locale,
+                            draft
+                        )
+                    },
+                    replyMarkup = inlineKeyboard {
+                        row {
+                            dataButton(
+                                CommonStrings.create.translation(locale),
+                                createTaskApproveButtonData
+                            )
+                            dataButton(
+                                CommonStrings.cancel.translation(locale),
+                                manageDraftButtonData
+                            )
+                        }
+                    }
+                )
+            }
+        }
+
+        onMessageDataCallbackQuery(createTaskApproveButtonData) {
+            val user = usersRepo.getById(it.user.id) ?: answer(it).let {
+                return@onMessageDataCallbackQuery
+            }
+            val teacher = teachersRepo.getById(
+                user.id
+            ) ?: answer(it).let {
+                return@onMessageDataCallbackQuery
+            }
+            val draft = draftsRepo.get(teacher.id) ?: return@onMessageDataCallbackQuery
+            val course = coursesRepo.getById(draft.courseId) ?: return@onMessageDataCallbackQuery
+            val locale = languagesRepo.getChatLanguage(it.user).locale
+
+            if (draft.canBeCreated) {
+                val answerFormats = answerFormatsRepo.create(draft.newAnswersFormats)
+                val registeredTask = tasksRepo.create(
+                    NewTask(
+                        courseId = draft.courseId,
+                        taskDescriptionMessages = draft.descriptionMessages,
+                        answerFormatsIds = answerFormats.map { it.id },
+                        assignmentDateTime = draft.assignmentDateTime,
+                        answersAcceptingDeadLine = draft.deadLineDateTime
+                    )
+                ).firstOrNull()
+                registeredTask ?.let {
+
+                }
+            }
+        }
+
         strictlyOn { state: DescriptionMessagesRegistration ->
             val locale = languagesRepo.getChatLanguage(state.context).locale
             val user = usersRepo.getById(state.context) ?: return@strictlyOn null
@@ -612,7 +709,7 @@ internal object DraftButtonsDrawer : Plugin {
             } else {
                 edit(
                     it.message,
-                    replyMarkup = buildDraftKeyboard(locale)
+                    replyMarkup = buildDraftKeyboard(locale, draft.canBeCreated)
                 )
             }
         }

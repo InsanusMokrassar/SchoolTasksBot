@@ -25,6 +25,7 @@ import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.annotations.GenerateKoinDefinition
 import dev.inmo.micro_utils.koin.getAllDistinct
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
+import dev.inmo.micro_utils.language_codes.IetfLang
 import dev.inmo.micro_utils.language_codes.IetfLanguageCode
 import dev.inmo.micro_utils.pagination.Pagination
 import dev.inmo.micro_utils.pagination.firstPageWithOneElementPagination
@@ -197,7 +198,7 @@ object CommonPlugin : Plugin {
             }
         }
 
-        suspend fun buildCourseButtons(course: RegisteredCourse, user: RegisteredUser, chatLanguage: IetfLanguageCode): InlineKeyboardMarkup {
+        suspend fun buildCourseButtons(course: RegisteredCourse, user: RegisteredUser, chatLanguage: IetfLang): InlineKeyboardMarkup {
             return inlineKeyboard {
                 val subkeyboards = courseButtonsProviders.mapNotNull {
                     inlineKeyboard {

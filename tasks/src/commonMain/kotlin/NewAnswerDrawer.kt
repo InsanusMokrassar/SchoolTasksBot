@@ -13,6 +13,7 @@ import center.sciprog.tasks_bot.users.repos.ReadUsersRepo
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
+import dev.inmo.micro_utils.language_codes.IetfLang
 import dev.inmo.micro_utils.language_codes.IetfLanguageCode
 import dev.inmo.micro_utils.pagination.Pagination
 import dev.inmo.micro_utils.pagination.SimplePagination
@@ -75,7 +76,7 @@ internal class NewAnswerDrawer(
 
     fun newAnswerFormatSmallTitle(
         newAnswerFormatInfo: NewAnswerFormatInfo,
-        ietfLanguageCode: IetfLanguageCode
+        ietfLanguageCode: IetfLang
     ): String {
         val locale = ietfLanguageCode.locale
         return when (val format = newAnswerFormatInfo.format) {
@@ -91,7 +92,7 @@ internal class NewAnswerDrawer(
         }
     }
 
-    private fun createAnswersFormatKeyboardByPage(ietfLanguageCode: IetfLanguageCode, draft: TaskDraft, pagination: Pagination): InlineKeyboardMarkup {
+    private fun createAnswersFormatKeyboardByPage(ietfLanguageCode: IetfLang, draft: TaskDraft, pagination: Pagination): InlineKeyboardMarkup {
         return inlineKeyboard {
             val resultPagination = draft.newAnswersFormats.paginate(pagination)
             if (resultPagination.size > 1) {

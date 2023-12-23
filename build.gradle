@@ -4,16 +4,13 @@ buildscript {
         mavenCentral()
         mavenLocal()
         maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://nexus.inmo.dev/repository/maven-releases" }
     }
 
     dependencies {
         classpath libs.kotlin.gradle.plugin
         classpath libs.kotlin.serialization.plugin
         classpath libs.kotlin.dokka.plugin
-        classpath libs.moko.resources.plugin
         classpath libs.kotlin.ksp.plugin
-        classpath libs.libres.plugin
     }
 }
 

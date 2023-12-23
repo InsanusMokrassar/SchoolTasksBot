@@ -1,7 +1,14 @@
 @file:GenerateKoinDefinition("supervisorId", UserId::class, nullable = false, generateFactory = false)
-@file:GenerateKoinDefinition("supervisorIetfLanguageCode", IetfLanguageCode::class, nullable = false, generateFactory = false)
+@file:GenerateKoinDefinition("supervisorIetfLanguageCode", IetfLang::class, nullable = false, generateFactory = false)
 @file:GenerateKoinDefinition("useCache", Boolean::class, nullable = false, generateFactory = false)
-@file:GenerateKoinDefinition("languagesRepo", KeyValueRepo::class, IdChatIdentifier::class, IetfLanguageCode::class, nullable = false, generateFactory = false)
+@file:GenerateKoinDefinition(
+    "languagesRepo",
+    KeyValueRepo::class,
+    IdChatIdentifier::class,
+    IetfLang::class,
+    nullable = false,
+    generateFactory = false
+)
 @file:GenerateKoinDefinition("statesJson", Json::class, nullable = false, generateFactory = false)
 @file:GenerateKoinDefinition("cacheChatId", IdChatIdentifier::class, nullable = false, generateFactory = false)
 package center.sciprog.tasks_bot.common
@@ -18,6 +25,7 @@ import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.annotations.GenerateKoinDefinition
 import dev.inmo.micro_utils.koin.getAllDistinct
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
+import dev.inmo.micro_utils.language_codes.IetfLang
 import dev.inmo.micro_utils.language_codes.IetfLanguageCode
 import dev.inmo.micro_utils.repos.KeyValueRepo
 import dev.inmo.plagubot.Plugin
@@ -55,9 +63,9 @@ object CommonPlugin : Plugin {
             UserId(params["supervisor"] ?.jsonPrimitive ?.long ?: error("Unable to load supervisor id"))
         }
         supervisorIetfLanguageCodeSingle {
-            params["supervisor_locale"] ?.jsonPrimitive ?.contentOrNull ?.let {
+            params["supervisor_locale"]?.jsonPrimitive?.contentOrNull?.let {
                 IetfLanguageCode(it)
-            } ?: IetfLanguageCode.English
+            } ?: IetfLang.English
         }
         useCacheSingle {
             params["useCache"] ?.jsonPrimitive ?.booleanOrNull ?: false

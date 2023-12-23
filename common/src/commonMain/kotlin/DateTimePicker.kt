@@ -17,6 +17,7 @@ import korlibs.time.years
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
+import dev.inmo.micro_utils.language_codes.IetfLang
 import dev.inmo.micro_utils.language_codes.IetfLanguageCode
 import dev.inmo.micro_utils.repos.KeyValueRepo
 import dev.inmo.plagubot.Plugin
@@ -244,8 +245,8 @@ object DateTimePicker : Plugin {
 
     private suspend inline fun <reified StateType : FSMState.ChangePartTime> BehaviourContextWithFSM<State>.createStrictly(
         koin: Koin,
-        languagesRepo: KeyValueRepo<IdChatIdentifier, IetfLanguageCode>,
-        noinline suggestTextResolver: (IetfLanguageCode) -> String,
+        languagesRepo: KeyValueRepo<IdChatIdentifier, IetfLang>,
+        noinline suggestTextResolver: (IetfLang) -> String,
         noinline possibleValues: (params: Params, state: StateType) -> Iterable<Int>,
         noinline dateTimeConverter: (params: Params, state: StateType, Int) -> DateTime
     ) {
@@ -280,8 +281,8 @@ object DateTimePicker : Plugin {
 
     private suspend inline fun <reified StateType : FSMState.ChangePartTime> BehaviourContextWithFSM<State>.createStrictlyUnified(
         koin: Koin,
-        languagesRepo: KeyValueRepo<IdChatIdentifier, IetfLanguageCode>,
-        noinline suggestTextResolver: (IetfLanguageCode) -> String,
+        languagesRepo: KeyValueRepo<IdChatIdentifier, IetfLang>,
+        noinline suggestTextResolver: (IetfLang) -> String,
         noinline globalMin: (params: Params, dateTime: DateTime) -> Int,
         noinline globalMax: (params: Params, dateTime: DateTime) -> Int,
         noinline dateTimePart: (params: Params, dateTime: DateTime) -> Int,

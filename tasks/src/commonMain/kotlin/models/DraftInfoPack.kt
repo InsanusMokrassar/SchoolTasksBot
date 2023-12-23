@@ -7,13 +7,14 @@ import center.sciprog.tasks_bot.teachers.models.TeacherId
 import center.sciprog.tasks_bot.teachers.repos.ReadTeachersRepo
 import center.sciprog.tasks_bot.users.models.RegisteredUser
 import center.sciprog.tasks_bot.users.repos.ReadUsersRepo
+import dev.inmo.micro_utils.language_codes.IetfLang
 import dev.inmo.micro_utils.language_codes.IetfLanguageCode
 import dev.inmo.micro_utils.repos.KeyValueRepo
 import dev.inmo.tgbotapi.types.IdChatIdentifier
 import dev.inmo.tgbotapi.types.UserId
 
 data class DraftInfoPack(
-    val ietfLanguageCode: IetfLanguageCode,
+    val ietfLanguageCode: IetfLang,
     val user: RegisteredUser,
     val teacher: RegisteredTeacher,
     val draft: TaskDraft?
@@ -22,7 +23,7 @@ data class DraftInfoPack(
 
 suspend fun DraftInfoPack(
     userId: UserId,
-    languagesRepo: KeyValueRepo<IdChatIdentifier, IetfLanguageCode>,
+    languagesRepo: KeyValueRepo<IdChatIdentifier, IetfLang>,
     usersRepo: ReadUsersRepo,
     teachersRepo: ReadTeachersRepo,
     draftsRepo: KeyValueRepo<TeacherId, TaskDraft>

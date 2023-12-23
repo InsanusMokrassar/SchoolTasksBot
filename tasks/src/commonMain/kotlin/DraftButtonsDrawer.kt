@@ -27,6 +27,7 @@ import korlibs.time.DateTime
 import korlibs.time.days
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.fsm.common.State
+import dev.inmo.micro_utils.language_codes.IetfLang
 import dev.inmo.micro_utils.language_codes.IetfLanguageCode
 import dev.inmo.micro_utils.repos.KeyValueRepo
 import dev.inmo.micro_utils.repos.set
@@ -190,7 +191,7 @@ internal object DraftButtonsDrawer : Plugin {
         chatIdentifier: IdChatIdentifier,
         messageId: MessageId,
         courseId: CourseId,
-        languagesRepo: KeyValueRepo<IdChatIdentifier, IetfLanguageCode>,
+        languagesRepo: KeyValueRepo<IdChatIdentifier, IetfLang>,
         usersRepo: ReadUsersRepo,
         teachersRepo: ReadTeachersRepo,
         coursesRepo: ReadCoursesRepo,

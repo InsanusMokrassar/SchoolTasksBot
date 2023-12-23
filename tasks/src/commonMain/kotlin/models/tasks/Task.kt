@@ -7,8 +7,8 @@ import dev.inmo.tgbotapi.libraries.resender.MessageMetaInfo
 @GenerateCRUDModel(IRegisteredTask::class)
 sealed interface Task {
     val courseId: center.sciprog.tasks_bot.courses.models.CourseId // keep full due to KSP errors
-    val taskMessages: List<MessageMetaInfo>
-    val taskPartsIds: List<AnswerFormatInfoId>
+    val taskDescriptionMessages: List<MessageMetaInfo>
+    val answerFormatsIds: List<AnswerFormatInfoId>
     val assignmentDateTime: DateTime?
     val answersAcceptingDeadLine: DateTime?
 }

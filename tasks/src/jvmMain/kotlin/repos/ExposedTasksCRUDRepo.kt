@@ -5,6 +5,7 @@ import center.sciprog.tasks_bot.tasks.models.tasks.AnswerFormatInfoId
 import center.sciprog.tasks_bot.tasks.models.tasks.NewTask
 import center.sciprog.tasks_bot.tasks.models.tasks.RegisteredTask
 import center.sciprog.tasks_bot.tasks.models.tasks.TaskId
+import dev.inmo.micro_utils.coroutines.withReadAcquire
 import dev.inmo.micro_utils.repos.MapKeyValueRepo
 import dev.inmo.micro_utils.repos.UpdatedValuePair
 import dev.inmo.micro_utils.repos.cache.full.FullCRUDCacheRepo
@@ -33,7 +34,38 @@ class ExposedTasksCRUDRepo(
     private val assignmentDateTimeColumn = double("assignment_dt").nullable()
     private val answerAcceptingDateTimeColumn = double("answers_accepting_until_dt").nullable()
 
-    fun cached(scope: CoroutineScope): TasksCRUDRepo = object : TasksCRUDRepo, FullCRUDCacheRepo<RegisteredTask, TaskId, NewTask>(this@ExposedTasksCRUDRepo, MapKeyValueRepo(), scope, idGetter = { it.id }) {}
+    fun cached(scope: CoroutineScope): TasksCRUDRepo = object : TasksCRUDRepo, FullCRUDCacheRepo<RegisteredTask, TaskId, NewTask>(this@ExposedTasksCRUDRepo, MapKeyValueRepo(), scope, idGetter = { it.id }) {
+        override suspend fun getClosestTasks(dt: DateTime): List<RegisteredTask> {
+            return locker.withReadAcquire {
+                var closestDt: DateTime? = null
+                kvCache.getAll().mapNotNull { (_, task) ->
+                    when {
+                        task.assignmentDateTime == null -> return@mapNotNull null
+                        closestDt == null && task.assignmentDateTime >= dt -> {
+                            closestDt = task.assignmentDateTime
+                            task
+                        }
+                        closestDt == task.assignmentDateTime -> task
+                        else -> null
+                    }
+                }
+            }
+        }
+
+        override suspend fun getTasksByDateTime(dt: DateTime): List<RegisteredTask> = locker.withReadAcquire {
+            return locker.withReadAcquire {
+                kvCache.getAll().values.filter { it.assignmentDateTime == dt }
+            }
+        }
+
+        override suspend fun getActiveTasks(course: CourseId, dt: DateTime): List<RegisteredTask> {
+            return locker.withReadAcquire {
+                kvCache.getAll().values.filter { task ->
+                    task.courseId == course && task.assignmentDateTime ?.let { it <= dt } == true && task.answersAcceptingDeadLine ?.let { it > dt } != false
+                }
+            }
+        }
+    }
 
     private val messagesMetaInfoTable by lazy {
         object : Table("tasks"), ExposedRepo {
@@ -149,5 +181,47 @@ class ExposedTasksCRUDRepo(
             get(assignmentDateTimeColumn) ?.let(::DateTime),
             get(answerAcceptingDateTimeColumn) ?.let(::DateTime),
         )
+    }
+
+    override suspend fun getClosestTasks(dt: DateTime): List<RegisteredTask> = transaction(database) {
+        var nearDt: DateTime? = null
+        select {
+            assignmentDateTimeColumn.greaterEq(dt.unixMillis)
+        }.orderBy(
+            column = assignmentDateTimeColumn,
+            order = SortOrder.ASC
+        ).mapNotNull {
+            when {
+                nearDt == null && it[assignmentDateTimeColumn] == null -> return@mapNotNull null
+                nearDt == null -> {
+                    nearDt = it[assignmentDateTimeColumn] ?.let(::DateTime)
+                    it
+                }
+                nearDt ?.unixMillis == it[assignmentDateTimeColumn] -> it
+                else -> null
+            }
+        }.map {
+            it.asObject
+        }
+    }
+
+    override suspend fun getTasksByDateTime(dt: DateTime): List<RegisteredTask> = transaction(database) {
+        select {
+            assignmentDateTimeColumn.eq(dt.unixMillis)
+        }.map {
+            it.asObject
+        }
+    }
+
+    override suspend fun getActiveTasks(course: CourseId, dt: DateTime): List<RegisteredTask> = transaction(database) {
+        select {
+            courseIdColumn.eq(course.long).and(
+                assignmentDateTimeColumn.lessEq(dt.unixMillis).and(
+                    answerAcceptingDateTimeColumn.isNull().or(answerAcceptingDateTimeColumn.greater(dt.unixMillis))
+                )
+            )
+        }.map {
+            it.asObject
+        }
     }
 }

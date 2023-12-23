@@ -6,9 +6,12 @@ import center.sciprog.tasks_bot.common.useCache
 import center.sciprog.tasks_bot.common.utils.getChatLanguage
 import center.sciprog.tasks_bot.common.utils.locale
 import center.sciprog.tasks_bot.courses.CourseButtonsProvider
+import center.sciprog.tasks_bot.courses.courseSubscribersRepo
 import center.sciprog.tasks_bot.courses.models.CourseId
 import center.sciprog.tasks_bot.courses.repos.ReadCoursesRepo
 import center.sciprog.tasks_bot.tasks.models.tasks.TaskDraft
+import center.sciprog.tasks_bot.tasks.services.AssignmentHappenService
+import center.sciprog.tasks_bot.tasks.services.AssignmentProcessorService
 import center.sciprog.tasks_bot.tasks.strings.TasksStrings
 import center.sciprog.tasks_bot.teachers.models.TeacherId
 import center.sciprog.tasks_bot.teachers.repos.ReadTeachersRepo
@@ -17,6 +20,7 @@ import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.annotations.GenerateKoinDefinition
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
 import dev.inmo.micro_utils.repos.KeyValueRepo
+import dev.inmo.micro_utils.repos.KeyValuesRepo
 import dev.inmo.micro_utils.repos.MapKeyValueRepo
 import dev.inmo.micro_utils.repos.cache.full.fullyCached
 import dev.inmo.micro_utils.repos.exposed.keyvalue.ExposedKeyValueRepo
@@ -90,6 +94,22 @@ object CommonPlugin : Plugin {
                 polymorphic(State::class, DraftButtonsDrawer.DescriptionMessagesRegistration::class, DraftButtonsDrawer.DescriptionMessagesRegistration.serializer())
                 polymorphic(Any::class, DraftButtonsDrawer.DescriptionMessagesRegistration::class, DraftButtonsDrawer.DescriptionMessagesRegistration.serializer())
             }
+        }
+        single {
+            AssignmentProcessorService(
+                tasksCRUDRepo = get(),
+                studentsRepo = courseSubscribersRepo,
+                usersRepo = get(),
+                resender = get()
+            )
+        }
+        single {
+            AssignmentHappenService(
+                tasksCRUDRepo = get(),
+                assignmentProcessorService = get(),
+                studentsRepo = courseSubscribersRepo,
+                scope = get()
+            )
         }
     }
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {

@@ -17,5 +17,5 @@ data class TaskDraft(
     val deadLineDateTime: DateTime?
 ) {
     val canBeCreated
-        get() = descriptionMessages.isNotEmpty()
+        get() = descriptionMessages.isNotEmpty() && newAnswersFormats.isNotEmpty()
 }

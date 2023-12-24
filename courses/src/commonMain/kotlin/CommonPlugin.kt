@@ -478,7 +478,7 @@ object CommonPlugin : Plugin {
                         course.title,
                         InputTextMessageContent(
                             buildEntities {
-                                link(course.title, makeTelegramDeepLink(me.username!!, link.string))
+                                link(course.title, makeTelegramDeepLink(me.username!!, "$deepLinkPrefix${link.string}"))
                             }
                         ),
                         description = CoursesStrings.courseLinkInlineQuery.translation(chatLanguage)

@@ -10,6 +10,7 @@ import center.sciprog.tasks_bot.courses.courseSubscribersRepo
 import center.sciprog.tasks_bot.courses.models.CourseId
 import center.sciprog.tasks_bot.courses.repos.ReadCoursesRepo
 import center.sciprog.tasks_bot.tasks.models.tasks.TaskDraft
+import center.sciprog.tasks_bot.tasks.repos.TasksCRUDRepo
 import center.sciprog.tasks_bot.tasks.services.AssignmentHappenService
 import center.sciprog.tasks_bot.tasks.services.AssignmentProcessorService
 import center.sciprog.tasks_bot.tasks.strings.TasksStrings
@@ -20,13 +21,11 @@ import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.annotations.GenerateKoinDefinition
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
 import dev.inmo.micro_utils.repos.KeyValueRepo
-import dev.inmo.micro_utils.repos.KeyValuesRepo
 import dev.inmo.micro_utils.repos.MapKeyValueRepo
 import dev.inmo.micro_utils.repos.cache.full.fullyCached
 import dev.inmo.micro_utils.repos.exposed.keyvalue.ExposedKeyValueRepo
 import dev.inmo.micro_utils.repos.mappers.withMapper
 import dev.inmo.micro_utils.repos.set
-import dev.inmo.micro_utils.strings.translation
 import dev.inmo.plagubot.Plugin
 import dev.inmo.tgbotapi.extensions.api.answers.answer
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
@@ -35,6 +34,7 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessag
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.types.chat.ExtendedBot
 import dev.inmo.tgbotapi.utils.row
+import korlibs.time.DateTime
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.modules.SerializersModule
@@ -44,6 +44,7 @@ import org.koin.core.module.Module
 
 object CommonPlugin : Plugin {
     internal const val openDraftWithCourseIdBtnData = "tasks_draft_open"
+    internal const val openCourseTasksBtnData = "tasks_get"
     private val newAnswerDrawer by lazy {
         NewAnswerDrawer(DraftButtonsDrawer.changeAnswerFormatsButtonData, DraftButtonsDrawer.manageDraftButtonData)
     }
@@ -89,13 +90,26 @@ object CommonPlugin : Plugin {
                 }
             }
         }
+        singleWithRandomQualifier<CourseButtonsProvider> {
+            val subscribersRepo = courseSubscribersRepo
+            CourseButtonsProvider { course, user, chatLanguage ->
+                if (subscribersRepo.contains(course.id, user.id)) {
+                    row {
+                        dataButton(
+                            TasksStrings.tasks.translation(chatLanguage),
+                            "$openCourseTasksBtnData ${course.id.long}"
+                        )
+                    }
+                }
+            }
+        }
         singleWithRandomQualifier<SerializersModule> {
             SerializersModule {
                 polymorphic(State::class, DraftButtonsDrawer.DescriptionMessagesRegistration::class, DraftButtonsDrawer.DescriptionMessagesRegistration.serializer())
                 polymorphic(Any::class, DraftButtonsDrawer.DescriptionMessagesRegistration::class, DraftButtonsDrawer.DescriptionMessagesRegistration.serializer())
             }
         }
-        single {
+        single(createdAtStart = true) {
             AssignmentProcessorService(
                 tasksCRUDRepo = get(),
                 studentsRepo = courseSubscribersRepo,
@@ -103,7 +117,7 @@ object CommonPlugin : Plugin {
                 resender = get()
             )
         }
-        single {
+        single(createdAtStart = true) {
             AssignmentHappenService(
                 tasksCRUDRepo = get(),
                 assignmentProcessorService = get(),
@@ -126,6 +140,8 @@ object CommonPlugin : Plugin {
         val draftsRepo = koin.tasksDraftsRepo
         val coursesRepo = koin.get<ReadCoursesRepo>()
         val languagesRepo = koin.languagesRepo
+        val studentsRepo = koin.courseSubscribersRepo
+        val tasksRepo = koin.get<TasksCRUDRepo>()
 
         onMessageDataCallbackQuery(Regex("^$openDraftWithCourseIdBtnData( \\d+)?")) {
             val courseId = it.data.removePrefix(openDraftWithCourseIdBtnData).trim().toLongOrNull() ?.let(::CourseId)
@@ -171,5 +187,28 @@ object CommonPlugin : Plugin {
                 }
             }
         }
+
+//        onMessageDataCallbackQuery(Regex("$openCourseTasksBtnData.*")) {
+//            val data = it.data.removePrefix("$openCourseTasksBtnData ")
+//            val courseId = it.data.toLongOrNull() ?.let(::CourseId) ?: return@onMessageDataCallbackQuery
+//            val locale = languagesRepo.getChatLanguage(it.user).locale
+//            val user = usersRepo.getById(it.user.id) ?: answer(it).let {
+//                return@onMessageDataCallbackQuery
+//            }
+//            val teacherInfo = teachersRepo.getById(
+//                user.id
+//            )
+//            val isStudent = studentsRepo.getAll(courseId).contains(user.id)
+//
+//            if (isStudent) {
+//                tasksRepo.getActiveTasks(courseId, DateTime.now())
+//            }
+//
+//            val course = (draftsRepo.get(teacherInfo.id) ?.courseId ?: courseId) ?.let {
+//                coursesRepo.getById(it)
+//            } ?: coursesRepo.getCoursesIds(teacherInfo.id).firstNotNullOfOrNull {
+//                coursesRepo.getById(it)
+//            }
+//        }
     }
 }

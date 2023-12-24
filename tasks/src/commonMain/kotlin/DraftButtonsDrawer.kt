@@ -42,16 +42,16 @@ import dev.inmo.tgbotapi.extensions.api.delete
 import dev.inmo.tgbotapi.extensions.api.edit.edit
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.send
-import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
-import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
-import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitAnyContentMessage
-import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitCommandMessage
-import dev.inmo.tgbotapi.extensions.behaviour_builder.oneOf
-import dev.inmo.tgbotapi.extensions.behaviour_builder.strictlyOn
+import dev.inmo.tgbotapi.extensions.behaviour_builder.*
+import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.*
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessageDataCallbackQuery
+import dev.inmo.tgbotapi.extensions.utils.extensions.raw.data
+import dev.inmo.tgbotapi.extensions.utils.extensions.sameChat
+import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.formatting.makeLinkToMessage
 import dev.inmo.tgbotapi.extensions.utils.textContentOrNull
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
+import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
 import dev.inmo.tgbotapi.extensions.utils.updates.hasNoCommands
 import dev.inmo.tgbotapi.libraries.resender.MessageMetaInfo
@@ -85,6 +85,7 @@ internal object DraftButtonsDrawer : Plugin {
     const val changeCourseButtonData = "tasks_draft_changeCourse"
     const val manageDraftButtonData = "tasks_draft_manage"
     const val manageDescriptionButtonData = "tasks_draft_ManageDescription"
+    const val manageTitleButtonData = "tasks_draft_ManageTitle"
     const val changeDescriptionButtonData = "tasks_draft_changeDescription"
     const val resendDescriptionButtonData = "tasks_draft_resendDescription"
     const val changeAnswerFormatsButtonData = "tasks_draft_changeAnswerFormats"
@@ -115,6 +116,10 @@ internal object DraftButtonsDrawer : Plugin {
             dataButton(
                 TasksStrings.courseChangeBtnTitle.translation(locale),
                 changeCourseButtonData
+            )
+            dataButton(
+                TasksStrings.titleChangeBtnTitle.translation(locale),
+                manageTitleButtonData
             )
             dataButton(
                 TasksStrings.descriptionChangeBtnTitle.translation(locale),
@@ -168,6 +173,17 @@ internal object DraftButtonsDrawer : Plugin {
 
                     regular(", ")
                 }
+            } else {
+                bold {
+                    +TasksStrings.taskAnswerParameterNotSpecified.translation(locale) + " "
+                    +"(" + underline(CommonStrings.required.translation(locale)) + ")"
+                }
+            }
+            +"\n\n"
+
+            +TasksStrings.titlePrefix.translation(locale)
+            if (draft.title != null) {
+                bold(draft.title)
             } else {
                 bold {
                     +TasksStrings.taskAnswerParameterNotSpecified.translation(locale) + " "
@@ -597,6 +613,54 @@ internal object DraftButtonsDrawer : Plugin {
             )
         }
 
+        standardOnMessageDataCallbackQuery(manageTitleButtonData) { query, locale, user, teacher, draft ->
+            edit(
+                query.message.chat.id,
+                query.message.messageId,
+                replyMarkup = flatInlineKeyboard {
+                    dataButton(
+                        CommonStrings.cancel.translation(locale),
+                        manageDraftButtonData
+                    )
+                }
+            ) {
+                regular(
+                    TasksStrings.typeTitleSuggestion.translation(locale)
+                )
+            }
+
+            val newTitle = oneOf(
+                parallel {
+                    waitTextMessage().filter {
+                        it.sameChat(query.message)
+                    }.first().content.text
+                },
+                parallel {
+                    waitMessageDataCallbackQuery().filter {
+                        it.data == manageDraftButtonData && it.message.sameMessage(query.message)
+                    }.first()
+                    draft.title
+                }
+            )
+
+            val newDraft = draft.copy(title = newTitle)
+            if (newTitle != draft.title) {
+                draftsRepo.set(teacher.id, newDraft)
+            }
+
+            edit(
+                query.message.chat.id,
+                query.message.messageId,
+                entities = drawDraftInfoOnMessage(
+                    me,
+                    coursesRepo.getById(draft.courseId) ?: return@standardOnMessageDataCallbackQuery,
+                    locale,
+                    newDraft
+                ),
+                replyMarkup = buildDraftKeyboard(locale, draft.canBeCreated)
+            )
+        }
+
         onMessageDataCallbackQuery(changeDescriptionButtonData) {
             startChain(MessagesRegistrar.FSMState(it.user.id, draftDescriptionMessagesRegistrarQualifier))
         }
@@ -672,11 +736,12 @@ internal object DraftButtonsDrawer : Plugin {
             val course = coursesRepo.getById(draft.courseId) ?: return@onMessageDataCallbackQuery
             val locale = languagesRepo.getChatLanguage(it.user).locale
 
-            if (draft.canBeCreated && draft.assignmentDateTime != null) {
+            if (draft.canBeCreated && draft.assignmentDateTime != null && draft.title != null) {
                 val answerFormats = answerFormatsRepo.create(draft.newAnswersFormats)
                 val registeredTask = tasksRepo.create(
                     NewTask(
                         courseId = draft.courseId,
+                        title = draft.title,
                         taskDescriptionMessages = draft.descriptionMessages,
                         answerFormatsIds = answerFormats.map { it.id },
                         assignmentDateTime = draft.assignmentDateTime,

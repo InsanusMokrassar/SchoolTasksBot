@@ -13,26 +13,32 @@ object TasksStrings {
     val descriptionPrefix = buildStringResource("Task: ") {
         IetfLang.Russian variant "Задание: "
     }
+    val titlePrefix = buildStringResource("Title: ") {
+        IetfLang.Russian variant "Название: "
+    }
     val assignmentDatePrefix = buildStringResource("Assignment: ") {
         IetfLang.Russian variant "Назначение: "
     }
     val deadlineDatePrefix = buildStringResource("Deadline: ") {
         IetfLang.Russian variant "Дата сдачи: "
     }
-    val courseChangeBtnTitle = buildStringResource("Change course") {
-        IetfLang.Russian variant "Изменить курс"
+    val courseChangeBtnTitle = buildStringResource("Course") {
+        IetfLang.Russian variant "Курс"
     }
-    val descriptionChangeBtnTitle = buildStringResource("Change description") {
-        IetfLang.Russian variant "Изменить описание"
+    val titleChangeBtnTitle = buildStringResource("Title") {
+        IetfLang.Russian variant "Название"
     }
-    val answersFormatsChangeBtnTitle = buildStringResource("Change answer formats") {
-        IetfLang.Russian variant "Изменить форматы ответов"
+    val descriptionChangeBtnTitle = buildStringResource("Description") {
+        IetfLang.Russian variant "Описание"
     }
-    val assignmentDateChangeBtnTitle = buildStringResource("Change assignment date") {
-        IetfLang.Russian variant "Изменить дату назначения"
+    val answersFormatsChangeBtnTitle = buildStringResource("Answer formats") {
+        IetfLang.Russian variant "Форматы ответов"
     }
-    val deadlineDateChangeBtnTitle = buildStringResource("Change answers deadline") {
-        IetfLang.Russian variant "Изменить дату сдачи"
+    val assignmentDateChangeBtnTitle = buildStringResource("Assignment date") {
+        IetfLang.Russian variant "Дата назначения"
+    }
+    val deadlineDateChangeBtnTitle = buildStringResource("Answers deadline") {
+        IetfLang.Russian variant "Дата сдачи"
     }
     val tasksListTitle = buildStringResource("Tasks:") {
         IetfLang.Russian variant "Задания:"
@@ -147,5 +153,15 @@ object TasksStrings {
         "Task has been created"
     ) {
         IetfLang.Russian variant { "Задание было создано" }
+    }
+    val tasks = buildStringResource(
+        "Tasks"
+    ) {
+        IetfLang.Russian variant { "Задания" }
+    }
+    val typeTitleSuggestion = buildStringResource(
+        "Type new title"
+    ) {
+        IetfLang.Russian variant { "Отправьте новое название" }
     }
 }

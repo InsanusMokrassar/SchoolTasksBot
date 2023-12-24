@@ -31,6 +31,7 @@ class ExposedTasksCRUDRepo(
     val idColumn = long("_id").autoIncrement()
     override val primaryKey: PrimaryKey = PrimaryKey(idColumn)
     val courseIdColumn = long("course_id")
+    val titleColumn = text("title")
     private val assignmentDateTimeColumn = double("assignment_dt")
     private val answerAcceptingDateTimeColumn = double("answers_accepting_until_dt").nullable()
 
@@ -40,7 +41,6 @@ class ExposedTasksCRUDRepo(
                 var closestDt: DateTime? = null
                 kvCache.getAll().mapNotNull { (_, task) ->
                     when {
-                        task.assignmentDateTime == null -> return@mapNotNull null
                         closestDt == null && task.assignmentDateTime >= dt -> {
                             closestDt = task.assignmentDateTime
                             task
@@ -123,6 +123,7 @@ class ExposedTasksCRUDRepo(
         get() = RegisteredTask(
             asId,
             CourseId(get(courseIdColumn)),
+            get(titleColumn),
             messagesMetaInfoTable.getByTaskIdWithoutTransaction(asId),
             answersFormatsCRUDRepo.getByTaskIdWithoutTransaction(asId),
             get(assignmentDateTimeColumn).let(::DateTime),
@@ -137,6 +138,7 @@ class ExposedTasksCRUDRepo(
         it[assignmentDateTimeColumn] = value.assignmentDateTime.unixMillis
         it[answerAcceptingDateTimeColumn] = value.answersAcceptingDeadLine ?.unixMillis
         it[courseIdColumn] = value.courseId.long
+        it[titleColumn] = value.title
     }
 
     override suspend fun onAfterCreate(values: List<Pair<NewTask, RegisteredTask>>): List<RegisteredTask> {
@@ -180,6 +182,7 @@ class ExposedTasksCRUDRepo(
         return RegisteredTask(
             id,
             CourseId(get(courseIdColumn)),
+            get(titleColumn),
             messagesMetaInfoTable.getByTaskIdWithoutTransaction(id),
             answersFormatsCRUDRepo.getByTaskIdWithoutTransaction(id),
             get(assignmentDateTimeColumn).let(::DateTime),
@@ -196,9 +199,8 @@ class ExposedTasksCRUDRepo(
             order = SortOrder.ASC
         ).mapNotNull {
             when {
-                nearDt == null && it[assignmentDateTimeColumn] == null -> return@mapNotNull null
                 nearDt == null -> {
-                    nearDt = it[assignmentDateTimeColumn] ?.let(::DateTime)
+                    nearDt = it[assignmentDateTimeColumn].let(::DateTime)
                     it
                 }
                 nearDt ?.unixMillis == it[assignmentDateTimeColumn] -> it

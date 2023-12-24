@@ -11,11 +11,12 @@ data class TaskDraft(
     val courseId: CourseId,
     val descriptionMessages: List<MessageMetaInfo>,
     val newAnswersFormats: List<NewAnswerFormatInfo>,
+    val title: String? = null,
     @Serializable(DateTimeSerializer::class)
     val assignmentDateTime: DateTime?,
     @Serializable(DateTimeSerializer::class)
     val deadLineDateTime: DateTime?
 ) {
     val canBeCreated
-        get() = descriptionMessages.isNotEmpty() && newAnswersFormats.isNotEmpty() && assignmentDateTime != null
+        get() = descriptionMessages.isNotEmpty() && newAnswersFormats.isNotEmpty() && assignmentDateTime != null && title != null
 }

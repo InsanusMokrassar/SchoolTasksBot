@@ -15,6 +15,7 @@ import kotlinx.serialization.Serializable
 @SerialName(value = "NewTask")
 public data class NewTask(
     public override val courseId: CourseId,
+    public override val title: String,
     public override val taskDescriptionMessages: List<MessageMetaInfo>,
     public override val answerFormatsIds: List<AnswerFormatInfoId>,
     @Serializable(DateTimeSerializer::class)
@@ -28,6 +29,7 @@ public data class NewTask(
 public data class RegisteredTask(
     public override val id: TaskId,
     public override val courseId: CourseId,
+    public override val title: String,
     public override val taskDescriptionMessages: List<MessageMetaInfo>,
     public override val answerFormatsIds: List<AnswerFormatInfoId>,
     @Serializable(DateTimeSerializer::class)
@@ -36,8 +38,8 @@ public data class RegisteredTask(
     public override val answersAcceptingDeadLine: DateTime?,
 ) : Task, IRegisteredTask
 
-public fun Task.asNew(): NewTask = NewTask(courseId, taskDescriptionMessages, answerFormatsIds, assignmentDateTime,
+public fun Task.asNew(): NewTask = NewTask(courseId, title, taskDescriptionMessages, answerFormatsIds, assignmentDateTime,
     answersAcceptingDeadLine)
 
-public fun Task.asRegistered(id: TaskId): RegisteredTask = RegisteredTask(id, courseId, taskDescriptionMessages,
+public fun Task.asRegistered(id: TaskId): RegisteredTask = RegisteredTask(id, courseId, title, taskDescriptionMessages,
     answerFormatsIds, assignmentDateTime, answersAcceptingDeadLine)

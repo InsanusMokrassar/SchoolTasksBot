@@ -149,3 +149,25 @@ public fun Module.cacheChatIdSingle(
     definition: Definition<IdChatIdentifier>
 ): KoinDefinition<IdChatIdentifier> =
     single(named("cacheChatId"), createdAtStart = createdAtStart, definition = definition)
+
+
+/**
+ * @return Definition by key "debug"
+ */
+public val Scope.debug: Boolean
+    get() = get(named("debug"))
+
+/**
+ * @return Definition by key "debug"
+ */
+public val Koin.debug: Boolean
+    get() = get(named("debug"))
+
+/**
+ * Will register [definition] with [org.koin.core.module.Module.single] and key "debug"
+ */
+public fun Module.debugSingle(
+    createdAtStart: Boolean = false,
+    definition: Definition<Boolean>
+): KoinDefinition<Boolean> =
+    single(named("debug"), createdAtStart = createdAtStart, definition = definition)

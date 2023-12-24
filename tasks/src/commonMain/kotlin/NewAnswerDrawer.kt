@@ -14,7 +14,6 @@ import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
 import dev.inmo.micro_utils.language_codes.IetfLang
-import dev.inmo.micro_utils.language_codes.IetfLanguageCode
 import dev.inmo.micro_utils.pagination.Pagination
 import dev.inmo.micro_utils.pagination.SimplePagination
 import dev.inmo.micro_utils.pagination.firstIndex
@@ -360,7 +359,7 @@ internal class NewAnswerDrawer(
                         simpleButton("docx")
                     }
                 ) {
-                    +TasksStrings.answerFormatFileCurrentExtensionTemplate.translation(draftInfoPack.ietfLanguageCode).format(format.extension ?: "*")
+                    +TasksStrings.answerFormatFileCurrentExtensionEditingTemplate.translation(draftInfoPack.ietfLanguageCode).format(format.extension ?: "*")
                 }
             }
 
@@ -451,7 +450,7 @@ internal class NewAnswerDrawer(
                 send(
                     state.context,
                 ) {
-                    +TasksStrings.answerFormatLinkCurrentRegexTemplate.translation(draftInfoPack.ietfLanguageCode).format(format.regexString)
+                    +TasksStrings.answerFormatLinkCurrentRegexEditingTemplate.translation(draftInfoPack.ietfLanguageCode).format(format.regexString)
                 }
             }
 

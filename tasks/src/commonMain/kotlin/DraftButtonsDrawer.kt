@@ -14,6 +14,7 @@ import center.sciprog.tasks_bot.courses.models.RegisteredCourse
 import center.sciprog.tasks_bot.courses.repos.CoursesRepo
 import center.sciprog.tasks_bot.courses.repos.ReadCoursesRepo
 import center.sciprog.tasks_bot.tasks.models.DraftInfoPack
+import center.sciprog.tasks_bot.tasks.models.tasks.AnswerFormat
 import center.sciprog.tasks_bot.tasks.models.tasks.NewTask
 import center.sciprog.tasks_bot.tasks.models.tasks.TaskDraft
 import center.sciprog.tasks_bot.tasks.repos.AnswersFormatsCRUDRepo
@@ -59,7 +60,6 @@ import dev.inmo.tgbotapi.libraries.resender.invoke
 import dev.inmo.tgbotapi.types.IdChatIdentifier
 import dev.inmo.tgbotapi.types.MessageId
 import dev.inmo.tgbotapi.types.UserId
-import dev.inmo.tgbotapi.types.chat.Bot
 import dev.inmo.tgbotapi.types.chat.ExtendedBot
 import dev.inmo.tgbotapi.types.message.textsources.BotCommandTextSource
 import dev.inmo.tgbotapi.types.message.textsources.TextSourcesList
@@ -137,11 +137,13 @@ internal object DraftButtonsDrawer : Plugin {
                 changeAnswerFormatsButtonData
             )
         }
-        row {
-            dataButton(
-                TasksStrings.createTaskBtnTitle.translation(locale),
-                createTaskButtonData
-            )
+        if (isReadyForCreation) {
+            row {
+                dataButton(
+                    TasksStrings.createTaskBtnTitle.translation(locale),
+                    createTaskButtonData
+                )
+            }
         }
     }
 
@@ -174,10 +176,48 @@ internal object DraftButtonsDrawer : Plugin {
             }
             +"\n\n"
 
+            +TasksStrings.answerFormatsDataPrefix.translation(locale)
+            draft.newAnswersFormats.ifEmpty {
+                bold {
+                    +TasksStrings.taskAnswerParameterNotSpecified.translation(locale) + " "
+                    +"(" + underline(CommonStrings.required.translation(locale)) + ")"
+                }
+                regular("\n")
+                emptyList()
+            }.forEach {
+                regular("---\n")
+                regular("    ")
+                regular(CommonStrings.type.translation(locale))
+                regular(": ")
+                bold(
+                    when (it.format) {
+                        is AnswerFormat.File -> TasksStrings.answerFormatTitleFile.translation(locale)
+                        is AnswerFormat.Link -> TasksStrings.answerFormatTitleLink.translation(locale)
+                        is AnswerFormat.Text -> TasksStrings.answerFormatTitleText.translation(locale)
+                    }
+                )
+                when (val format = it.format) {
+                    is AnswerFormat.File -> {
+                        regular("\n    ") + regular(TasksStrings.answerFormatFileCurrentExtensionTemplate.translation(locale).format(format.extension ?: "*.*")) + regular("\n")
+                        regular("\n    ") + regular(TasksStrings.answerFormatFileCurrentUseDescriptionTemplate.translation(locale).format(format.useDescription.toString())) + regular("\n")
+                    }
+                    is AnswerFormat.Link -> {
+                        regular("\n    ") + regular(TasksStrings.answerFormatLinkCurrentRegexTemplate.translation(locale).format(format.regexString)) + regular("\n")
+                    }
+                    is AnswerFormat.Text -> {
+                        regular("\n    ") + regular(TasksStrings.taskAnswerVariantTextSymbolsTemplate.translation(locale).format(format.lengthRange.first, format.lengthRange.last)) + regular("\n")
+                    }
+                }
+            }
+            +"\n"
+
             +TasksStrings.assignmentDatePrefix.translation(locale)
             draft.assignmentDateTime ?.local ?.let {
                 underline(it.format(TasksStrings.dateTimeFormat.translation(locale)))
-            } ?: bold(TasksStrings.taskAnswerParameterNotSpecified.translation(locale))
+            } ?: bold {
+                +TasksStrings.taskAnswerParameterNotSpecified.translation(locale) + " "
+                +"(" + underline(CommonStrings.required.translation(locale)) + ")"
+            }
             +"\n\n"
 
             +TasksStrings.deadlineDatePrefix.translation(locale)
@@ -632,7 +672,7 @@ internal object DraftButtonsDrawer : Plugin {
             val course = coursesRepo.getById(draft.courseId) ?: return@onMessageDataCallbackQuery
             val locale = languagesRepo.getChatLanguage(it.user).locale
 
-            if (draft.canBeCreated) {
+            if (draft.canBeCreated && draft.assignmentDateTime != null) {
                 val answerFormats = answerFormatsRepo.create(draft.newAnswersFormats)
                 val registeredTask = tasksRepo.create(
                     NewTask(
@@ -643,8 +683,19 @@ internal object DraftButtonsDrawer : Plugin {
                         answersAcceptingDeadLine = draft.deadLineDateTime
                     )
                 ).firstOrNull()
-                registeredTask ?.let {
-
+                registeredTask ?.let { createdTask ->
+                    edit(
+                        it.message.chat.id,
+                        it.message.messageId
+                    ) {
+                        +TasksStrings.taskHasBeenCreated.translation(locale) + "\n\n"
+                        +drawDraftInfoOnMessage(
+                            me,
+                            course,
+                            locale,
+                            draft
+                        )
+                    }
                 }
             }
         }

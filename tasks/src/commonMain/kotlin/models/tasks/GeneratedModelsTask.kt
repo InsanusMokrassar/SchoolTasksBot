@@ -18,9 +18,9 @@ public data class NewTask(
     public override val taskDescriptionMessages: List<MessageMetaInfo>,
     public override val answerFormatsIds: List<AnswerFormatInfoId>,
     @Serializable(DateTimeSerializer::class)
-  public override val assignmentDateTime: DateTime?,
+    public override val assignmentDateTime: DateTime,
     @Serializable(DateTimeSerializer::class)
-  public override val answersAcceptingDeadLine: DateTime?,
+    public override val answersAcceptingDeadLine: DateTime?,
 ) : Task
 
 @Serializable
@@ -31,9 +31,9 @@ public data class RegisteredTask(
     public override val taskDescriptionMessages: List<MessageMetaInfo>,
     public override val answerFormatsIds: List<AnswerFormatInfoId>,
     @Serializable(DateTimeSerializer::class)
-  public override val assignmentDateTime: DateTime?,
+    public override val assignmentDateTime: DateTime,
     @Serializable(DateTimeSerializer::class)
-  public override val answersAcceptingDeadLine: DateTime?,
+    public override val answersAcceptingDeadLine: DateTime?,
 ) : Task, IRegisteredTask
 
 public fun Task.asNew(): NewTask = NewTask(courseId, taskDescriptionMessages, answerFormatsIds, assignmentDateTime,

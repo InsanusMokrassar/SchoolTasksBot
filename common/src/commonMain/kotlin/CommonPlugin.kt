@@ -1,6 +1,7 @@
 @file:GenerateKoinDefinition("supervisorId", UserId::class, nullable = false, generateFactory = false)
 @file:GenerateKoinDefinition("supervisorIetfLanguageCode", IetfLang::class, nullable = false, generateFactory = false)
 @file:GenerateKoinDefinition("useCache", Boolean::class, nullable = false, generateFactory = false)
+@file:GenerateKoinDefinition("debug", Boolean::class, nullable = false, generateFactory = false)
 @file:GenerateKoinDefinition(
     "languagesRepo",
     KeyValueRepo::class,
@@ -15,12 +16,10 @@ package center.sciprog.tasks_bot.common
 
 import center.sciprog.tasks_bot.common.utils.serializers.ChatIdSerializer
 import center.sciprog.tasks_bot.common.utils.serializers.ChatIdWithThreadIdSerializer
+import dev.inmo.kslog.common.*
 import korlibs.time.DateTime
 import korlibs.time.months
 import korlibs.time.years
-import dev.inmo.kslog.common.KSLog
-import dev.inmo.kslog.common.d
-import dev.inmo.kslog.common.e
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.annotations.GenerateKoinDefinition
 import dev.inmo.micro_utils.koin.getAllDistinct
@@ -38,6 +37,7 @@ import dev.inmo.tgbotapi.types.ChatIdentifier
 import dev.inmo.tgbotapi.types.FullChatIdentifierSerializer
 import dev.inmo.tgbotapi.types.IdChatIdentifier
 import dev.inmo.tgbotapi.types.UserId
+import dev.inmo.tgbotapi.utils.DefaultKTgBotAPIKSLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -69,6 +69,9 @@ object CommonPlugin : Plugin {
         }
         useCacheSingle {
             params["useCache"] ?.jsonPrimitive ?.booleanOrNull ?: false
+        }
+        debugSingle {
+            params["debug"] ?.jsonPrimitive ?.booleanOrNull ?: false
         }
         cacheChatIdSingle {
             val cacheChatIdPrimitive = params["cacheChatId"] ?.jsonPrimitive ?: error("cacheChatId should be presented in config")
@@ -118,6 +121,11 @@ object CommonPlugin : Plugin {
     }
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {
         val me = getMe()
+
+        if (koin.debug) {
+            println(me)
+        }
+
         koin.loadModules(
             listOf(
                 module {

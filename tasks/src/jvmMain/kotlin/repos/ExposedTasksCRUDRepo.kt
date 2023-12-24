@@ -31,7 +31,7 @@ class ExposedTasksCRUDRepo(
     val idColumn = long("_id").autoIncrement()
     override val primaryKey: PrimaryKey = PrimaryKey(idColumn)
     val courseIdColumn = long("course_id")
-    private val assignmentDateTimeColumn = double("assignment_dt").nullable()
+    private val assignmentDateTimeColumn = double("assignment_dt")
     private val answerAcceptingDateTimeColumn = double("answers_accepting_until_dt").nullable()
 
     fun cached(scope: CoroutineScope): TasksCRUDRepo = object : TasksCRUDRepo, FullCRUDCacheRepo<RegisteredTask, TaskId, NewTask>(this@ExposedTasksCRUDRepo, MapKeyValueRepo(), scope, idGetter = { it.id }) {
@@ -68,7 +68,7 @@ class ExposedTasksCRUDRepo(
     }
 
     private val messagesMetaInfoTable by lazy {
-        object : Table("tasks"), ExposedRepo {
+        object : Table("tasks_messages_meta"), ExposedRepo {
             override val database: Database
                 get() = this@ExposedTasksCRUDRepo.database
             val taskIdColumn = long("task_id").references(this@ExposedTasksCRUDRepo.idColumn, onDelete = ReferenceOption.CASCADE, onUpdate = ReferenceOption.CASCADE)
@@ -76,6 +76,10 @@ class ExposedTasksCRUDRepo(
             val threadIdColumn = long("thread_id").nullable()
             val messageIdColumn = long("message_id")
             val groupColumn = text("group_id").nullable()
+
+            init {
+                initTable()
+            }
 
             fun getByTaskIdWithoutTransaction(taskId: TaskId) = select {
                 taskIdColumn.eq(taskId.long)
@@ -90,10 +94,6 @@ class ExposedTasksCRUDRepo(
                     it[messageIdColumn],
                     it[groupColumn]
                 )
-            }
-
-            init {
-                initTable()
             }
         }
     }
@@ -125,7 +125,7 @@ class ExposedTasksCRUDRepo(
             CourseId(get(courseIdColumn)),
             messagesMetaInfoTable.getByTaskIdWithoutTransaction(asId),
             answersFormatsCRUDRepo.getByTaskIdWithoutTransaction(asId),
-            get(assignmentDateTimeColumn) ?.let(::DateTime),
+            get(assignmentDateTimeColumn).let(::DateTime),
             get(answerAcceptingDateTimeColumn) ?.let(::DateTime),
         )
 
@@ -134,9 +134,13 @@ class ExposedTasksCRUDRepo(
     }
 
     override fun update(id: TaskId?, value: NewTask, it: UpdateBuilder<Int>) {
-        it[assignmentDateTimeColumn] = value.assignmentDateTime ?.unixMillis
+        it[assignmentDateTimeColumn] = value.assignmentDateTime.unixMillis
         it[answerAcceptingDateTimeColumn] = value.answersAcceptingDeadLine ?.unixMillis
         it[courseIdColumn] = value.courseId.long
+    }
+
+    override suspend fun onAfterCreate(values: List<Pair<NewTask, RegisteredTask>>): List<RegisteredTask> {
+        return onAfterUpdate(values)
     }
 
     override suspend fun onAfterUpdate(value: List<UpdatedValuePair<NewTask, RegisteredTask>>): List<RegisteredTask> {
@@ -178,7 +182,7 @@ class ExposedTasksCRUDRepo(
             CourseId(get(courseIdColumn)),
             messagesMetaInfoTable.getByTaskIdWithoutTransaction(id),
             answersFormatsCRUDRepo.getByTaskIdWithoutTransaction(id),
-            get(assignmentDateTimeColumn) ?.let(::DateTime),
+            get(assignmentDateTimeColumn).let(::DateTime),
             get(answerAcceptingDateTimeColumn) ?.let(::DateTime),
         )
     }

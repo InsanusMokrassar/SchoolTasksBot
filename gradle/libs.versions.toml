@@ -7,14 +7,14 @@ dokka = "1.9.10"
 
 microutils = "0.20.23"
 
-tgbotapi = "9.4.2"
-tgbotapi-libraries = "0.17.1"
-plagubot = "7.4.1"
-plagubot-plugins = "0.17.1"
+tgbotapi = "9.4.3"
+tgbotapi-libraries = "0.17.2"
+plagubot = "7.4.2"
+plagubot-plugins = "0.17.2"
 
 psql = "42.6.0"
 
-ksp = "1.9.21-1.0.15"
+ksp = "1.9.21-1.0.16"
 
 junit_version = "4.12"
 

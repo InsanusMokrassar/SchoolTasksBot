@@ -1,7 +1,6 @@
 package center.sciprog.tasks_bot.tasks.strings
 
 import dev.inmo.micro_utils.language_codes.IetfLang
-import dev.inmo.micro_utils.language_codes.IetfLanguageCode
 import dev.inmo.micro_utils.strings.buildStringResource
 
 object TasksStrings {
@@ -42,8 +41,8 @@ object TasksStrings {
     val taskAnswerVariantTextTemplate = buildStringResource("Text message, length: %s") {
         IetfLang.Russian variant "Текстовое сообщение, длина: %s"
     }
-    val taskAnswerVariantTextSymbolsTemplate = buildStringResource("%d-%d symbols") {
-        IetfLang.Russian variant "%d-%d символов"
+    val taskAnswerVariantTextSymbolsTemplate = buildStringResource("Symbols count: %d-%d") {
+        IetfLang.Russian variant "Количество символов: %d-%d"
     }
     val taskAnswerParameterNotSpecified = buildStringResource("Not specified") {
         IetfLang.Russian variant "Не указано"
@@ -70,6 +69,9 @@ object TasksStrings {
     val newAnswersFormatAddBtnText = buildStringResource("Add answer format") {
         IetfLang.Russian variant "Добавить формат ответа"
     }
+    val answerFormatsDataPrefix = buildStringResource("Answer formats: ") {
+        IetfLang.Russian variant "Форматы ответов"
+    }
     val answerFormatTitleFile = buildStringResource("File") {
         IetfLang.Russian variant "Файл"
     }
@@ -91,15 +93,24 @@ object TasksStrings {
         IetfLang.Russian variant "Добавить лимиты"
     }
 
-    val answerFormatFileCurrentExtensionTemplate = buildStringResource("You are editing file extension. Current file extension: %s\n\nSend me any message with one word, it will be used as new extension\n\nOr send me /cancel to cancel current action") {
+    val answerFormatFileCurrentExtensionEditingTemplate = buildStringResource("You are editing file extension. Current file extension: %s\n\nSend me any message with one word, it will be used as new extension\n\nOr send me /cancel to cancel current action") {
         IetfLang.Russian variant "Вы редактируете расширение. Текущее расширение: %s\n\nОтправьте мне сообщение с одним словом, оно будет использовано как новое расширение\n\nТакже вы можете отправить мне /cancel для отмены текущего действия"
     }
     val answerFormatFileCurrentWrongNewExtension = buildStringResource("Please, send me one word with file extension") {
         IetfLang.Russian variant "Отправьте мне одно слово-расширение файла"
     }
+    val answerFormatFileCurrentExtensionTemplate = buildStringResource("Extension: %s") {
+        IetfLang.Russian variant "Расширение: %s"
+    }
+    val answerFormatFileCurrentUseDescriptionTemplate = buildStringResource("Use description: %s") {
+        IetfLang.Russian variant "Использовать описание: %s"
+    }
 
-    val answerFormatLinkCurrentRegexTemplate = buildStringResource("You are editing url link. Current url extension: %s.\n\nSend me any message with url, it will be used as new site url\n\nOr send me /cancel to cancel current action") {
+    val answerFormatLinkCurrentRegexEditingTemplate = buildStringResource("You are editing url link. Current url extension: %s.\n\nSend me any message with url, it will be used as new site url\n\nOr send me /cancel to cancel current action") {
         IetfLang.Russian variant "Вы редактируете ссылку. Текущее расширение ссылки: %s\n\nОтправьте мне сообщение со ссылкой, она будет установлена как новая ссылка для ответов\n\nТакже вы можете отправить мне /cancel для отмены текущего действия"
+    }
+    val answerFormatLinkCurrentRegexTemplate = buildStringResource("Regex: %s") {
+        IetfLang.Russian variant "Шаблон: %s"
     }
     val answerFormatLinkCurrentWrongNewExtension = buildStringResource("Please, send me one word with url beginning") {
         IetfLang.Russian variant "Отправьте мне сообщение со ссылкой"
@@ -131,5 +142,10 @@ object TasksStrings {
         "Please, check parameters of your draft:"
     ) {
         IetfLang.Russian variant { "Проверьте параметры черновика:" }
+    }
+    val taskHasBeenCreated = buildStringResource(
+        "Task has been created"
+    ) {
+        IetfLang.Russian variant { "Задание было создано" }
     }
 }

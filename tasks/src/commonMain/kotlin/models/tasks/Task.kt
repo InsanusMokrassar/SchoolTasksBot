@@ -9,6 +9,6 @@ sealed interface Task {
     val courseId: center.sciprog.tasks_bot.courses.models.CourseId // keep full due to KSP errors
     val taskDescriptionMessages: List<MessageMetaInfo>
     val answerFormatsIds: List<AnswerFormatInfoId>
-    val assignmentDateTime: DateTime?
+    val assignmentDateTime: DateTime
     val answersAcceptingDeadLine: DateTime?
 }

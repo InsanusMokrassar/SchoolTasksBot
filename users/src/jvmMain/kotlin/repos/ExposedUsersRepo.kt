@@ -5,6 +5,7 @@ import center.sciprog.tasks_bot.users.models.RegisteredUser
 import center.sciprog.tasks_bot.users.models.InternalUserId
 import dev.inmo.micro_utils.repos.exposed.AbstractExposedCRUDRepo
 import dev.inmo.micro_utils.repos.exposed.initTable
+import dev.inmo.tgbotapi.types.RawChatId
 import dev.inmo.tgbotapi.types.UserId
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.ISqlExpressionBuilder
@@ -33,7 +34,7 @@ class ExposedUsersRepo(
     override val ResultRow.asObject: RegisteredUser
         get() = RegisteredUser(
             asId,
-            UserId(get(userIdColumn))
+            UserId(RawChatId(get(userIdColumn)))
         )
 
     init {
@@ -41,15 +42,15 @@ class ExposedUsersRepo(
     }
 
     override fun update(id: InternalUserId?, value: NewUser, it: UpdateBuilder<Int>) {
-        it[userIdColumn] = value.userId.chatId
+        it[userIdColumn] = value.userId.chatId.long
     }
 
     override fun InsertStatement<Number>.asObject(value: NewUser): RegisteredUser = RegisteredUser(
         InternalUserId(get(idColumn)),
-        UserId(get(userIdColumn))
+        UserId(RawChatId(get(userIdColumn)))
     )
 
     override suspend fun getById(userId: UserId): RegisteredUser? = transaction(database) {
-        select { userIdColumn.eq(userId.chatId) }.limit(1).firstOrNull() ?.asObject
+        select { userIdColumn.eq(userId.chatId.long) }.limit(1).firstOrNull() ?.asObject
     }
 }

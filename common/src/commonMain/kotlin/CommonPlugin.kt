@@ -31,12 +31,7 @@ import dev.inmo.plagubot.Plugin
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import dev.inmo.tgbotapi.libraries.resender.MessagesResender
-import dev.inmo.tgbotapi.types.ChatId
-import dev.inmo.tgbotapi.types.ChatIdWithThreadId
-import dev.inmo.tgbotapi.types.ChatIdentifier
-import dev.inmo.tgbotapi.types.FullChatIdentifierSerializer
-import dev.inmo.tgbotapi.types.IdChatIdentifier
-import dev.inmo.tgbotapi.types.UserId
+import dev.inmo.tgbotapi.types.*
 import dev.inmo.tgbotapi.utils.DefaultKTgBotAPIKSLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -60,7 +55,7 @@ object CommonPlugin : Plugin {
     override fun Module.setupDI(database: Database, params: JsonObject) {
         with(DateTimePicker) { setupDI(database, params) }
         supervisorIdSingle {
-            UserId(params["supervisor"] ?.jsonPrimitive ?.long ?: error("Unable to load supervisor id"))
+            UserId(params["supervisor"] ?.jsonPrimitive ?.long ?.let(::RawChatId) ?: error("Unable to load supervisor id"))
         }
         supervisorIetfLanguageCodeSingle {
             params["supervisor_locale"]?.jsonPrimitive?.contentOrNull?.let {
@@ -77,7 +72,7 @@ object CommonPlugin : Plugin {
             val cacheChatIdPrimitive = params["cacheChatId"] ?.jsonPrimitive ?: error("cacheChatId should be presented in config")
 
             cacheChatIdPrimitive.longOrNull ?.let {
-                ChatId(it)
+                ChatId(it.let(::RawChatId))
             } ?: get<Json>().decodeFromString(FullChatIdentifierSerializer, cacheChatIdPrimitive.content) as IdChatIdentifier
         }
 

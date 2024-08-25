@@ -64,14 +64,11 @@ import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineQueryButton
 import dev.inmo.tgbotapi.extensions.utils.withContentOrThrow
-import dev.inmo.tgbotapi.types.IdChatIdentifier
+import dev.inmo.tgbotapi.types.*
 import dev.inmo.tgbotapi.types.InlineQueries.InlineQueryResult.InlineQueryResultArticle
 import dev.inmo.tgbotapi.types.InlineQueries.InputMessageContent.InputTextMessageContent
-import dev.inmo.tgbotapi.types.MessageId
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardMarkup
 import dev.inmo.tgbotapi.types.chat.ExtendedBot
-import dev.inmo.tgbotapi.types.inlineQueryAnswerResultsLimit
-import dev.inmo.tgbotapi.types.toChatId
 import dev.inmo.tgbotapi.utils.buildEntities
 import dev.inmo.tgbotapi.utils.link
 import dev.inmo.tgbotapi.utils.row
@@ -474,7 +471,7 @@ object CommonPlugin : Plugin {
                     Pagination(page, inlineQueryAnswerResultsLimit.last + 1)
                 ).results.map { (course, link) ->
                     InlineQueryResultArticle(
-                        "$dataButtonCourseGetLinkDataPrefix${course.id.long}",
+                        InlineQueryId("$dataButtonCourseGetLinkDataPrefix${course.id.long}"),
                         course.title,
                         InputTextMessageContent(
                             buildEntities {

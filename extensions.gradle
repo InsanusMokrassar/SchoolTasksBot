@@ -1,25 +1,17 @@
+Map extensions = new HashMap<String, Object>()
+
+extensions["mppProjectWithSerializationPresetPath"] = "${rootProject.projectDir.absolutePath}/mppProjectWithSerialization.gradle"
+extensions["mppJavaProjectPresetPath"] = "${rootProject.projectDir.absolutePath}/mppJavaProject.gradle"
+extensions["mppJsProjectPresetPath"] = "${rootProject.projectDir.absolutePath}/mppJsProject.gradle"
+
+// extensions["publishGradlePath"] = "${rootProject.projectDir.absolutePath}/publish.gradle"
+
 allprojects {
     ext {
-        projectByName = { String name ->
-            for (subproject in rootProject.subprojects) {
-                if (subproject.name == name) {
-                    return subproject
-                }
-            }
-            return null
-        }
+        mppProjectWithSerializationPresetPath = extensions["mppProjectWithSerializationPresetPath"]
+        mppJavaProjectPresetPath = extensions["mppJavaProjectPresetPath"]
+        mppJsProjectPresetPath = extensions["mppJsProjectPresetPath"]
 
-        internalProject = { String name ->
-            projectByName(name)
-        }
-
-        mppProjectWithSerializationPresetPath = "${rootProject.projectDir.absolutePath}/mppProjectWithSerialization.gradle"
-        mppJavaProjectPresetPath = "${rootProject.projectDir.absolutePath}/mppJavaProject.gradle"
-        mppJsProjectPresetPath = "${rootProject.projectDir.absolutePath}/mppJsProject.gradle"
-        mppAndroidProjectPresetPath = "${rootProject.projectDir.absolutePath}/mppAndroidProject.gradle"
-
-        defaultAndroidSettingsPresetPath = "${rootProject.projectDir.absolutePath}/defaultAndroidSettings.gradle"
-
-        // publishGradlePath = "${rootProject.projectDir.absolutePath}/publish.gradle"
+        // publishGradlePath = extensions["publishGradlePath"]
     }
 }

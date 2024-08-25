@@ -1,6 +1,7 @@
 package center.sciprog.tasks_bot.common.utils.serializers
 
 import dev.inmo.tgbotapi.types.ChatId
+import dev.inmo.tgbotapi.types.RawChatId
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.builtins.serializer
@@ -13,9 +14,9 @@ import kotlinx.serialization.encoding.Encoder
 object ChatIdSerializer : KSerializer<ChatId> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("ChatId", PrimitiveKind.LONG)
 
-    override fun deserialize(decoder: Decoder): ChatId = ChatId(decoder.decodeLong())
+    override fun deserialize(decoder: Decoder): ChatId = ChatId(decoder.decodeLong().let(::RawChatId))
 
     override fun serialize(encoder: Encoder, value: ChatId) {
-        encoder.encodeLong(value.chatId)
+        encoder.encodeLong(value.chatId.long)
     }
 }

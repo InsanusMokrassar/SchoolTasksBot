@@ -13,8 +13,7 @@ import dev.inmo.micro_utils.repos.exposed.AbstractExposedCRUDRepo
 import dev.inmo.micro_utils.repos.exposed.ExposedRepo
 import dev.inmo.micro_utils.repos.exposed.initTable
 import dev.inmo.tgbotapi.libraries.resender.MessageMetaInfo
-import dev.inmo.tgbotapi.types.ChatId
-import dev.inmo.tgbotapi.types.ChatIdWithThreadId
+import dev.inmo.tgbotapi.types.*
 import korlibs.time.DateTime
 import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.exposed.sql.*
@@ -87,12 +86,12 @@ class ExposedTasksCRUDRepo(
                 MessageMetaInfo(
                     it[threadIdColumn]?.let { threadId ->
                         ChatIdWithThreadId(
-                            it[chatIdColumn],
-                            threadId
+                            RawChatId(it[chatIdColumn]),
+                            threadId.let(::MessageThreadId)
                         )
-                    } ?: ChatId(it[chatIdColumn]),
-                    it[messageIdColumn],
-                    it[groupColumn]
+                    } ?: ChatId(RawChatId(it[chatIdColumn])),
+                    MessageId(it[messageIdColumn]),
+                    it[groupColumn] ?.let(::MediaGroupId)
                 )
             }
         }
@@ -153,10 +152,10 @@ class ExposedTasksCRUDRepo(
                     new.taskDescriptionMessages.forEach { messageMetaInfo ->
                         insert {
                             it[taskIdColumn] = registered.id.long
-                            it[chatIdColumn] = messageMetaInfo.chatId.chatId
-                            it[threadIdColumn] = messageMetaInfo.chatId.threadId
-                            it[messageIdColumn] = messageMetaInfo.messageId
-                            it[groupColumn] = messageMetaInfo.group
+                            it[chatIdColumn] = messageMetaInfo.chatId.chatId.long
+                            it[threadIdColumn] = messageMetaInfo.chatId.threadId ?.long
+                            it[messageIdColumn] = messageMetaInfo.messageId.long
+                            it[groupColumn] = messageMetaInfo.group ?.string
                         }
                     }
                 }

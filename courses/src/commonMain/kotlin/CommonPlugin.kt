@@ -384,28 +384,56 @@ object CommonPlugin : Plugin {
             val courseId = it.data.extractDataButtonCourseId ?: return@onMessageDataCallbackQuery
             val course = coursesRepo.getById(courseId) ?: return@onMessageDataCallbackQuery
             val user = usersRepo.getById(it.user.id) ?: return@onMessageDataCallbackQuery
-            if (!courseUsersRepo.contains(courseId, user.id)) {
+            val teacher = teachersRepo.getById(course.teacherId) ?.let {
+                usersRepo.getById(it.internalUserId)
+            }
+
+            if (courseUsersRepo.contains(courseId, user.id)) {
+                val chatLanguage = languagesRepo.getChatLanguage(it.user.id)
+
+                val markup = buildCourseButtons(course, user, chatLanguage)
+                if (markup.keyboard.isEmpty()) {
+                    answer(
+                        it,
+                        CoursesStrings.courseManagementIsEmptyText.translation(chatLanguage),
+                        showAlert = true,
+                        cachedTimeSeconds = 0
+                    )
+                } else {
+                    edit(
+                        it.message.withContentOrThrow(),
+                        replyMarkup = markup
+                    ) {
+                        +CoursesStrings.courseManagementTextTemplate.translation(
+                            chatLanguage
+                        ).format(course.title)
+                    }
+                }
                 return@onMessageDataCallbackQuery
             }
-            val chatLanguage = languagesRepo.getChatLanguage(it.user.id)
 
-            val markup = buildCourseButtons(course, user, chatLanguage)
-            if (markup.keyboard.isEmpty()) {
-                answer(
-                    it,
-                    CoursesStrings.courseManagementIsEmptyText.translation(chatLanguage),
-                    showAlert = true,
-                    cachedTimeSeconds = 0
-                )
-            } else {
-                edit(
-                    it.message.withContentOrThrow(),
-                    replyMarkup = markup
-                ) {
-                    +CoursesStrings.courseManagementTextTemplate.translation(
-                        chatLanguage
-                    ).format(course.title)
+            if (teacher ?.userId == it.user.id) {
+                val chatLanguage = languagesRepo.getChatLanguage(it.user.id)
+
+                val markup = buildCourseButtons(course, user, chatLanguage)
+                if (markup.keyboard.isEmpty()) {
+                    answer(
+                        it,
+                        CoursesStrings.courseManagementIsEmptyText.translation(chatLanguage),
+                        showAlert = true,
+                        cachedTimeSeconds = 0
+                    )
+                } else {
+                    edit(
+                        it.message.withContentOrThrow(),
+                        replyMarkup = markup
+                    ) {
+                        +CoursesStrings.courseManagementTextTemplate.translation(
+                            chatLanguage
+                        ).format(course.title)
+                    }
                 }
+                return@onMessageDataCallbackQuery
             }
         }
         onMessageDataCallbackQuery(Regex("^$dataButtonCourseRenameDataPrefix\\d+")) {

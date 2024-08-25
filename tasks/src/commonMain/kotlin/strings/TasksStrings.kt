@@ -76,7 +76,7 @@ object TasksStrings {
         IetfLang.Russian variant "Добавить формат ответа"
     }
     val answerFormatsDataPrefix = buildStringResource("Answer formats: ") {
-        IetfLang.Russian variant "Форматы ответов"
+        IetfLang.Russian variant "Форматы ответов: "
     }
     val answerFormatTitleFile = buildStringResource("File") {
         IetfLang.Russian variant "Файл"

@@ -51,6 +51,6 @@ class ExposedUsersRepo(
     )
 
     override suspend fun getById(userId: UserId): RegisteredUser? = transaction(database) {
-        select { userIdColumn.eq(userId.chatId.long) }.limit(1).firstOrNull() ?.asObject
+        selectAll().where { userIdColumn.eq(userId.chatId.long) }.limit(1).firstOrNull() ?.asObject
     }
 }

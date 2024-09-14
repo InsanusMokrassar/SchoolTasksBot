@@ -1,0 +1,44 @@
+plugins {
+    id "org.jetbrains.kotlin.multiplatform"
+    id "org.jetbrains.kotlin.plugin.serialization"
+    id "com.google.devtools.ksp"
+    alias(libs.plugins.compose)
+    alias(libs.plugins.kt.jb.compose)
+}
+
+apply from: "$mppJsProjectPresetPath"
+
+kotlin {
+    js (IR) {
+        binaries.executable()
+    }
+    sourceSets {
+        commonMain {
+            dependencies {
+                api libs.microutils.koin
+                api libs.microutils.repos.common
+                api libs.microutils.repos.cache
+                api libs.microutils.fsm.repos.common
+                api libs.microutils.serialization.mapper
+                api libs.microutils.resources
+                api libs.microutils.startup.launcher
+                api libs.tgbotapi
+                api(compose.runtime)
+                api libs.tgbotapi.webapps
+            }
+        }
+        jsMain {
+            dependencies {
+                implementation compose.web.core
+            }
+        }
+    }
+}
+
+dependencies {
+    add("kspCommonMainMetadata", libs.microutils.koin.generator)
+    add("kspCommonMainMetadata", libs.microutils.repos.generator)
+}
+
+ksp {
+}

@@ -53,6 +53,6 @@ class ExposedTeachersRepo(
     )
 
     override suspend fun getById(internalUserId: InternalUserId): RegisteredTeacher? = transaction(database) {
-        select { userIdColumn.eq(internalUserId.long) }.firstOrNull() ?.asObject
+        selectAll().where { userIdColumn.eq(internalUserId.long) }.firstOrNull() ?.asObject
     }
 }

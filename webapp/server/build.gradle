@@ -1,0 +1,27 @@
+plugins {
+    id "org.jetbrains.kotlin.multiplatform"
+    id "org.jetbrains.kotlin.plugin.serialization"
+    id "com.google.devtools.ksp"
+}
+
+apply from: "$mppJavaProjectPresetPath"
+
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                api project(":tasks_bot.common")
+                api libs.microutils.ktor.server
+                api libs.ktor.server.engine.netty
+            }
+        }
+    }
+}
+
+dependencies {
+    add("kspCommonMainMetadata", libs.microutils.koin.generator)
+    add("kspCommonMainMetadata", libs.microutils.repos.generator)
+}
+
+ksp {
+}

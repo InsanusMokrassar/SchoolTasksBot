@@ -80,7 +80,7 @@ class ExposedTasksCRUDRepo(
                 initTable()
             }
 
-            fun getByTaskIdWithoutTransaction(taskId: TaskId) = select {
+            fun getByTaskIdWithoutTransaction(taskId: TaskId) = selectAll().where {
                 taskIdColumn.eq(taskId.long)
             }.map {
                 MessageMetaInfo(
@@ -103,7 +103,7 @@ class ExposedTasksCRUDRepo(
             val taskIdColumn = long("task_id").references(this@ExposedTasksCRUDRepo.idColumn, onDelete = ReferenceOption.CASCADE, onUpdate = ReferenceOption.CASCADE)
             val answerFormatIdColumn = long("answer_id")
 
-            fun getByTaskIdWithoutTransaction(taskId: TaskId) = select {
+            fun getByTaskIdWithoutTransaction(taskId: TaskId) = selectAll().where {
                 taskIdColumn.eq(taskId.long)
             }.map {
                 AnswerFormatInfoId(it.get(answerFormatIdColumn))
@@ -191,7 +191,7 @@ class ExposedTasksCRUDRepo(
 
     override suspend fun getClosestTasks(dt: DateTime): List<RegisteredTask> = transaction(database) {
         var nearDt: DateTime? = null
-        select {
+        selectAll().where {
             assignmentDateTimeColumn.greaterEq(dt.unixMillis)
         }.orderBy(
             column = assignmentDateTimeColumn,
@@ -211,7 +211,7 @@ class ExposedTasksCRUDRepo(
     }
 
     override suspend fun getTasksByDateTime(dt: DateTime): List<RegisteredTask> = transaction(database) {
-        select {
+        selectAll().where {
             assignmentDateTimeColumn.eq(dt.unixMillis)
         }.map {
             it.asObject
@@ -219,7 +219,7 @@ class ExposedTasksCRUDRepo(
     }
 
     override suspend fun getActiveTasks(course: CourseId, dt: DateTime): List<RegisteredTask> = transaction(database) {
-        select {
+        selectAll().where {
             courseIdColumn.eq(course.long).and(
                 assignmentDateTimeColumn.lessEq(dt.unixMillis).and(
                     answerAcceptingDateTimeColumn.isNull().or(answerAcceptingDateTimeColumn.greater(dt.unixMillis))

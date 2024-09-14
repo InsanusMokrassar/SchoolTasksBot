@@ -57,6 +57,6 @@ class ExposedCoursesRepo(
     )
 
     override suspend fun getCoursesIds(teacherId: TeacherId): List<CourseId> = transaction(database) {
-        select { teacherIdColumn.eq(teacherId.long) }.map { it.asId }
+        selectAll().where { teacherIdColumn.eq(teacherId.long) }.map { it.asId }
     }
 }

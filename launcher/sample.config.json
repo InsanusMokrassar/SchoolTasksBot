@@ -6,16 +6,29 @@
     "driver": "org.postgresql.Driver"
   },
   "botToken": "1234567890:ABCDEFGHIJKLMNOP_qrstuvwxyz12345678",
+  "testServer": false,
   "plugins": [
     "center.sciprog.tasks_bot.common.JvmPlugin",
     "center.sciprog.tasks_bot.teachers.JvmPlugin",
     "center.sciprog.tasks_bot.courses.JvmPlugin",
     "center.sciprog.tasks_bot.tasks.JvmPlugin",
     "center.sciprog.tasks_bot.users.JvmPlugin",
+    "center.sciprog.tasks_bot.webapp.server.WebAppServerPlugin",
+    "dev.inmo.tasks_bot.webapp.bot.WebAppPlugin",
+
     "dev.inmo.plagubot.plugins.commands.CommandsPlugin"
   ],
   "supervisor": 123456789,
   "cacheChatId": 123456789,
   "supervisor_locale": "ru",
-  "useCache": true
+  "useCache": true,
+  "webapp": {
+    "webappUrl": "127.0.0.1:8080",
+    "host": "0.0.0.0",
+    "port": 8080,
+    "staticFolders": [
+      "../client/build/dist/js/developmentExecutable/",
+      "../client/build/dist/js/productionExecutable/"
+    ]
+  }
 }

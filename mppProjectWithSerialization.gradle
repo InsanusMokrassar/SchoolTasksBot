@@ -37,14 +37,6 @@ kotlin {
         jsTest {
             dependencies {
                 implementation libs.kotlin.test.js
-                implementation libs.kotlin.test.junit
-            }
-        }
-        androidTest {
-            dependencies {
-                implementation libs.kotlin.test.junit
-                implementation libs.android.test.junit
-                implementation libs.android.test.espresso.core
             }
         }
     }
@@ -54,5 +46,3 @@ java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
 }
-
-apply from: "$defaultAndroidSettingsPresetPath"

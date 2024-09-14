@@ -1,6 +1,9 @@
 package dev.inmo.tasks_bot.webapp.bot
 
+import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.plagubot.Plugin
+import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
+import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import org.jetbrains.exposed.sql.Database
@@ -13,9 +16,7 @@ object WebAppPlugin : Plugin {
         with(CommonPlugin) { setupDI(database, params) }
     }
 
-    override suspend fun startPlugin(koin: Koin) {
-        CommonPlugin.startPlugin(koin)
-        super.startPlugin(koin)
-
+    override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {
+        with(CommonPlugin) { setupBotPlugin(koin) }
     }
 }

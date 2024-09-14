@@ -1,5 +1,6 @@
 package center.sciprog.tasks_bot.common
 
+import center.sciprog.tasks_bot.common.CommonPlugin.setupBotClient
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.fsm.common.managers.DefaultStatesManager
 import dev.inmo.micro_utils.fsm.common.managers.DefaultStatesManagerRepo
@@ -12,6 +13,7 @@ import dev.inmo.micro_utils.repos.cache.full.fullyCached
 import dev.inmo.micro_utils.repos.exposed.keyvalue.ExposedKeyValueRepo
 import dev.inmo.micro_utils.repos.mappers.withMapper
 import dev.inmo.plagubot.Plugin
+import dev.inmo.tgbotapi.bot.ktor.KtorRequestsExecutorBuilder
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import dev.inmo.tgbotapi.types.FullChatIdentifierSerializer
 import dev.inmo.tgbotapi.types.IdChatIdentifier
@@ -21,8 +23,13 @@ import kotlinx.serialization.json.JsonObject
 import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
 import org.koin.core.module.Module
+import org.koin.core.scope.Scope
 
 object JvmPlugin : Plugin {
+    override fun KtorRequestsExecutorBuilder.setupBotClient(scope: Scope, params: JsonObject) {
+        with(CommonPlugin) { setupBotClient(scope, params) }
+    }
+
     override fun Module.setupDI(database: Database, params: JsonObject) {
         with(CommonPlugin) { setupDI(database, params) }
 

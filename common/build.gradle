@@ -11,6 +11,7 @@ kotlin {
         commonMain {
             dependencies {
                 api libs.plagubot.plugin
+                implementation libs.plagubot.bot
                 api libs.microutils.koin
                 api libs.microutils.repos.common
                 api libs.microutils.repos.cache

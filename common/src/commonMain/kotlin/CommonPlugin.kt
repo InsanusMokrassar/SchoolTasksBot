@@ -28,11 +28,15 @@ import dev.inmo.micro_utils.language_codes.IetfLang
 import dev.inmo.micro_utils.language_codes.IetfLanguageCode
 import dev.inmo.micro_utils.repos.KeyValueRepo
 import dev.inmo.plagubot.Plugin
+import dev.inmo.plagubot.config.Config
+import dev.inmo.tgbotapi.bot.ktor.KtorRequestsExecutorBuilder
+import dev.inmo.tgbotapi.bot.ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import dev.inmo.tgbotapi.libraries.resender.MessagesResender
 import dev.inmo.tgbotapi.types.*
 import dev.inmo.tgbotapi.utils.DefaultKTgBotAPIKSLog
+import dev.inmo.tgbotapi.utils.TelegramAPIUrlsKeeper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -49,6 +53,7 @@ import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
 import org.koin.core.module.Module
 import org.koin.core.qualifier.qualifier
+import org.koin.core.scope.Scope
 import org.koin.dsl.module
 
 object CommonPlugin : Plugin {

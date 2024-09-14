@@ -10,6 +10,8 @@ dependencies {
     api project(":tasks_bot.courses")
     api project(":tasks_bot.tasks")
     api project(":tasks_bot.users")
+    api project(":tasks_bot.webapp.server")
+    api project(":tasks_bot.webapp.bot")
 
     api libs.plagubot.bot
     api libs.psql

@@ -13,6 +13,7 @@ import dev.inmo.micro_utils.repos.cache.full.fullyCached
 import dev.inmo.micro_utils.repos.exposed.keyvalue.ExposedKeyValueRepo
 import dev.inmo.micro_utils.repos.mappers.withMapper
 import dev.inmo.plagubot.Plugin
+import dev.inmo.plagubot.database
 import dev.inmo.tgbotapi.bot.ktor.KtorRequestsExecutorBuilder
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import dev.inmo.tgbotapi.types.FullChatIdentifierSerializer
@@ -30,8 +31,8 @@ object JvmPlugin : Plugin {
         with(CommonPlugin) { setupBotClient(scope, params) }
     }
 
-    override fun Module.setupDI(database: Database, params: JsonObject) {
-        with(CommonPlugin) { setupDI(database, params) }
+    override fun Module.setupDI(params: JsonObject) {
+        with(CommonPlugin) { setupDI(params) }
 
         languagesRepoSingle {
             val json = get<Json>()

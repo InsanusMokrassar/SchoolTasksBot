@@ -1,6 +1,10 @@
 package center.sciprog.tasks_bot.webapp.server
 
 import dev.inmo.micro_utils.fsm.common.State
+import dev.inmo.micro_utils.koin.getAllDistinct
+import dev.inmo.micro_utils.koin.singleWithRandomQualifier
+import dev.inmo.micro_utils.ktor.server.configurators.ApplicationRoutingConfigurator
+import dev.inmo.micro_utils.ktor.server.configurators.KtorApplicationConfigurator
 import dev.inmo.micro_utils.ktor.server.createKtorServer
 import dev.inmo.plagubot.Plugin
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
@@ -16,8 +20,22 @@ import org.koin.core.module.Module
 import java.io.File
 
 object WebAppServerPlugin : Plugin {
-    override fun Module.setupDI(database: Database, params: JsonObject) {
-        with(CommonPlugin) { setupDI(database, params) }
+    override fun Module.setupDI(params: JsonObject) {
+        with(CommonPlugin) { setupDI(params) }
+        singleWithRandomQualifier<ApplicationRoutingConfigurator.Element> {
+            val config = getOrNull<Config>() ?: error("Unable to create ktor server due to absence of config in json (field 'webapp')")
+            ApplicationRoutingConfigurator.Element {
+                config.staticFolders.forEach {
+                    staticFiles(
+                        "/",
+                        File(it)
+                    )
+                }
+            }
+        }
+        singleWithRandomQualifier<KtorApplicationConfigurator> {
+            ApplicationRoutingConfigurator(getAllDistinct())
+        }
         single<BaseApplicationEngine> {
             val config = getOrNull<Config>() ?: error("Unable to create ktor server due to absence of config in json (field 'webapp')")
 
@@ -26,13 +44,8 @@ object WebAppServerPlugin : Plugin {
                 config.host,
                 config.port
             ) {
-                routing {
-                    config.staticFolders.forEach {
-                        staticFiles(
-                            "/",
-                            File(it)
-                        )
-                    }
+                getAllDistinct<KtorApplicationConfigurator>().forEach {
+                    with(it) { configure() }
                 }
             }
         }

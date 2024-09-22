@@ -9,8 +9,13 @@ import org.koin.core.Koin
 import org.koin.core.module.Module
 
 object JvmPlugin : Plugin {
-    override fun Module.setupDI(database: Database, params: JsonObject) {
-        with(CommonPlugin) { setupDI(database, params) }
+    override fun Module.setupDI(params: JsonObject) {
+        with(CommonPlugin) { setupDI(params) }
+    }
+
+    override suspend fun startPlugin(koin: Koin) {
+        super.startPlugin(koin)
+        CommonPlugin.startPlugin(koin)
     }
 
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {

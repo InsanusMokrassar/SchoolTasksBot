@@ -11,8 +11,8 @@ ktor = "2.3.12"
 
 tgbotapi = "18.2.0"
 tgbotapi-libraries = "0.24.0"
-plagubot = "9.3.0"
-plagubot-plugins = "0.22.0"
+plagubot = "10.0.0"
+plagubot-plugins = "0.23.0"
 
 compose = "1.7.0-alpha03"
 

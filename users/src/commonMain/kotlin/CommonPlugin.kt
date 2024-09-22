@@ -14,7 +14,7 @@ import org.koin.core.Koin
 import org.koin.core.module.Module
 
 object CommonPlugin : Plugin {
-    override fun Module.setupDI(database: Database, params: JsonObject) {
+    override fun Module.setupDI(params: JsonObject) {
         userRetrieverSingle {
             val repo = get<UsersRepo>()
 

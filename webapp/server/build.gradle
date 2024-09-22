@@ -10,7 +10,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api project(":tasks_bot.common")
+                api project(":tasks_bot.webapp.common")
                 api libs.microutils.ktor.server
                 api libs.ktor.server.engine.netty
             }

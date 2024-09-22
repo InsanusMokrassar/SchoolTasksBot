@@ -57,8 +57,8 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 
 object CommonPlugin : Plugin {
-    override fun Module.setupDI(database: Database, params: JsonObject) {
-        with(DateTimePicker) { setupDI(database, params) }
+    override fun Module.setupDI(params: JsonObject) {
+        with(DateTimePicker) { setupDI(params) }
         supervisorIdSingle {
             UserId(params["supervisor"] ?.jsonPrimitive ?.long ?.let(::RawChatId) ?: error("Unable to load supervisor id"))
         }

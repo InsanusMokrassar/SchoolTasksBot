@@ -12,8 +12,8 @@ import org.koin.core.module.Module
 
 @Serializable
 object WebAppPlugin : Plugin {
-    override fun Module.setupDI(database: Database, params: JsonObject) {
-        with(CommonPlugin) { setupDI(database, params) }
+    override fun Module.setupDI(params: JsonObject) {
+        with(CommonPlugin) { setupDI(params) }
     }
 
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {

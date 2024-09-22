@@ -197,7 +197,7 @@ internal class NewAnswerDrawer(
         )
     }
 
-    override fun Module.setupDI(database: Database, params: JsonObject) {
+    override fun Module.setupDI(params: JsonObject) {
         singleWithRandomQualifier {
             SerializersModule {
                 polymorphic(State::class, OnChangeFileExtensionState::class, OnChangeFileExtensionState.serializer())

@@ -15,14 +15,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api libs.microutils.koin
-                api libs.microutils.repos.common
-                api libs.microutils.repos.cache
-                api libs.microutils.fsm.repos.common
-                api libs.microutils.serialization.mapper
-                api libs.microutils.resources
-                api libs.microutils.startup.launcher
-                api libs.tgbotapi
+                api project(":tasks_bot.webapp.common")
                 api(compose.runtime)
                 api libs.tgbotapi.webapps
             }

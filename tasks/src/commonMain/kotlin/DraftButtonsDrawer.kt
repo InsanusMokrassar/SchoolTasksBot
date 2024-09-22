@@ -314,7 +314,7 @@ internal object DraftButtonsDrawer : Plugin {
         }
     }
 
-    override fun Module.setupDI(database: Database, params: JsonObject) {
+    override fun Module.setupDI(params: JsonObject) {
         single<MessagesRegistrar.Handler>(draftDescriptionMessagesRegistrarQualifier) {
             val usersRepo = get<UsersRepo>()
             val teachersRepo = get<TeachersRepo>()

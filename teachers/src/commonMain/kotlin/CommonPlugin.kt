@@ -32,7 +32,7 @@ import org.koin.core.module.Module
 import kotlin.math.absoluteValue
 
 object CommonPlugin : Plugin {
-    override fun Module.setupDI(database: Database, params: JsonObject) {
+    override fun Module.setupDI(params: JsonObject) {
         singleWithRandomQualifier {
             BotCommand(
                 "add_teacher",

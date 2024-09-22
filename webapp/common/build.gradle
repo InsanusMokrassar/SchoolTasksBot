@@ -1,0 +1,39 @@
+plugins {
+    id "org.jetbrains.kotlin.multiplatform"
+    id "org.jetbrains.kotlin.plugin.serialization"
+    id "com.google.devtools.ksp"
+}
+
+apply from: "$mppProjectWithSerializationPresetPath"
+
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                api libs.microutils.koin
+                api libs.microutils.repos.common
+                api libs.microutils.repos.cache
+                api libs.microutils.fsm.repos.common
+                api libs.microutils.serialization.mapper
+                api libs.microutils.resources
+                api libs.microutils.startup.launcher
+                api libs.tgbotapi
+                api libs.tgbotapi.webapps
+            }
+        }
+        jvmMain {
+            dependsOn(commonMain)
+            dependencies {
+                api project(":tasks_bot.common")
+            }
+        }
+    }
+}
+
+dependencies {
+    add("kspCommonMainMetadata", libs.microutils.koin.generator)
+    add("kspCommonMainMetadata", libs.microutils.repos.generator)
+}
+
+ksp {
+}

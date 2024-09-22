@@ -335,7 +335,7 @@ object DateTimePicker : Plugin {
         }
     }
 
-    override fun Module.setupDI(database: Database, params: JsonObject) {
+    override fun Module.setupDI(params: JsonObject) {
         singleWithRandomQualifier<SerializersModule> {
             SerializersModule {
                 polymorphic(State::class, FSMState.InProgress::class, FSMState.InProgress.serializer())

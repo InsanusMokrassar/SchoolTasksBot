@@ -49,12 +49,12 @@ object CommonPlugin : Plugin {
         NewAnswerDrawer(DraftButtonsDrawer.changeAnswerFormatsButtonData, DraftButtonsDrawer.manageDraftButtonData)
     }
 
-    override fun Module.setupDI(database: Database, params: JsonObject) {
+    override fun Module.setupDI(params: JsonObject) {
         with(DraftButtonsDrawer) {
-            setupDI(database, params)
+            setupDI(params)
         }
         with(newAnswerDrawer) {
-            setupDI(database, params)
+            setupDI(params)
         }
         tasksDraftsRepoSingle {
             val json = get<Json>()

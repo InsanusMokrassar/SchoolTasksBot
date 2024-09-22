@@ -116,7 +116,7 @@ object CommonPlugin : Plugin {
     private val String.extractDataButtonCourseGetLinkCourseId
         get() = removePrefix(dataButtonCourseGetLinkDataPrefix).toLongOrNull() ?.let(::CourseId)
 
-    override fun Module.setupDI(database: Database, params: JsonObject) {
+    override fun Module.setupDI(params: JsonObject) {
         singleWithRandomQualifier {
             SerializersModule {
                 polymorphic(State::class, InnerState.CreateCourse::class, InnerState.CreateCourse.serializer())

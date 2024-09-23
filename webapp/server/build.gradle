@@ -13,6 +13,7 @@ kotlin {
                 api project(":tasks_bot.webapp.common")
                 api libs.microutils.ktor.server
                 api libs.ktor.server.engine.netty
+                implementation libs.plagubot.bot
             }
         }
     }

@@ -1,5 +1,8 @@
 package center.sciprog.tasks_bot.webapp.server
 
+import center.sciprog.tasks_bot.webapp.common.CommonWebAppConstants
+import center.sciprog.tasks_bot.webapp.common.models.AuthorizedRequestBody
+import center.sciprog.tasks_bot.webapp.server.models.RequestHandler
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.getAllDistinct
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
@@ -7,10 +10,15 @@ import dev.inmo.micro_utils.ktor.server.configurators.ApplicationRoutingConfigur
 import dev.inmo.micro_utils.ktor.server.configurators.KtorApplicationConfigurator
 import dev.inmo.micro_utils.ktor.server.createKtorServer
 import dev.inmo.plagubot.Plugin
+import dev.inmo.plagubot.config
+import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
+import dev.inmo.tgbotapi.utils.TelegramAPIUrlsKeeper
+import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.http.content.*
 import io.ktor.server.netty.*
+import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -30,6 +38,22 @@ object WebAppServerPlugin : Plugin {
                         "/",
                         File(it)
                     )
+                }
+            }
+        }
+        singleWithRandomQualifier<ApplicationRoutingConfigurator.Element> {
+            val requestsHandlers = getAllDistinct<RequestHandler>()
+            val config = config<dev.inmo.plagubot.config.Config>()
+            val telegramBotApiUrlsKeeper = TelegramAPIUrlsKeeper(
+                token = config.botToken,
+                testServer = config.testServer,
+                hostUrl = config.botApiServer
+            )
+            ApplicationRoutingConfigurator.Element {
+                post(CommonWebAppConstants.requestAddress) {
+                    val data = call.receive<AuthorizedRequestBody<*>>()
+
+                    val authorized = telegramBotApiUrlsKeeper.checkWebAppData(data.initData, data.initDataHash)
                 }
             }
         }

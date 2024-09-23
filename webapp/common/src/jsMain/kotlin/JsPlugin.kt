@@ -10,6 +10,13 @@ import org.koin.core.module.Module
 object JsPlugin : StartPlugin {
     override fun Module.setupDI(params: JsonObject) {
         with(CommonPlugin) { setupDI(params) }
+
+        single<DefaultClient> {
+            JsDefaultClient(
+                get(),
+                get()
+            )
+        }
     }
 
     override suspend fun startPlugin(koin: Koin) {

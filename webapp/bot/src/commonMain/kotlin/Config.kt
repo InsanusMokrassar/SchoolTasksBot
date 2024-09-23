@@ -1,4 +1,4 @@
-package dev.inmo.tasks_bot.webapp.bot
+package center.sciprog.tasks_bot.webapp.bot
 
 import kotlinx.serialization.Serializable
 

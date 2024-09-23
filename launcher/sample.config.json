@@ -13,8 +13,9 @@
     "center.sciprog.tasks_bot.courses.JvmPlugin",
     "center.sciprog.tasks_bot.tasks.JvmPlugin",
     "center.sciprog.tasks_bot.users.JvmPlugin",
+    "center.sciprog.tasks_bot.webapp.common.JvmPlugin",
     "center.sciprog.tasks_bot.webapp.server.WebAppServerPlugin",
-    "dev.inmo.tasks_bot.webapp.bot.WebAppPlugin",
+    "center.sciprog.tasks_bot.webapp.bot.WebAppPlugin",
 
     "dev.inmo.plagubot.plugins.commands.CommandsPlugin"
   ],

@@ -1,8 +1,8 @@
 package center.sciprog.tasks_bot.webapp.client
 
+import center.sciprog.tasks_bot.webapp.common.DefaultClient
 import dev.inmo.micro_utils.startup.plugin.StartPlugin
 import kotlinx.serialization.json.JsonObject
-import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.renderComposable
 import org.koin.core.Koin
 import org.koin.core.module.Module
@@ -15,7 +15,7 @@ object JsPlugin : StartPlugin {
         super.startPlugin(koin)
         with(CommonPlugin) { startPlugin(koin) }
         renderComposable("root") {
-            Text("Hello world")
+            WebAppContent(koin.get<DefaultClient>())
         }
     }
 }

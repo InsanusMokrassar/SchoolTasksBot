@@ -1,4 +1,4 @@
-package dev.inmo.tasks_bot.webapp.bot
+package center.sciprog.tasks_bot.webapp.bot
 
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.plagubot.Plugin

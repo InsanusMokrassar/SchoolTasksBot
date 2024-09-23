@@ -7,7 +7,8 @@ suspend fun main() {
     StartLauncherPlugin.start(
         Config(
             plugins = listOf(
-                JsPlugin
+                JsPlugin,
+                center.sciprog.tasks_bot.webapp.common.JsPlugin
             )
         )
     )

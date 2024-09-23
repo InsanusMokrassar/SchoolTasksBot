@@ -11,18 +11,21 @@ import dev.inmo.micro_utils.ktor.server.configurators.KtorApplicationConfigurato
 import dev.inmo.micro_utils.ktor.server.createKtorServer
 import dev.inmo.micro_utils.ktor.server.respond
 import dev.inmo.plagubot.Plugin
-import dev.inmo.plagubot.config
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import dev.inmo.tgbotapi.utils.TelegramAPIUrlsKeeper
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.http.content.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.websocket.*
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -48,7 +51,7 @@ object WebAppServerPlugin : Plugin {
         }
         singleWithRandomQualifier<ApplicationRoutingConfigurator.Element> {
             val requestsHandlers = getAllDistinct<RequestHandler>()
-            val config = config<dev.inmo.plagubot.config.Config>()
+            val config = get<dev.inmo.plagubot.config.Config>()
             val telegramBotApiUrlsKeeper = TelegramAPIUrlsKeeper(
                 token = config.botToken,
                 testServer = config.testServer,
@@ -56,16 +59,21 @@ object WebAppServerPlugin : Plugin {
             )
             ApplicationRoutingConfigurator.Element {
                 post(CommonWebAppConstants.requestAddress) {
-                    val data = call.receive<AuthorizedRequestBody<*>>()
+                    val data = runCatching {
+                        call.receive<AuthorizedRequestBody>()
+                    }.getOrElse {
+                        it.printStackTrace()
+                        throw it
+                    }
 
                     val authorized = telegramBotApiUrlsKeeper.checkWebAppData(data.initData, data.initDataHash)
                     if (authorized) {
-                        call.respond(HttpStatusCode.Unauthorized)
-                    } else {
                         call.respond(
                             HttpStatusCode.OK,
                             requestsHandlers.first { it.ableToHandle(data.data) }.handle(data.data),
                         )
+                    } else {
+                        call.respond(HttpStatusCode.Unauthorized)
                     }
                 }
             }
@@ -76,11 +84,21 @@ object WebAppServerPlugin : Plugin {
         single<BaseApplicationEngine> {
             val config = getOrNull<Config>() ?: error("Unable to create ktor server due to absence of config in json (field 'webapp')")
 
+            val json = get<Json>()
+
             createKtorServer(
                 Netty,
                 config.host,
                 config.port
             ) {
+                install(ContentNegotiation) {
+                    json(json)
+                }
+                install(WebSockets) {
+                    contentConverter = KotlinxWebsocketSerializationConverter(json)
+                }
+
+
                 getAllDistinct<KtorApplicationConfigurator>().forEach {
                     with(it) { configure() }
                 }

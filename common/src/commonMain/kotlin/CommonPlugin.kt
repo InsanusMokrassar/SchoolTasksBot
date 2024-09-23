@@ -85,16 +85,16 @@ object CommonPlugin : Plugin {
 
         singleWithRandomQualifier {
             SerializersModule {
-                polymorphic(Any::class, String::class, String.serializer())
-                polymorphic(Any::class, Byte::class, Byte.serializer())
-                polymorphic(Any::class, Short::class, Short.serializer())
-                polymorphic(Any::class, Int::class, Int.serializer())
-                polymorphic(Any::class, Long::class, Long.serializer())
-                polymorphic(Any::class, Float::class, Float.serializer())
-                polymorphic(Any::class, Double::class, Double.serializer())
-                polymorphic(Any::class, ChatId::class, ChatIdSerializer)
-                polymorphic(Any::class, ChatIdWithThreadId::class, ChatIdWithThreadIdSerializer)
-                polymorphic(Any::class, ChatIdentifier::class, FullChatIdentifierSerializer)
+//                polymorphic(Any::class, String::class, String.serializer())
+//                polymorphic(Any::class, Byte::class, Byte.serializer())
+//                polymorphic(Any::class, Short::class, Short.serializer())
+//                polymorphic(Any::class, Int::class, Int.serializer())
+//                polymorphic(Any::class, Long::class, Long.serializer())
+//                polymorphic(Any::class, Float::class, Float.serializer())
+//                polymorphic(Any::class, Double::class, Double.serializer())
+//                polymorphic(Any::class, ChatId::class, ChatIdSerializer)
+//                polymorphic(Any::class, ChatIdWithThreadId::class, ChatIdWithThreadIdSerializer)
+//                polymorphic(Any::class, ChatIdentifier::class, FullChatIdentifierSerializer)
 
                 polymorphic(State::class, MessagesRegistrar.FSMState::class, MessagesRegistrar.FSMState.serializer())
             }

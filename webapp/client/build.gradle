@@ -18,6 +18,8 @@ kotlin {
                 api project(":tasks_bot.webapp.common")
                 api(compose.runtime)
                 api libs.tgbotapi.webapps
+                api libs.ktor.client.content.negotiation
+                api libs.ktor.serialization.kotlinx.json
             }
         }
         jsMain {

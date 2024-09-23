@@ -1,10 +1,9 @@
 package center.sciprog.tasks_bot.webapp.common.models
 
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
-import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.serializer
 import org.koin.core.module.Module
 
@@ -18,7 +17,7 @@ import org.koin.core.module.Module
  * @see StatusRequest
  */
 interface BaseRequest<R> {
-    val resultSerializer: DeserializationStrategy<R>
+    val resultSerializer: KSerializer<R>
 }
 
 @OptIn(InternalSerializationApi::class)

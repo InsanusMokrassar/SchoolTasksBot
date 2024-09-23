@@ -16,6 +16,12 @@ kotlin {
                 implementation libs.plagubot.bot
             }
         }
+        jvmMain {
+            dependencies {
+                api libs.ktor.serialization.kotlinx.json
+                api libs.ktor.websockets
+            }
+        }
     }
 }
 

@@ -9,17 +9,22 @@ import dev.inmo.micro_utils.koin.singleWithRandomQualifier
 import dev.inmo.micro_utils.ktor.server.configurators.ApplicationRoutingConfigurator
 import dev.inmo.micro_utils.ktor.server.configurators.KtorApplicationConfigurator
 import dev.inmo.micro_utils.ktor.server.createKtorServer
+import dev.inmo.micro_utils.ktor.server.respond
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plagubot.config
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import dev.inmo.tgbotapi.utils.TelegramAPIUrlsKeeper
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.http.content.*
 import io.ktor.server.netty.*
 import io.ktor.server.request.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.StringFormat
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import org.jetbrains.exposed.sql.Database
@@ -54,6 +59,14 @@ object WebAppServerPlugin : Plugin {
                     val data = call.receive<AuthorizedRequestBody<*>>()
 
                     val authorized = telegramBotApiUrlsKeeper.checkWebAppData(data.initData, data.initDataHash)
+                    if (authorized) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                    } else {
+                        call.respond(
+                            HttpStatusCode.OK,
+                            requestsHandlers.first { it.ableToHandle(data.data) }.handle(data.data),
+                        )
+                    }
                 }
             }
         }

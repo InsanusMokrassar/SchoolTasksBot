@@ -1,5 +1,7 @@
 package center.sciprog.tasks_bot.webapp.server
 
+import center.sciprog.tasks_bot.webapp.server.models.StatusRequestHandler
+import center.sciprog.tasks_bot.webapp.server.models.registerRequestHandler
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.plagubot.Plugin
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
@@ -14,6 +16,8 @@ object CommonPlugin : Plugin {
         params["webapp"] ?.let { webappRaw ->
             single { get<Json>().decodeFromJsonElement(Config.serializer(), webappRaw) }
         }
+
+        registerRequestHandler(StatusRequestHandler)
     }
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {
 

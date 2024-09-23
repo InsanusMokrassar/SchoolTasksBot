@@ -6,7 +6,7 @@ import org.koin.core.module.Module
 
 interface RequestHandler {
     suspend fun ableToHandle(request: BaseRequest<*>): Boolean
-    suspend fun <R> handle(request: BaseRequest<R>): R
+    suspend fun handle(request: BaseRequest<*>): Any
 }
 
 fun Module.registerRequestHandler(handler: RequestHandler) {
@@ -17,7 +17,7 @@ fun Module.registerRequestHandler(ableToHandle: (BaseRequest<*>) -> Boolean, han
     registerRequestHandler(
         object : RequestHandler {
             override suspend fun ableToHandle(request: BaseRequest<*>): Boolean = ableToHandle(request)
-            override suspend fun <R> handle(request: BaseRequest<R>): R = handle(request) as R
+            override suspend fun handle(request: BaseRequest<*>): Any = handle(request)
         }
     )
 }

@@ -12,5 +12,8 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 17
+      - name: Add gradle memory restrictions
+        run:
+          printf "\norg.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=2g\n" >> gradle.properties
       - name: Build with Gradle
         run: ./gradlew build

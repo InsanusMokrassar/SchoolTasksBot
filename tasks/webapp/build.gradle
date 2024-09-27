@@ -4,16 +4,19 @@ plugins {
     id "com.google.devtools.ksp"
 }
 
-apply from: "$mppJavaProjectPresetPath"
+apply from: "$mppProjectWithSerializationPresetPath"
 
 kotlin {
     sourceSets {
         commonMain {
             dependencies {
                 api project(":tasks_bot.common")
-                api project(":tasks_bot.courses")
+                api project(":tasks_bot.tasks")
                 api project(":tasks_bot.webapp.common")
             }
+        }
+        jvmMain {
+            dependsOn(commonMain)
         }
     }
 }

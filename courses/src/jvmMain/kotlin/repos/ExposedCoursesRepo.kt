@@ -2,19 +2,14 @@ package center.sciprog.tasks_bot.courses.repos
 
 import center.sciprog.tasks_bot.courses.models.NewCourse
 import center.sciprog.tasks_bot.courses.models.RegisteredCourse
-import center.sciprog.tasks_bot.courses.models.Course
 import center.sciprog.tasks_bot.courses.models.CourseId
-import center.sciprog.tasks_bot.courses.models.CourseRegistrationLink
 import center.sciprog.tasks_bot.teachers.models.TeacherId
-import dev.inmo.micro_utils.repos.CRUDRepo
 import dev.inmo.micro_utils.repos.exposed.AbstractExposedCRUDRepo
 import dev.inmo.micro_utils.repos.exposed.initTable
-import dev.inmo.tgbotapi.types.UserId
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.ISqlExpressionBuilder
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
 import org.jetbrains.exposed.sql.transactions.transaction

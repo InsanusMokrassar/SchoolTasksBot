@@ -43,4 +43,15 @@ fun WebAppContent(client: DefaultClient) {
         }
     }
 
+
+    val activeTasks = remember { mutableStateOf<StatusRequest.Status?>(null) }
+    remember(client) {
+        scope.launch {
+            runCatching {
+                status.value = client.status()
+            }.onFailure {
+                it.printStackTrace()
+            }
+        }
+    }
 }

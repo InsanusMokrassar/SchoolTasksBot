@@ -25,6 +25,7 @@ kotlin {
         jsMain {
             dependencies {
                 implementation compose.web.core
+                api project(":tasks_bot.tasks.webapp")
             }
         }
     }

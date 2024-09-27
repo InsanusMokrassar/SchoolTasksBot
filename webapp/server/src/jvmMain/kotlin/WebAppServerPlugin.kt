@@ -2,17 +2,17 @@ package center.sciprog.tasks_bot.webapp.server
 
 import center.sciprog.tasks_bot.webapp.common.CommonWebAppConstants
 import center.sciprog.tasks_bot.webapp.common.models.AuthorizedRequestBody
-import center.sciprog.tasks_bot.webapp.server.models.RequestHandler
+import center.sciprog.tasks_bot.webapp.common.models.HandingResult
+import center.sciprog.tasks_bot.webapp.common.models.RequestHandler
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.getAllDistinct
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
 import dev.inmo.micro_utils.ktor.server.configurators.ApplicationRoutingConfigurator
 import dev.inmo.micro_utils.ktor.server.configurators.KtorApplicationConfigurator
 import dev.inmo.micro_utils.ktor.server.createKtorServer
-import dev.inmo.micro_utils.ktor.server.respond
 import dev.inmo.plagubot.Plugin
-import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
+import dev.inmo.tgbotapi.types.toChatId
 import dev.inmo.tgbotapi.utils.TelegramAPIUrlsKeeper
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.*
@@ -26,11 +26,8 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
-import kotlinx.serialization.StringFormat
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
-import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
 import org.koin.core.module.Module
 import java.io.File
@@ -57,6 +54,7 @@ object WebAppServerPlugin : Plugin {
                 testServer = config.testServer,
                 hostUrl = config.botApiServer
             )
+            val json = get<Json>()
             ApplicationRoutingConfigurator.Element {
                 post(CommonWebAppConstants.requestAddress) {
                     val data = runCatching {
@@ -68,10 +66,15 @@ object WebAppServerPlugin : Plugin {
 
                     val authorized = telegramBotApiUrlsKeeper.checkWebAppData(data.initData, data.initDataHash)
                     if (authorized) {
-                        call.respond(
-                            HttpStatusCode.OK,
-                            requestsHandlers.first { it.ableToHandle(data.data) }.handle(data.data),
-                        )
+                        val info = json.decodeFromString(InitDataInfo.serializer(), data.initData)
+                        val handlingResult = requestsHandlers.first { it.ableToHandle(data.data) }.handle(info.userInfo.id.toChatId(), data.data)
+
+                        when (handlingResult) {
+                            is HandingResult.Code -> call.respond(handlingResult.code)
+                            is HandingResult.Success -> handlingResult.data ?.let {
+                                call.respond(HttpStatusCode.OK, it)
+                            } ?: call.respond(HttpStatusCode.OK)
+                        }
                     } else {
                         call.respond(HttpStatusCode.Unauthorized)
                     }

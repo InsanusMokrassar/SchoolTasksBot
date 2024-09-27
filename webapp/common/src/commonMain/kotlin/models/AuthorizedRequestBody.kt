@@ -1,5 +1,6 @@
 package center.sciprog.tasks_bot.webapp.common.models
 
+import dev.inmo.tgbotapi.types.UserId
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 

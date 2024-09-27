@@ -7,6 +7,7 @@ String[] includes = [
     ":courses",
     ":users",
     ":tasks",
+    ":tasks:webapp",
     ":webapp:common",
     ":webapp:bot",
     ":webapp:client",

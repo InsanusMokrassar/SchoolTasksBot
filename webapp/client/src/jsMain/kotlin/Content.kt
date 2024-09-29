@@ -5,13 +5,9 @@ import center.sciprog.tasks_bot.common.webapp.DefaultClient
 import center.sciprog.tasks_bot.common.webapp.models.HandlingResult
 import center.sciprog.tasks_bot.common.webapp.models.StatusRequest
 import center.sciprog.tasks_bot.common.webapp.models.status
-import center.sciprog.tasks_bot.tasks.webapp.models.GetActiveTasksRequest
-import center.sciprog.tasks_bot.tasks.webapp.models.activeTasks
-import center.sciprog.tasks_bot.tasks.webapp.ui.DrawActiveTasks
+import center.sciprog.tasks_bot.tasks.webapp.ui.ActiveTasks
 import dev.inmo.kslog.common.KSLog
 import dev.inmo.kslog.common.e
-import dev.inmo.kslog.common.i
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
@@ -47,5 +43,5 @@ fun WebAppContent(client: DefaultClient) {
         }
     }
 
-    DrawActiveTasks(client)
+    ActiveTasks(client)
 }

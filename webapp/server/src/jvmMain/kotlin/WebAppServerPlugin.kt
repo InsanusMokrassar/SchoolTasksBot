@@ -1,9 +1,9 @@
 package center.sciprog.tasks_bot.webapp.server
 
-import center.sciprog.tasks_bot.webapp.common.CommonWebAppConstants
-import center.sciprog.tasks_bot.webapp.common.models.AuthorizedRequestBody
-import center.sciprog.tasks_bot.webapp.common.models.HandingResult
-import center.sciprog.tasks_bot.webapp.common.models.RequestHandler
+import center.sciprog.tasks_bot.common.webapp.CommonWebAppConstants
+import center.sciprog.tasks_bot.common.webapp.models.AuthorizedRequestBody
+import center.sciprog.tasks_bot.common.webapp.models.HandingResult
+import center.sciprog.tasks_bot.common.webapp.models.RequestHandler
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.getAllDistinct
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier

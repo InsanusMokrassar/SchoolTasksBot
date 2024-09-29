@@ -1,4 +1,4 @@
-package center.sciprog.tasks_bot.webapp.common.models
+package center.sciprog.tasks_bot.common.webapp.models
 
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
 import dev.inmo.tgbotapi.types.UserId

@@ -1,7 +1,7 @@
 rootProject.name = 'tasks_bot'
 
 String[] includes = [
-    ":common",
+//    ":common",
     ":common:common",
     ":common:bot",
     ":common:webapp",
@@ -22,7 +22,7 @@ String[] includes = [
     ":tasks:common",
     ":tasks:bot",
     ":tasks:webapp",
-    ":webapp:common",
+//    ":webapp:common",
     ":webapp:bot",
     ":webapp:client",
     ":webapp:server",

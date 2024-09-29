@@ -1,16 +1,16 @@
 package center.sciprog.tasks_bot.tasks
 
-import center.sciprog.tasks_bot.common.languagesRepo
+import center.sciprog.tasks_bot.common.bot.utils.locale
+import center.sciprog.tasks_bot.common.common.languagesRepo
 import center.sciprog.tasks_bot.common.strings.CommonStrings
-import center.sciprog.tasks_bot.common.utils.locale
 import center.sciprog.tasks_bot.tasks.common.tasksDraftsRepo
-import center.sciprog.tasks_bot.tasks.models.DraftInfoPack
-import center.sciprog.tasks_bot.tasks.models.tasks.AnswerFormat
-import center.sciprog.tasks_bot.tasks.models.tasks.NewAnswerFormatInfo
-import center.sciprog.tasks_bot.tasks.models.tasks.TaskDraft
-import center.sciprog.tasks_bot.tasks.strings.TasksStrings
-import center.sciprog.tasks_bot.teachers.repos.ReadTeachersRepo
-import center.sciprog.tasks_bot.users.repos.ReadUsersRepo
+import center.sciprog.tasks_bot.tasks.common.models.DraftInfoPack
+import center.sciprog.tasks_bot.tasks.common.models.tasks.AnswerFormat
+import center.sciprog.tasks_bot.tasks.common.models.tasks.NewAnswerFormatInfo
+import center.sciprog.tasks_bot.tasks.common.models.tasks.TaskDraft
+import center.sciprog.tasks_bot.tasks.common.strings.TasksStrings
+import center.sciprog.tasks_bot.teachers.common.repos.ReadTeachersRepo
+import center.sciprog.tasks_bot.users.common.repos.ReadUsersRepo
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
@@ -406,7 +406,7 @@ internal class NewAnswerDrawer(
                         draftsRepo
                     ) ?: return@parallel
                     val draft = freshDraftInfoPack.draft ?: return@parallel
-                    val newDraft = freshDraftInfoPack.draft.copy(
+                    val newDraft = draft.copy(
                         newAnswersFormats = draft.newAnswersFormats.let {
                             it.toMutableList().apply {
                                 val old = get(state.i)
@@ -497,7 +497,7 @@ internal class NewAnswerDrawer(
                         draftsRepo
                     ) ?: return@parallel
                     val draft = freshDraftInfoPack.draft ?: return@parallel
-                    val newDraft = freshDraftInfoPack.draft.copy(
+                    val newDraft = draft.copy(
                         newAnswersFormats = draft.newAnswersFormats.let {
                             it.toMutableList().apply {
                                 val old = get(state.i)
@@ -614,7 +614,7 @@ internal class NewAnswerDrawer(
                         draftsRepo
                     ) ?: return@parallel
                     val draft = freshDraftInfoPack.draft ?: return@parallel
-                    val newDraft = freshDraftInfoPack.draft.copy(
+                    val newDraft = draft.copy(
                         newAnswersFormats = draft.newAnswersFormats.let {
                             it.toMutableList().apply {
                                 val old = get(state.i)
@@ -758,8 +758,9 @@ internal class NewAnswerDrawer(
                         draftsRepo
                     ) ?: return@onMessageDataCallbackQuery
 
-                    val newDraft = freshDraftInfoPack.draft ?.copy(
-                        newAnswersFormats = draftInfoPack.draft.newAnswersFormats - answerPart
+                    val draft = freshDraftInfoPack.draft
+                    val newDraft = draft ?.copy(
+                        newAnswersFormats = draft.newAnswersFormats - answerPart
                     ) ?: return@onMessageDataCallbackQuery
 
                     draftsRepo.set(

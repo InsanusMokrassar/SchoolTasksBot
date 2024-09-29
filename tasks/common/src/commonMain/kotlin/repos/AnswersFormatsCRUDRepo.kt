@@ -1,4 +1,4 @@
-package center.sciprog.tasks_bot.tasks.repos
+package center.sciprog.tasks_bot.tasks.common.repos
 
 import center.sciprog.tasks_bot.tasks.common.models.tasks.AnswerFormatInfoId
 import center.sciprog.tasks_bot.tasks.common.models.tasks.NewAnswerFormatInfo

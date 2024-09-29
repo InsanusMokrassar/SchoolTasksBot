@@ -1,7 +1,7 @@
-package center.sciprog.tasks_bot.webapp.common
+package center.sciprog.tasks_bot.common.webapp
 
-import center.sciprog.tasks_bot.webapp.common.models.StatusRequestHandler
-import center.sciprog.tasks_bot.webapp.common.models.registerRequestHandler
+import center.sciprog.tasks_bot.common.webapp.models.StatusRequestHandler
+import center.sciprog.tasks_bot.common.webapp.models.registerRequestHandler
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.plagubot.Plugin
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM

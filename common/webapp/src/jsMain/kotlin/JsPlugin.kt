@@ -1,6 +1,5 @@
 package center.sciprog.tasks_bot.common.webapp
 
-import center.sciprog.tasks_bot.common.common.JsPlugin
 import dev.inmo.micro_utils.startup.plugin.StartPlugin
 import kotlinx.serialization.json.JsonObject
 import org.koin.core.Koin

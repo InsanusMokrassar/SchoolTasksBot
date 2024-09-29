@@ -11,7 +11,7 @@ kotlin {
         commonMain {
             dependencies {
                 api project(":tasks_bot.common")
-                api project(":tasks_bot.webapp.common")
+                api project(":tasks_bot.common.webapp")
             }
         }
         jvmMain {

@@ -4,8 +4,8 @@ import center.sciprog.tasks_bot.common.common.useCache
 import center.sciprog.tasks_bot.tasks.common.models.tasks.TaskDraft
 import center.sciprog.tasks_bot.tasks.common.repos.ExposedTasksCRUDRepo
 import center.sciprog.tasks_bot.tasks.common.repos.TasksCRUDRepo
-import center.sciprog.tasks_bot.tasks.repos.AnswersFormatsCRUDRepo
-import center.sciprog.tasks_bot.tasks.repos.ExposedAnswersFormatsCRUDRepo
+import center.sciprog.tasks_bot.tasks.common.repos.AnswersFormatsCRUDRepo
+import center.sciprog.tasks_bot.tasks.common.repos.ExposedAnswersFormatsCRUDRepo
 import center.sciprog.tasks_bot.teachers.common.models.TeacherId
 import dev.inmo.micro_utils.koin.singleWithBinds
 import dev.inmo.micro_utils.repos.MapKeyValueRepo

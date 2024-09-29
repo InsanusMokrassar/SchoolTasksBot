@@ -13,7 +13,7 @@
     "center.sciprog.tasks_bot.courses.bot.JvmPlugin",
     "center.sciprog.tasks_bot.tasks.bot.JvmPlugin",
     "center.sciprog.tasks_bot.users.bot.JvmPlugin",
-    "center.sciprog.tasks_bot.webapp.common.JvmPlugin",
+    "center.sciprog.tasks_bot.common.webapp.JvmPlugin",
     "center.sciprog.tasks_bot.webapp.server.WebAppServerPlugin",
     "center.sciprog.tasks_bot.webapp.bot.WebAppPlugin",
 

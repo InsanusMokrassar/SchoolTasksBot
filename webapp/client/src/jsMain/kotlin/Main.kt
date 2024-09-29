@@ -11,7 +11,7 @@ suspend fun main() {
         Config(
             plugins = listOf(
                 JsPlugin,
-                center.sciprog.tasks_bot.webapp.common.JsPlugin
+                center.sciprog.tasks_bot.common.webapp.JsPlugin
             )
         )
     )

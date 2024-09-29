@@ -1,4 +1,4 @@
-package center.sciprog.tasks_bot.webapp.common.models
+package center.sciprog.tasks_bot.common.webapp.models
 
 import io.ktor.http.*
 import kotlinx.serialization.Serializable

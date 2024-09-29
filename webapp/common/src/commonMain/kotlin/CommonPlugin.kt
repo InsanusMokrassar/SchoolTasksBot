@@ -1,7 +1,7 @@
-package center.sciprog.tasks_bot.webapp.common
+package center.sciprog.tasks_bot.common.webapp
 
-import center.sciprog.tasks_bot.webapp.common.models.StatusRequest
-import center.sciprog.tasks_bot.webapp.common.models.registerRequestType
+import center.sciprog.tasks_bot.common.webapp.models.StatusRequest
+import center.sciprog.tasks_bot.common.webapp.models.registerRequestType
 import dev.inmo.micro_utils.startup.plugin.StartPlugin
 import kotlinx.serialization.json.JsonObject
 import org.koin.core.Koin

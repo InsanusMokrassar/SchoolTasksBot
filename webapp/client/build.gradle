@@ -15,7 +15,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api project(":tasks_bot.webapp.common")
+                api project(":tasks_bot.common.webapp")
                 api(compose.runtime)
                 api libs.tgbotapi.webapps
                 api libs.ktor.client.content.negotiation

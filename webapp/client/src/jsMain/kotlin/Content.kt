@@ -4,9 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import center.sciprog.tasks_bot.webapp.common.DefaultClient
-import center.sciprog.tasks_bot.webapp.common.models.StatusRequest
-import center.sciprog.tasks_bot.webapp.common.models.status
+import center.sciprog.tasks_bot.common.webapp.DefaultClient
+import center.sciprog.tasks_bot.common.webapp.models.StatusRequest
+import center.sciprog.tasks_bot.common.webapp.models.status
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.Div

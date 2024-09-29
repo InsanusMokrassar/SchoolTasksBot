@@ -42,6 +42,7 @@ fun WebAppContent(client: DefaultClient) {
                 Text("Status: ${if (statusValue.data.ok) "Ok" else "Something is wrong"}")
                 Br()
                 Text("Memory state: ${statusValue.data.freeMemoryInfo}")
+
             }
         }
     }

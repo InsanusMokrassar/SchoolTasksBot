@@ -1,4 +1,4 @@
-package center.sciprog.tasks_bot.teachers
+package center.sciprog.tasks_bot.teachers.bot
 
 import center.sciprog.tasks_bot.common.bot.utils.locale
 import center.sciprog.tasks_bot.common.common.supervisorId

@@ -1,6 +1,7 @@
-package center.sciprog.tasks_bot.courses
+package center.sciprog.tasks_bot.courses.bot
 
 import center.sciprog.tasks_bot.common.common.useCache
+import center.sciprog.tasks_bot.courses.common.JvmPlugin
 import center.sciprog.tasks_bot.courses.common.courseKeywordsRepoSingle
 import center.sciprog.tasks_bot.courses.common.courseSubscribersRepoSingle
 import center.sciprog.tasks_bot.courses.common.models.CourseId
@@ -25,6 +26,7 @@ import org.koin.core.module.Module
 object JvmPlugin : Plugin {
     override fun Module.setupDI(params: JsonObject) {
         with(CommonPlugin) { setupDI(params) }
+        with(JvmPlugin) { setupDI(params) }
 
         single { ExposedCoursesRepo(get()) }
 
@@ -81,6 +83,7 @@ object JvmPlugin : Plugin {
     override suspend fun startPlugin(koin: Koin) {
         super.startPlugin(koin)
         CommonPlugin.startPlugin(koin)
+        JvmPlugin.startPlugin(koin)
     }
 
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {

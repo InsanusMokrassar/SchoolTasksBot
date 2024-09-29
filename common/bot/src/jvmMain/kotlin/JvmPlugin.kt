@@ -1,5 +1,6 @@
 package center.sciprog.tasks_bot.common.bot
 
+import center.sciprog.tasks_bot.common.common.JvmPlugin
 import center.sciprog.tasks_bot.common.common.singleLanguagesRepo
 import center.sciprog.tasks_bot.common.common.statesJson
 import dev.inmo.micro_utils.fsm.common.State
@@ -30,6 +31,7 @@ object JvmPlugin : Plugin {
 
     override fun Module.setupDI(params: JsonObject) {
         with(CommonPlugin) { setupDI(params) }
+        with(JvmPlugin) { setupDI(params) }
 
         singleLanguagesRepo {
             val json = get<Json>()
@@ -64,6 +66,12 @@ object JvmPlugin : Plugin {
                 ).fullyCached(MapKeyValueRepo(), get())
             )
         }
+    }
+
+    override suspend fun startPlugin(koin: Koin) {
+        super.startPlugin(koin)
+        CommonPlugin.startPlugin(koin)
+        JvmPlugin.startPlugin(koin)
     }
 
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {

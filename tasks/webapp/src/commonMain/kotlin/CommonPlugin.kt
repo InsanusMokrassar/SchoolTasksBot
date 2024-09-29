@@ -1,7 +1,9 @@
 package center.sciprog.tasks_bot.tasks.webapp
 
 import center.sciprog.tasks_bot.common.webapp.models.registerRequestHandler
+import center.sciprog.tasks_bot.common.webapp.models.registerRequestType
 import center.sciprog.tasks_bot.courses.common.courseSubscribersRepo
+import center.sciprog.tasks_bot.tasks.webapp.models.GetActiveTasksRequest
 import center.sciprog.tasks_bot.tasks.webapp.models.GetActiveTasksRequestsHandler
 import dev.inmo.micro_utils.startup.plugin.StartPlugin
 import kotlinx.serialization.json.JsonObject
@@ -19,6 +21,8 @@ object CommonPlugin : StartPlugin {
                 tasksRepo = get()
             )
         }
+
+        registerRequestType<GetActiveTasksRequest>()
     }
 
     override suspend fun startPlugin(koin: Koin) {

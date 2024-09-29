@@ -1,19 +1,19 @@
-package center.sciprog.tasks_bot.tasks
+package center.sciprog.tasks_bot.tasks.bot
 
 import center.sciprog.tasks_bot.common.bot.utils.locale
 import center.sciprog.tasks_bot.common.common.languagesRepo
 import center.sciprog.tasks_bot.common.utils.getChatLanguage
-import center.sciprog.tasks_bot.courses.CourseButtonsProvider
+import center.sciprog.tasks_bot.courses.bot.CourseButtonsProvider
 import center.sciprog.tasks_bot.courses.common.courseSubscribersRepo
 import center.sciprog.tasks_bot.courses.common.models.CourseId
 import center.sciprog.tasks_bot.courses.common.repos.ReadCoursesRepo
+import center.sciprog.tasks_bot.tasks.bot.services.AssignmentHappenService
+import center.sciprog.tasks_bot.tasks.bot.services.AssignmentProcessorService
 import center.sciprog.tasks_bot.tasks.common.CommonPlugin
 import center.sciprog.tasks_bot.tasks.common.models.tasks.TaskDraft
 import center.sciprog.tasks_bot.tasks.common.repos.TasksCRUDRepo
 import center.sciprog.tasks_bot.tasks.common.strings.TasksStrings
 import center.sciprog.tasks_bot.tasks.common.tasksDraftsRepo
-import center.sciprog.tasks_bot.tasks.services.AssignmentHappenService
-import center.sciprog.tasks_bot.tasks.services.AssignmentProcessorService
 import center.sciprog.tasks_bot.teachers.common.repos.ReadTeachersRepo
 import center.sciprog.tasks_bot.users.common.repos.ReadUsersRepo
 import dev.inmo.micro_utils.fsm.common.State

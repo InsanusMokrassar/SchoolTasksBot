@@ -9,6 +9,7 @@ dependencies {
     api project(":tasks_bot.teachers.bot")
     api project(":tasks_bot.courses.bot")
     api project(":tasks_bot.tasks.bot")
+    api project(":tasks_bot.tasks.webapp")
     api project(":tasks_bot.users.bot")
     api project(":tasks_bot.webapp.server")
     api project(":tasks_bot.webapp.bot")

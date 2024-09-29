@@ -5,9 +5,9 @@ import dev.inmo.micro_utils.common.fixed
 import dev.inmo.tgbotapi.types.UserId
 
 object StatusRequestHandler : RequestHandler {
-    override suspend fun ableToHandle(request: BaseRequest<*>): Boolean = request is StatusRequest
+    override suspend fun ableToHandle(request: BaseRequest<*>): Boolean = request == StatusRequest
 
-    override suspend fun handle(userId: UserId, request: BaseRequest<*>): HandingResult {
+    override suspend fun handle(userId: UserId, request: BaseRequest<*>): HandlingResult<*> {
         val casted = (request as StatusRequest)
         val runtime = Runtime.getRuntime()
         return StatusRequest.Status(

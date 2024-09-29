@@ -1,6 +1,7 @@
 package center.sciprog.tasks_bot.common.webapp
 
 import center.sciprog.tasks_bot.common.webapp.models.registerRequestHandler
+import center.sciprog.tasks_bot.common.common.JvmPlugin
 import dev.inmo.micro_utils.startup.plugin.StartPlugin
 import kotlinx.serialization.json.JsonObject
 import org.koin.core.Koin

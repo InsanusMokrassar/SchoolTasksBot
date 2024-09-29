@@ -1,4 +1,4 @@
-package center.sciprog.tasks_bot.template
+package center.sciprog.tasks_bot.template.bot
 
 import center.sciprog.tasks_bot.template.common.CommonPlugin
 import dev.inmo.micro_utils.fsm.common.State

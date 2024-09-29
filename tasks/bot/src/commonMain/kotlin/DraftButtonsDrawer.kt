@@ -1,4 +1,4 @@
-package center.sciprog.tasks_bot.tasks
+package center.sciprog.tasks_bot.tasks.bot
 
 import center.sciprog.tasks_bot.common.bot.DateTimePicker
 import center.sciprog.tasks_bot.common.bot.MessagesRegistrar
@@ -13,7 +13,7 @@ import center.sciprog.tasks_bot.courses.common.models.CourseId
 import center.sciprog.tasks_bot.courses.common.models.RegisteredCourse
 import center.sciprog.tasks_bot.courses.common.repos.CoursesRepo
 import center.sciprog.tasks_bot.courses.common.repos.ReadCoursesRepo
-import center.sciprog.tasks_bot.tasks.CommonPlugin.openDraftWithCourseIdBtnData
+import center.sciprog.tasks_bot.tasks.bot.CommonPlugin.openDraftWithCourseIdBtnData
 import center.sciprog.tasks_bot.tasks.common.CommonPlugin
 import center.sciprog.tasks_bot.tasks.common.models.DraftInfoPack
 import center.sciprog.tasks_bot.tasks.common.models.tasks.AnswerFormat

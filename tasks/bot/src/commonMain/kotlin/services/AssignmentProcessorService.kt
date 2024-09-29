@@ -1,4 +1,4 @@
-package center.sciprog.tasks_bot.tasks.services
+package center.sciprog.tasks_bot.tasks.bot.services
 
 import center.sciprog.tasks_bot.courses.common.models.CourseId
 import center.sciprog.tasks_bot.tasks.common.models.tasks.RegisteredTask

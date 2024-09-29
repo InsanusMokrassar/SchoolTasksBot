@@ -1,4 +1,4 @@
-package center.sciprog.tasks_bot.common
+package center.sciprog.tasks_bot.common.common
 
 import center.sciprog.tasks_bot.common.common.CommonPlugin
 import dev.inmo.micro_utils.startup.plugin.StartPlugin

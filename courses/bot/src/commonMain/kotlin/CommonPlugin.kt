@@ -1,4 +1,4 @@
-package center.sciprog.tasks_bot.courses
+package center.sciprog.tasks_bot.courses.bot
 
 import center.sciprog.tasks_bot.common.bot.utils.locale
 import center.sciprog.tasks_bot.common.common.languagesRepo

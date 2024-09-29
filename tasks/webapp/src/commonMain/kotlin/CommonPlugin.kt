@@ -1,8 +1,8 @@
 package center.sciprog.tasks_bot.tasks.webapp
 
-import center.sciprog.tasks_bot.courses.courseSubscribersRepo
+import center.sciprog.tasks_bot.common.webapp.models.registerRequestHandler
+import center.sciprog.tasks_bot.courses.common.courseSubscribersRepo
 import center.sciprog.tasks_bot.tasks.webapp.models.GetActiveTasksRequestsHandler
-import center.sciprog.tasks_bot.webapp.common.models.registerRequestHandler
 import dev.inmo.micro_utils.startup.plugin.StartPlugin
 import kotlinx.serialization.json.JsonObject
 import org.koin.core.Koin

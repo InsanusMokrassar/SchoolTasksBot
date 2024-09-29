@@ -1,6 +1,6 @@
 package center.sciprog.tasks_bot.tasks.webapp.models
 
-import center.sciprog.tasks_bot.webapp.common.models.BaseRequest
+import center.sciprog.tasks_bot.common.webapp.models.BaseRequest
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 

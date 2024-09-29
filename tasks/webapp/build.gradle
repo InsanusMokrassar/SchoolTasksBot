@@ -10,13 +10,9 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api project(":tasks_bot.common")
-                api project(":tasks_bot.tasks")
-                api project(":tasks_bot.webapp.common")
+                api project(":tasks_bot.common.webapp")
+                api project(":tasks_bot.tasks.common")
             }
-        }
-        jvmMain {
-            dependsOn(commonMain)
         }
     }
 }

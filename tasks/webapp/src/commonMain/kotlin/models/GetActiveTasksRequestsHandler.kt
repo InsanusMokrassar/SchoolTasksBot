@@ -1,15 +1,15 @@
 package center.sciprog.tasks_bot.tasks.webapp.models
 
-import center.sciprog.tasks_bot.courses.models.CourseId
-import center.sciprog.tasks_bot.courses.repos.CoursesRepo
-import center.sciprog.tasks_bot.tasks.repos.TasksCRUDRepo
-import center.sciprog.tasks_bot.teachers.repos.TeachersRepo
-import center.sciprog.tasks_bot.users.models.InternalUserId
-import center.sciprog.tasks_bot.users.repos.UsersRepo
-import center.sciprog.tasks_bot.webapp.common.models.BaseRequest
-import center.sciprog.tasks_bot.webapp.common.models.HandingResult
-import center.sciprog.tasks_bot.webapp.common.models.RequestHandler
-import center.sciprog.tasks_bot.webapp.common.models.requestHandlingSuccess
+import center.sciprog.tasks_bot.common.webapp.models.BaseRequest
+import center.sciprog.tasks_bot.common.webapp.models.HandingResult
+import center.sciprog.tasks_bot.common.webapp.models.RequestHandler
+import center.sciprog.tasks_bot.common.webapp.models.requestHandlingSuccess
+import center.sciprog.tasks_bot.courses.common.models.CourseId
+import center.sciprog.tasks_bot.courses.common.repos.CoursesRepo
+import center.sciprog.tasks_bot.tasks.common.repos.TasksCRUDRepo
+import center.sciprog.tasks_bot.teachers.common.repos.TeachersRepo
+import center.sciprog.tasks_bot.users.common.models.InternalUserId
+import center.sciprog.tasks_bot.users.common.repos.UsersRepo
 import dev.inmo.micro_utils.pagination.utils.getAllByWithNextPaging
 import dev.inmo.micro_utils.repos.KeyValuesRepo
 import dev.inmo.micro_utils.repos.pagination.maxPagePagination

@@ -1,7 +1,6 @@
 package center.sciprog.tasks_bot.common
 
 import center.sciprog.tasks_bot.common.strings.CommonStrings
-import center.sciprog.tasks_bot.common.utils.StringQualifierSerializer
 import center.sciprog.tasks_bot.common.utils.getChatLanguage
 import center.sciprog.tasks_bot.common.utils.locale
 import dev.inmo.micro_utils.coroutines.runCatchingSafely

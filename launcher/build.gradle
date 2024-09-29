@@ -5,11 +5,11 @@ plugins {
 }
 
 dependencies {
-    api project(":tasks_bot.common")
-    api project(":tasks_bot.teachers")
-    api project(":tasks_bot.courses")
-    api project(":tasks_bot.tasks")
-    api project(":tasks_bot.users")
+    api project(":tasks_bot.common.bot")
+    api project(":tasks_bot.teachers.bot")
+    api project(":tasks_bot.courses.bot")
+    api project(":tasks_bot.tasks.bot")
+    api project(":tasks_bot.users.bot")
     api project(":tasks_bot.webapp.server")
     api project(":tasks_bot.webapp.bot")
 

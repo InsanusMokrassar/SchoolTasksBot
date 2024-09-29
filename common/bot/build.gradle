@@ -1,0 +1,34 @@
+plugins {
+    id "org.jetbrains.kotlin.multiplatform"
+    id "org.jetbrains.kotlin.plugin.serialization"
+    id "com.google.devtools.ksp"
+}
+
+apply from: "$mppJavaProjectPresetPath"
+
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                api project(":tasks_bot.common.common")
+                api libs.plagubot.plugin
+                implementation libs.plagubot.bot
+                api libs.microutils.koin
+                api libs.microutils.repos.common
+                api libs.microutils.repos.cache
+                api libs.microutils.fsm.repos.common
+                api libs.microutils.serialization.mapper
+                api libs.microutils.resources
+                api libs.tgbotapi
+                api libs.plagubot.plugins.commands
+            }
+        }
+    }
+}
+
+dependencies {
+    add("kspCommonMainMetadata", libs.microutils.koin.generator)
+}
+
+ksp {
+}

@@ -17,6 +17,7 @@ class GetMyRolesRequestHandler(
     private val supervisorId: UserId
 ) : RequestHandler {
     override suspend fun ableToHandle(request: BaseRequest<*>): Boolean = request is GetMyRolesRequest
+
     override suspend fun handle(userId: UserId, request: BaseRequest<*>): HandlingResult<*> {
         return (request as? GetMyRolesRequest) ?.let {
             val isSupervisor = supervisorId == userId

@@ -20,6 +20,16 @@ import org.koin.core.module.Module
 
 object CommonPlugin : StartPlugin {
     override fun Module.setupDI(config: JsonObject) {
+        registerRequestHandler {
+            GetMyRolesRequestHandler(
+                usersRepo = get(),
+                teachersRepo = get(),
+                subscribersRepo = courseSubscribersRepo,
+                supervisorId = supervisorId
+            )
+        }
+        registerRequestType<GetMyRolesRequest>()
+
         single {
             HttpClient {
                 WebSockets {
@@ -33,17 +43,6 @@ object CommonPlugin : StartPlugin {
                 }
             }
         }
-
-        registerRequestHandler {
-            GetMyRolesRequestHandler(
-                usersRepo = get(),
-                teachersRepo = get(),
-                subscribersRepo = courseSubscribersRepo,
-                supervisorId = supervisorId
-            )
-        }
-        registerRequestType<GetMyRolesRequest>()
-
     }
     override suspend fun startPlugin(koin: Koin) {
         super.startPlugin(koin)

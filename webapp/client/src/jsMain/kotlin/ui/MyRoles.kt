@@ -1,6 +1,8 @@
 package center.sciprog.tasks_bot.webapp.client.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import center.sciprog.tasks_bot.common.webapp.ContentWithRequest
 import center.sciprog.tasks_bot.common.webapp.DefaultClient
 import center.sciprog.tasks_bot.common.webapp.models.HandlingResult
@@ -20,7 +22,7 @@ fun MyRoles(
                 Text("Problems with role status receiving: ${roles.code.value}")
             }
             is HandlingResult.Success -> {
-                val activeRoles = mutableListOf<String>()
+                val activeRoles = remember { mutableStateListOf<String>() }
                 if (roles.data.isTeacher) activeRoles.add("Teacher")
                 if (roles.data.isSupervisor) activeRoles.add("Supervisor")
                 if (roles.data.isStudent) activeRoles.add("Student")

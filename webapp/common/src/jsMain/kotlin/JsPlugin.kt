@@ -1,4 +1,4 @@
-package center.sciprog.tasks_bot.webapp.common
+package center.sciprog.tasks_bot.common.webapp
 
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.startup.plugin.StartPlugin

@@ -8,14 +8,16 @@
   "botToken": "1234567890:ABCDEFGHIJKLMNOP_qrstuvwxyz12345678",
   "testServer": false,
   "plugins": [
-    "center.sciprog.tasks_bot.common.JvmPlugin",
-    "center.sciprog.tasks_bot.teachers.JvmPlugin",
-    "center.sciprog.tasks_bot.courses.JvmPlugin",
-    "center.sciprog.tasks_bot.tasks.JvmPlugin",
-    "center.sciprog.tasks_bot.users.JvmPlugin",
-    "center.sciprog.tasks_bot.webapp.common.JvmPlugin",
+    "center.sciprog.tasks_bot.common.bot.JvmPlugin",
+    "center.sciprog.tasks_bot.teachers.bot.JvmPlugin",
+    "center.sciprog.tasks_bot.courses.bot.JvmPlugin",
+    "center.sciprog.tasks_bot.tasks.bot.JvmPlugin",
+    "center.sciprog.tasks_bot.tasks.webapp.JvmPlugin",
+    "center.sciprog.tasks_bot.users.bot.JvmPlugin",
+    "center.sciprog.tasks_bot.common.webapp.JvmPlugin",
     "center.sciprog.tasks_bot.webapp.server.WebAppServerPlugin",
     "center.sciprog.tasks_bot.webapp.bot.WebAppPlugin",
+    "center.sciprog.tasks_bot.webapp.client.JvmPlugin",
 
     "dev.inmo.plagubot.plugins.commands.CommandsPlugin"
   ],

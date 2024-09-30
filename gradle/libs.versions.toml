@@ -41,6 +41,7 @@ microutils-koin-generator = { module = "dev.inmo:micro_utils.koin.generator", ve
 microutils-ktor-server = { module = "dev.inmo:micro_utils.ktor.server", version.ref = "microutils" }
 microutils-repos-common = { module = "dev.inmo:micro_utils.repos.common", version.ref = "microutils" }
 microutils-repos-cache = { module = "dev.inmo:micro_utils.repos.cache", version.ref = "microutils" }
+microutils-repos-exposed = { module = "dev.inmo:micro_utils.repos.exposed", version.ref = "microutils" }
 microutils-repos-generator = { module = "dev.inmo:micro_utils.repos.generator", version.ref = "microutils" }
 microutils-fsm-repos-common = { module = "dev.inmo:micro_utils.fsm.repos.common", version.ref = "microutils" }
 microutils-serialization-mapper = { module = "dev.inmo:micro_utils.serialization.mapper", version.ref = "microutils" }

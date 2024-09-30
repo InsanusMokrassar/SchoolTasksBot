@@ -1,7 +1,7 @@
-package center.sciprog.tasks_bot.webapp.common
+package center.sciprog.tasks_bot.common.webapp
 
-import center.sciprog.tasks_bot.webapp.common.models.AuthorizedRequestBody
-import center.sciprog.tasks_bot.webapp.common.models.BaseRequest
+import center.sciprog.tasks_bot.common.webapp.models.AuthorizedRequestBody
+import center.sciprog.tasks_bot.common.webapp.models.BaseRequest
 import dev.inmo.tgbotapi.webapps.webApp
 import io.ktor.client.*
 import io.ktor.client.request.*

@@ -1,6 +1,6 @@
 package center.sciprog.tasks_bot.webapp.client
 
-import center.sciprog.tasks_bot.webapp.common.DefaultClient
+import center.sciprog.tasks_bot.common.webapp.DefaultClient
 import dev.inmo.micro_utils.startup.plugin.StartPlugin
 import kotlinx.serialization.json.JsonObject
 import org.jetbrains.compose.web.renderComposable
@@ -13,7 +13,7 @@ object JsPlugin : StartPlugin {
     }
     override suspend fun startPlugin(koin: Koin) {
         super.startPlugin(koin)
-        with(CommonPlugin) { startPlugin(koin) }
+        CommonPlugin.startPlugin(koin)
         renderComposable("root") {
             WebAppContent(koin.get<DefaultClient>())
         }

@@ -11,7 +11,7 @@ kotlin {
         commonMain {
             dependencies {
                 api project(":tasks_bot.common")
-                api project(":tasks_bot.teachers")
+                api project(":tasks_bot.teachers.bot")
                 api libs.plagubot.plugins.inline.buttons
             }
         }

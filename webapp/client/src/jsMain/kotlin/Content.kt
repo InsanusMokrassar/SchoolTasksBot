@@ -1,30 +1,30 @@
 package center.sciprog.tasks_bot.webapp.client
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import center.sciprog.tasks_bot.webapp.common.DefaultClient
-import center.sciprog.tasks_bot.webapp.common.models.StatusRequest
-import center.sciprog.tasks_bot.webapp.common.models.status
-import kotlinx.coroutines.launch
+import center.sciprog.tasks_bot.common.webapp.DefaultClient
+import center.sciprog.tasks_bot.common.webapp.models.HandlingResult
+import center.sciprog.tasks_bot.common.webapp.models.StatusRequest
+import center.sciprog.tasks_bot.common.webapp.models.status
+import center.sciprog.tasks_bot.tasks.webapp.ui.ActiveTasks
+import center.sciprog.tasks_bot.webapp.client.ui.MyRoles
+import dev.inmo.kslog.common.KSLog
+import dev.inmo.kslog.common.e
 import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.dom.P
 import org.jetbrains.compose.web.dom.Text
 
 @Composable
 fun WebAppContent(client: DefaultClient) {
-    val scope = rememberCoroutineScope()
-
-    val status = remember { mutableStateOf<StatusRequest.Status?>(null) }
-    remember(client) {
-        scope.launch {
-            runCatching {
-                status.value = client.status()
-            }.onFailure {
-                it.printStackTrace()
-            }
+    val status = remember { mutableStateOf<HandlingResult<StatusRequest.Status>?>(null) }
+    LaunchedEffect(client) {
+        runCatching {
+            status.value = client.status()
+        }.onFailure {
+            KSLog("Content").e(it)
+            it.printStackTrace()
         }
     }
 
@@ -33,14 +33,19 @@ fun WebAppContent(client: DefaultClient) {
     }
 
     Div {
-        val statusValue = status.value
-        if (statusValue == null) {
-            Text("Status receiving in progress")
-        } else {
-            Text("Status: ${if (statusValue.ok) "Ok" else "Something is wrong"}")
-            Br()
-            Text("Memory state: ${statusValue.freeMemoryInfo}")
+        when (val statusValue = status.value) {
+            null -> Text("Status receiving in progress")
+            is HandlingResult.Code -> {
+                Text("Problems with status receiving: ${statusValue.code.value}")
+            }
+            is HandlingResult.Success -> {
+                Text("Status: ${if (statusValue.data.ok) "Ok" else "Something is wrong"}")
+                Br()
+                Text("Memory state: ${statusValue.data.freeMemoryInfo}")
+
+            }
         }
     }
-
+    MyRoles(client)
+    ActiveTasks(client)
 }

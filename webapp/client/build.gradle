@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.kt.jb.compose)
 }
 
-apply from: "$mppJsProjectPresetPath"
+apply from: "$mppProjectWithSerializationPresetPath"
 
 kotlin {
     js (IR) {
@@ -15,7 +15,8 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api project(":tasks_bot.webapp.common")
+                api project(":tasks_bot.common.webapp")
+                api project(":tasks_bot.courses.webapp")
                 api(compose.runtime)
                 api libs.tgbotapi.webapps
                 api libs.ktor.client.content.negotiation
@@ -25,6 +26,7 @@ kotlin {
         jsMain {
             dependencies {
                 implementation compose.web.core
+                api project(":tasks_bot.tasks.webapp")
             }
         }
     }

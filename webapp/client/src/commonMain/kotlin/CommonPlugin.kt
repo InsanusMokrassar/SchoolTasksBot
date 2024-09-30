@@ -1,5 +1,11 @@
 package center.sciprog.tasks_bot.webapp.client
 
+import center.sciprog.tasks_bot.common.common.supervisorId
+import center.sciprog.tasks_bot.common.webapp.models.registerRequestHandler
+import center.sciprog.tasks_bot.common.webapp.models.registerRequestType
+import center.sciprog.tasks_bot.courses.common.courseSubscribersRepo
+import center.sciprog.tasks_bot.webapp.client.models.GetMyRolesRequest
+import center.sciprog.tasks_bot.webapp.client.models.GetMyRolesRequestHandler
 import dev.inmo.micro_utils.startup.plugin.StartPlugin
 import io.ktor.client.*
 import io.ktor.client.plugins.*
@@ -14,6 +20,16 @@ import org.koin.core.module.Module
 
 object CommonPlugin : StartPlugin {
     override fun Module.setupDI(config: JsonObject) {
+        registerRequestHandler {
+            GetMyRolesRequestHandler(
+                usersRepo = get(),
+                teachersRepo = get(),
+                subscribersRepo = courseSubscribersRepo,
+                supervisorId = supervisorId
+            )
+        }
+        registerRequestType<GetMyRolesRequest>()
+
         single {
             HttpClient {
                 WebSockets {

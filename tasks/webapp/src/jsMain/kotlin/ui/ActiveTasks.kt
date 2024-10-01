@@ -16,7 +16,7 @@ fun ActiveTasks(
     Div {
         when (activeTasks) {
             null -> Text("Status receiving in progress")
-            is HandlingResult.Code -> {
+            is HandlingResult.Failure -> {
                 Text("Problems with active tasks receiving: ${activeTasks.code.value}")
             }
             is HandlingResult.Success -> {

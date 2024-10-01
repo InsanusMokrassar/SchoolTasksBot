@@ -73,13 +73,13 @@ object WebAppServerPlugin : Plugin {
                             val handlingResult = requestsHandlers.first { it.ableToHandle(data.data) }.handle(info.id.toChatId(), data.data)
 
                             when (handlingResult) {
-                                is HandlingResult.Code -> call.respond(handlingResult.code)
+                                is HandlingResult.Failure -> call.respond(handlingResult.code)
                                 is HandlingResult.Success -> handlingResult.data ?.let {
                                     call.respond(handlingResult.code, it)
                                 } ?: call.respond(handlingResult.code)
                             }
                         } else {
-                            call.respond(HttpStatusCode.Unauthorized, HandlingResult.Code<Any?>(HttpStatusCode.Unauthorized) as HandlingResult<*>)
+                            call.respond(HttpStatusCode.Unauthorized, HandlingResult.Failure<Any?>(HttpStatusCode.Unauthorized, null) as HandlingResult<*>)
                         }
                     }.getOrElse {
                         it.printStackTrace()

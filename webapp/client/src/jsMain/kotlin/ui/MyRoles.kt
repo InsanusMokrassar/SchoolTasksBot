@@ -18,7 +18,7 @@ fun MyRoles(
     Div {
         when (roles) {
             null -> Text("Role status receiving in progress")
-            is HandlingResult.Code -> {
+            is HandlingResult.Failure -> {
                 Text("Problems with role status receiving: ${roles.code.value}")
             }
             is HandlingResult.Success -> {

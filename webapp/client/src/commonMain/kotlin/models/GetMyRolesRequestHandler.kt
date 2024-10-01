@@ -28,7 +28,7 @@ class GetMyRolesRequestHandler(
                     isSupervisor = isSupervisor,
                     isStudent = false
                 ).requestHandlingSuccess()
-                user == null -> HttpStatusCode.Unauthorized.requestHandlingCode()
+                user == null -> HttpStatusCode.Unauthorized.requestHandlingFailure()
                 else -> {
                     val isTeacher = teachersRepo.getById(user.id) != null
                     val isStudent = subscribersRepo.keys(user.id, FirstPagePagination(1)).results.isNotEmpty()
@@ -40,6 +40,6 @@ class GetMyRolesRequestHandler(
                 }
 
             }
-        } ?: HttpStatusCode.BadRequest.requestHandlingCode()
+        } ?: HttpStatusCode.BadRequest.requestHandlingFailure()
     }
 }

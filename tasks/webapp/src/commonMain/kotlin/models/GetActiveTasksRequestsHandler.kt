@@ -25,7 +25,7 @@ class GetActiveTasksRequestsHandler(
 
     override suspend fun handle(userId: UserId, request: BaseRequest<*>): HandlingResult<*> {
         return (request as? GetActiveTasksRequest) ?.let {
-            val user = usersRepo.getById(userId) ?: return HttpStatusCode.Unauthorized.requestHandlingCode()
+            val user = usersRepo.getById(userId) ?: return HttpStatusCode.Unauthorized.requestHandlingFailure()
             val now = DateTime.now()
             val teachingCoursesIds = teachersRepo.getById(user.id) ?.id ?.let { teacherId ->
                 coursesRepo.getCoursesIds(teacherId)
@@ -59,6 +59,6 @@ class GetActiveTasksRequestsHandler(
                 teachingTasks,
                 studyingTasks
             ).requestHandlingSuccess()
-        } ?: HttpStatusCode.BadRequest.requestHandlingCode()
+        } ?: HttpStatusCode.BadRequest.requestHandlingFailure()
     }
 }

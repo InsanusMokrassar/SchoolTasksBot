@@ -35,7 +35,7 @@ fun WebAppContent(client: DefaultClient) {
     Div {
         when (val statusValue = status.value) {
             null -> Text("Status receiving in progress")
-            is HandlingResult.Code -> {
+            is HandlingResult.Failure -> {
                 Text("Problems with status receiving: ${statusValue.code.value}")
             }
             is HandlingResult.Success -> {

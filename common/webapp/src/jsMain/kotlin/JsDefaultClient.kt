@@ -4,15 +4,12 @@ import center.sciprog.tasks_bot.common.webapp.models.AuthorizedRequestBody
 import center.sciprog.tasks_bot.common.webapp.models.BaseRequest
 import center.sciprog.tasks_bot.common.webapp.models.HandlingResult
 import dev.inmo.kslog.common.e
-import dev.inmo.kslog.common.i
 import dev.inmo.kslog.common.logger
 import dev.inmo.tgbotapi.webapps.webApp
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import kotlinx.coroutines.async
-import kotlinx.coroutines.supervisorScope
 import kotlinx.serialization.*
 
 class JsDefaultClient(
@@ -31,7 +28,7 @@ class JsDefaultClient(
                 setBody(serialized)
             }
             val body = response.bodyAsText()
-            val responseData = if (response.status.isSuccess() && body.isNotBlank()) {
+            val responseData = if (body.isNotBlank()) {
                 stringFormat.decodeFromString(
                     payload.resultSerializer,
                     response.bodyAsText()
@@ -40,8 +37,8 @@ class JsDefaultClient(
                 null
             }
             when {
-                response.status != HttpStatusCode.OK -> HandlingResult.Code<R>(response.status)
-                else -> HandlingResult.Success<R>(responseData as R)
+                response.status != HttpStatusCode.OK -> HandlingResult.Failure<R>(response.status, responseData as R)
+                else -> HandlingResult.Success<R>(responseData as R, response.status)
             }
         }.getOrElse {
             logger.e(it)

@@ -27,6 +27,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import org.koin.core.Koin
@@ -72,12 +73,12 @@ object WebAppServerPlugin : Plugin {
                             val info = json.decodeFromString(InitDataInfo.UserInfo.serializer(), userData)
                             val handlingResult = requestsHandlers.first { it.ableToHandle(data.data) }.handle(info.id.toChatId(), data.data)
 
-                            when (handlingResult) {
-                                is HandlingResult.Failure -> call.respond(handlingResult.code)
-                                is HandlingResult.Success -> handlingResult.data ?.let {
-                                    call.respond(handlingResult.code, it)
-                                } ?: call.respond(handlingResult.code)
+                            val serializedData = handlingResult.data ?.let {
+                                json.encodeToString(data.data.resultSerializer as KSerializer<Any?>, handlingResult.data)
                             }
+                            serializedData ?.let {
+                                call.respond(handlingResult.code, it)
+                            } ?: call.respond(handlingResult.code)
                         } else {
                             call.respond(HttpStatusCode.Unauthorized, HandlingResult.Failure<Any?>(HttpStatusCode.Unauthorized, null) as HandlingResult<*>)
                         }

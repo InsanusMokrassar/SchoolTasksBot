@@ -29,7 +29,6 @@ interface SimpleRequest : BaseRequest<Unit> {
         get() = Unit.serializer()
 }
 
-
 @OptIn(InternalSerializationApi::class)
 inline fun <reified T : BaseRequest<*>> Module.registerRequestType() {
     singleWithRandomQualifier {

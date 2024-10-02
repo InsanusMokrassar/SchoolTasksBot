@@ -23,7 +23,7 @@ class GetActiveTasksRequestsHandler(
 ) : RequestHandler {
     override suspend fun ableToHandle(request: BaseRequest<*>): Boolean = request is GetActiveTasksRequest
 
-    override suspend fun handle(userId: UserId, request: BaseRequest<*>): HandlingResult<*> {
+    override suspend fun handle(userId: UserId, request: BaseRequest<*>): HandlingResult<GetActiveTasksRequest.Response?> {
         return (request as? GetActiveTasksRequest) ?.let {
             val user = usersRepo.getById(userId) ?: return HttpStatusCode.Unauthorized.requestHandlingFailure()
             val now = DateTime.now()

@@ -6,13 +6,35 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface HandlingResult<R : Any?> {
+    val status: Boolean
     val code: HttpStatusCode
     val data: R
     @Serializable
-    data class Success<R : Any?>(override val data: R, override val code: @Serializable(HttpStatusCodeSerializer::class) HttpStatusCode = HttpStatusCode.OK) : HandlingResult<R>
+    data class Success<R : Any?>(
+        override val code: @Serializable(HttpStatusCodeSerializer::class) HttpStatusCode = HttpStatusCode.OK,
+        override val data: R,
+        override val status: Boolean = true,
+    ) : HandlingResult<R>
+
     @Serializable
-    data class Failure<R : Any?>(override val code: @Serializable(HttpStatusCodeSerializer::class) HttpStatusCode, override val data: R) : HandlingResult<R>
+    data class Failure<R : Any?>(
+        override val code: @Serializable(HttpStatusCodeSerializer::class) HttpStatusCode,
+        override val data: R,
+        val errorMessage: String? = null,
+        override val status: Boolean = true,
+    ) : HandlingResult<R>
 }
 
-fun <T : Any?> T.requestHandlingSuccess(code: HttpStatusCode = HttpStatusCode.OK) = HandlingResult.Success<T>(this, code)
-fun <T : Any> HttpStatusCode.requestHandlingFailure(data: T? = null) = HandlingResult.Failure<T?>(this, data)
+fun <T : Any?> T.requestHandlingSuccess(
+    code: HttpStatusCode = HttpStatusCode.OK
+)= HandlingResult.Success(code, this)
+
+fun requestSuccessTrue(
+    code: HttpStatusCode = HttpStatusCode.OK
+) = HandlingResult.Success(code, null)
+
+fun requestHandlingFailure(
+    code: HttpStatusCode,
+    data: Any? = null,
+    errorMessage: String? = null
+)= HandlingResult.Failure(code, data, errorMessage)

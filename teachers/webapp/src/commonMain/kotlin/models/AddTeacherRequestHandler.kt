@@ -17,7 +17,7 @@ class AddTeacherRequestHandler(
     override suspend fun ableToHandle(request: BaseRequest<*>): Boolean = request is AddTeacherRequest
 
     override suspend fun handle(userId: UserId, request: BaseRequest<*>): HandlingResult<*> {
-        return (request as? AddTeacherRequest)?.let {
+          return (request as? AddTeacherRequest)?.let {
             if (supervisorId == userId) {
                 runCatchingSafely {
                     teachersRepo.create(
@@ -26,16 +26,16 @@ class AddTeacherRequestHandler(
                 }.fold(
                     onSuccess = { created ->
                         if (created.isNotEmpty()) {
-                            AddTeacherRequest.Response(true).requestHandlingSuccess()
+                            return requestSuccessTrue()
                         } else {
-                            HttpStatusCode.InternalServerError.requestHandlingCode()
+                            requestHandlingFailure(HttpStatusCode.InternalServerError)
                         }
                     },
                     onFailure = { e ->
-                        AddTeacherRequest.Response(false, "${e.message}").requestHandlingSuccess()
+                        requestHandlingFailure(HttpStatusCode.InternalServerError, e.message)
                     }
                 )
-            } else HttpStatusCode.Forbidden.requestHandlingCode()
-        } ?: HttpStatusCode.BadRequest.requestHandlingCode()
+            } else requestHandlingFailure(HttpStatusCode.Forbidden)
+        } ?: requestHandlingFailure(HttpStatusCode.InternalServerError)
     }
 }

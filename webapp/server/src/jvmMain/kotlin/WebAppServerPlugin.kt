@@ -61,27 +61,39 @@ object WebAppServerPlugin : Plugin {
             ApplicationRoutingConfigurator.Element {
                 post(CommonWebAppConstants.requestAddress) {
                     runCatching {
-                        val data = call.receive<AuthorizedRequestBody>()
+                        val requestBody = call.receive<AuthorizedRequestBody>()
 
-                        val authorized = telegramBotApiUrlsKeeper.checkWebAppData(data.initData, data.initDataHash)
+                        val authorized = telegramBotApiUrlsKeeper.checkWebAppData(
+                            requestBody.initData,
+                            requestBody.initDataHash
+                        )
+
                         if (authorized) {
-                            val userData = data.initData.decodeUrlQueryToMap()["user"] ?.firstOrNull()
+                            val userData = requestBody.initData.decodeUrlQueryToMap()["user"] ?.firstOrNull()
                             if (userData == null) {
                                 call.respond(HttpStatusCode.BadRequest)
                                 return@post
                             }
                             val info = json.decodeFromString(InitDataInfo.UserInfo.serializer(), userData)
-                            val handlingResult = requestsHandlers.first { it.ableToHandle(data.data) }.handle(info.id.toChatId(), data.data)
+                            val handlingResult = requestsHandlers
+                                .first { it.ableToHandle(requestBody.data) }
+                                .handle(info.id.toChatId(), requestBody.data)
 
                             val serializedData = handlingResult.data ?.let {
-                                json.encodeToString(data.data.resultSerializer as KSerializer<Any?>, handlingResult.data)
+                                json.encodeToString(
+                                    requestBody.data.resultSerializer as KSerializer<Any?>,
+                                    handlingResult.data
+                                )
                             }
+
                             serializedData ?.let {
                                 call.respond(handlingResult.code, it)
                             } ?: call.respond(handlingResult.code)
-                        } else {
-                            call.respond(HttpStatusCode.Unauthorized, HandlingResult.Failure<Any?>(HttpStatusCode.Unauthorized, null) as HandlingResult<*>)
-                        }
+
+                        } else call.respond(
+                            HttpStatusCode.Unauthorized,
+                            HandlingResult.Failure<Any?>(HttpStatusCode.Unauthorized, null) as HandlingResult<*>
+                        )
                     }.getOrElse {
                         it.printStackTrace()
                         throw it

@@ -3,6 +3,7 @@ package center.sciprog.tasks_bot.common.webapp.models
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
 import org.koin.core.module.Module
@@ -22,6 +23,12 @@ import org.koin.core.module.Module
 interface BaseRequest<R> {
     val resultSerializer: KSerializer<R>
 }
+
+interface SimpleRequest : BaseRequest<Unit> {
+    override val resultSerializer: KSerializer<Unit>
+        get() = Unit.serializer()
+}
+
 
 @OptIn(InternalSerializationApi::class)
 inline fun <reified T : BaseRequest<*>> Module.registerRequestType() {

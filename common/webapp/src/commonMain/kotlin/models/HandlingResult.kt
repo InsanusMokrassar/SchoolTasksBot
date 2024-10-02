@@ -6,22 +6,19 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface HandlingResult<R : Any?> {
-    val status: Boolean
     val code: HttpStatusCode
     val data: R
     @Serializable
     data class Success<R : Any?>(
         override val code: @Serializable(HttpStatusCodeSerializer::class) HttpStatusCode = HttpStatusCode.OK,
-        override val data: R,
-        override val status: Boolean = true,
+        override val data: R
     ) : HandlingResult<R>
 
     @Serializable
     data class Failure<R : Any?>(
         override val code: @Serializable(HttpStatusCodeSerializer::class) HttpStatusCode,
         override val data: R,
-        val errorMessage: String? = null,
-        override val status: Boolean = true,
+        val errorMessage: String? = null
     ) : HandlingResult<R>
 }
 

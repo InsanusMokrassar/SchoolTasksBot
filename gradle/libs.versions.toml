@@ -9,6 +9,8 @@ microutils = "0.22.2"
 
 ktor = "2.3.12"
 
+navigation = "0.5.7"
+
 tgbotapi = "18.2.0"
 tgbotapi-libraries = "0.24.0"
 plagubot = "10.0.0"
@@ -46,6 +48,9 @@ microutils-repos-generator = { module = "dev.inmo:micro_utils.repos.generator", 
 microutils-fsm-repos-common = { module = "dev.inmo:micro_utils.fsm.repos.common", version.ref = "microutils" }
 microutils-serialization-mapper = { module = "dev.inmo:micro_utils.serialization.mapper", version.ref = "microutils" }
 microutils-startup-launcher = { module = "dev.inmo:micro_utils.startup.launcher", version.ref = "microutils" }
+
+navigation = { module = "dev.inmo:navigation.compose", version.ref = "navigation" }
+navigation-mermaid = { module = "dev.inmo:navigation.mermaid", version.ref = "navigation" }
 
 ktor-server-engine-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-websockets = { module = "io.ktor:ktor-websockets", version.ref = "ktor" }

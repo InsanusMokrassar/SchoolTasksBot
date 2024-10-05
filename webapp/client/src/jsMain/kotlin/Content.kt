@@ -46,6 +46,5 @@ fun WebAppContent(client: DefaultClient) {
             }
         }
     }
-    MyRoles(client)
     ActiveTasks(client)
 }

@@ -8,8 +8,29 @@ import center.sciprog.tasks_bot.common.webapp.DefaultClient
 import center.sciprog.tasks_bot.common.webapp.models.HandlingResult
 import center.sciprog.tasks_bot.webapp.client.models.GetMyRolesRequest
 import center.sciprog.tasks_bot.webapp.client.models.getMyRoles
+import dev.inmo.navigation.compose.ComposeNode
+import dev.inmo.navigation.core.NavigationChain
+import dev.inmo.navigation.core.NavigationNodeId
+import kotlinx.serialization.Serializable
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
+
+class MyRolesView(
+    private val client : DefaultClient,
+    config: Config,
+    chain: NavigationChain<Any?>,
+    id: NavigationNodeId = NavigationNodeId()
+) : ComposeNode<MyRolesView.Config, Any?>(config, chain, id) {
+    @Serializable
+    data object Config
+
+    @Composable
+    override fun onDraw() {
+        super.onDraw()
+        MyRoles(client)
+        SubchainsHost()
+    }
+}
 
 @Composable
 fun MyRoles(

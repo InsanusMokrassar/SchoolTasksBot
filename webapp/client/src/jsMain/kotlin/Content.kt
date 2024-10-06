@@ -18,33 +18,5 @@ import org.jetbrains.compose.web.dom.Text
 
 @Composable
 fun WebAppContent(client: DefaultClient) {
-    val status = remember { mutableStateOf<HandlingResult<StatusRequest.Status>?>(null) }
-    LaunchedEffect(client) {
-        runCatching {
-            status.value = client.status()
-        }.onFailure {
-            KSLog("Content").e(it)
-            it.printStackTrace()
-        }
-    }
-
-    Div {
-        Text("Hello world")
-    }
-
-    Div {
-        when (val statusValue = status.value) {
-            null -> Text("Status receiving in progress")
-            is HandlingResult.Failure -> {
-                Text("Problems with status receiving: ${statusValue.code.value}")
-            }
-            is HandlingResult.Success -> {
-                Text("Status: ${if (statusValue.data.ok) "Ok" else "Something is wrong"}")
-                Br()
-                Text("Memory state: ${statusValue.data.freeMemoryInfo}")
-
-            }
-        }
-    }
     ActiveTasks(client)
 }

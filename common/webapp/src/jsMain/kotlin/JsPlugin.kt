@@ -5,6 +5,7 @@ import kotlinx.serialization.json.JsonObject
 import org.koin.core.Koin
 import org.koin.core.module.Module
 import center.sciprog.tasks_bot.common.common.JsPlugin
+import center.sciprog.tasks_bot.common.webapp.utils.registerViewFactory
 
 object JsPlugin : StartPlugin {
     override fun Module.setupDI(params: JsonObject) {
@@ -16,6 +17,11 @@ object JsPlugin : StartPlugin {
                 get(),
                 get(),
             )
+        }
+
+
+        registerViewFactory<ServerStatusView.Config> { chain, config ->
+            ServerStatusView(get(), config, chain)
         }
     }
 

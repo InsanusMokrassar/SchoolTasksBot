@@ -2,6 +2,8 @@ package center.sciprog.tasks_bot.webapp.client
 
 import androidx.compose.runtime.LaunchedEffect
 import center.sciprog.tasks_bot.common.webapp.DefaultClient
+import center.sciprog.tasks_bot.common.webapp.ServerStatusView
+import center.sciprog.tasks_bot.common.webapp.utils.registerViewFactory
 import center.sciprog.tasks_bot.webapp.client.ui.MyRolesView
 import dev.inmo.kslog.common.KSLog
 import dev.inmo.kslog.common.LogLevel
@@ -28,15 +30,12 @@ object JsPlugin : StartPlugin {
     override fun Module.setupDI(config: JsonObject) {
         with(CommonPlugin) { setupDI(config) }
 
-        singleWithRandomQualifier<NavigationNodeFactory<Any?>> {
-            val client = get<DefaultClient>()
-            NavigationNodeFactory.Typed<MyRolesView.Config, Any?> { chain, config ->
-                MyRolesView(
-                    client,
-                    config,
-                    chain
-                )
-            }
+        registerViewFactory<MyRolesView.Config> { chain, config ->
+            MyRolesView(
+                get(),
+                config,
+                chain
+            )
         }
     }
     override suspend fun startPlugin(koin: Koin) {
@@ -61,6 +60,9 @@ object JsPlugin : StartPlugin {
                     }
                 }
 
+                InjectNavigationChain<Any?> {
+                    InjectNavigationNode(ServerStatusView.Config)
+                }
                 InjectNavigationChain<Any?> {
                     InjectNavigationNode(MyRolesView.Config)
                 }

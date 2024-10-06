@@ -23,9 +23,9 @@ class GetActiveTasksRequestsHandler(
 ) : RequestHandler {
     override suspend fun ableToHandle(request: BaseRequest<*>): Boolean = request is GetActiveTasksRequest
 
-    override suspend fun handle(userId: UserId, request: BaseRequest<*>): HandlingResult<GetActiveTasksRequest.Response?> {
+    override suspend fun handle(userId: UserId, request: BaseRequest<*>): HandlingResult<*> {
         return (request as? GetActiveTasksRequest) ?.let {
-            val user = usersRepo.getById(userId) ?: return HttpStatusCode.Unauthorized.requestHandlingFailure()
+            val user = usersRepo.getById(userId) ?: return requestHandlingFailure(HttpStatusCode.Unauthorized)
             val now = DateTime.now()
             val teachingCoursesIds = teachersRepo.getById(user.id) ?.id ?.let { teacherId ->
                 coursesRepo.getCoursesIds(teacherId)
@@ -36,18 +36,18 @@ class GetActiveTasksRequestsHandler(
             val coursesCache = (teachingCoursesIds + studentCoursesIds).mapNotNull {
                 it to (coursesRepo.getById(it) ?: return@mapNotNull null)
             }.toMap()
-            val teachingTasks = teachingCoursesIds.mapNotNull {
-                val course = coursesCache[it] ?: return@mapNotNull null
-                tasksRepo.getActiveTasks(it, now).map {
+            val teachingTasks = teachingCoursesIds.mapNotNull { courseId ->
+                val course = coursesCache[courseId] ?: return@mapNotNull null
+                tasksRepo.getActiveTasks(courseId, now).map {
                     TaskInfo(
                         it,
                         course
                     )
                 }
             }.flatten()
-            val studyingTasks = (studentCoursesIds - teachingCoursesIds.toSet()).mapNotNull {
-                val course = coursesCache[it] ?: return@mapNotNull null
-                tasksRepo.getActiveTasks(it, now).map {
+            val studyingTasks = (studentCoursesIds - teachingCoursesIds.toSet()).mapNotNull { courseId ->
+                val course = coursesCache[courseId] ?: return@mapNotNull null
+                tasksRepo.getActiveTasks(courseId, now).map {
                     TaskInfo(
                         it,
                         course
@@ -59,6 +59,6 @@ class GetActiveTasksRequestsHandler(
                 teachingTasks,
                 studyingTasks
             ).requestHandlingSuccess()
-        } ?: HttpStatusCode.BadRequest.requestHandlingFailure()
+        } ?: requestHandlingFailure(HttpStatusCode.BadRequest)
     }
 }

@@ -76,6 +76,8 @@ object WebAppServerPlugin : Plugin {
                             val serializedData = handlingResult.data ?.let {
                                 json.encodeToString(data.data.resultSerializer as KSerializer<Any?>, handlingResult.data)
                             }
+                            val isSuccess = handlingResult is HandlingResult.Success
+                            call.response.header("internal_status_type", if (isSuccess) "success" else "failure")
                             serializedData ?.let {
                                 call.respond(handlingResult.code, it)
                             } ?: call.respond(handlingResult.code)

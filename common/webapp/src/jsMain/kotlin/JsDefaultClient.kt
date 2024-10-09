@@ -31,14 +31,22 @@ class JsDefaultClient(
             val responseData = if (body.isNotBlank()) {
                 stringFormat.decodeFromString(
                     payload.resultSerializer,
-                    response.bodyAsText()
+                    body
                 )
             } else {
                 null
             }
             when {
-                response.status != HttpStatusCode.OK -> HandlingResult.Failure<R>(response.status, responseData as R)
-                else -> HandlingResult.Success<R>(responseData as R, response.status)
+                response.status != HttpStatusCode.OK ->
+                    HandlingResult.Failure(
+                        response.status,
+                        responseData as R
+                    )
+                else ->
+                    HandlingResult.Success(
+                        responseData as R,
+                        response.status
+                    )
             }
         }.getOrElse {
             logger.e(it)

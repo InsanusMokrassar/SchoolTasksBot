@@ -24,7 +24,7 @@ sealed interface HandlingResult<R : Any?> {
 
 fun <T : Any?> T.requestHandlingSuccess(
     code: HttpStatusCode = HttpStatusCode.OK
-)= HandlingResult.Success(code, this)
+) = HandlingResult.Success(code, this)
 
 fun requestSuccessTrue(
     code: HttpStatusCode = HttpStatusCode.OK
@@ -34,4 +34,4 @@ fun requestHandlingFailure(
     code: HttpStatusCode,
     data: Any? = null,
     errorMessage: String? = null
-)= HandlingResult.Failure(code, data, errorMessage)
+) = HandlingResult.Failure(code, data, errorMessage)

@@ -17,7 +17,9 @@ fun ActiveTasks(
         when (activeTasks) {
             null -> Text("Status receiving in progress")
             is HandlingResult.Failure -> {
-                Text("Problems with active tasks receiving: ${activeTasks.code.value}")
+                Text(
+                    "Problems with active tasks receiving: ${activeTasks.code.value} ${activeTasks.errorMessage}"
+                )
             }
             is HandlingResult.Success -> {
                 if (activeTasks.data.teachingTasksInfo.isNotEmpty()) {

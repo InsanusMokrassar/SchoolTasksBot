@@ -38,7 +38,7 @@ class JsDefaultClient(
             }
             when {
                 response.status != HttpStatusCode.OK -> HandlingResult.Failure(response.status, responseData as R)
-                else -> HandlingResult.Success(response.status, responseData as R, )
+                else -> HandlingResult.Success(responseData as R, response.status)
             }
         }.getOrElse {
             logger.e(it)

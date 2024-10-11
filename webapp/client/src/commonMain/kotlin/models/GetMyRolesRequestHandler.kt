@@ -18,7 +18,7 @@ class GetMyRolesRequestHandler(
 ) : RequestHandler {
     override suspend fun ableToHandle(request: BaseRequest<*>): Boolean = request is GetMyRolesRequest
 
-    override suspend fun handle(userId: UserId, request: BaseRequest<*>): HandlingResult<*> {
+    override suspend fun handle(userId: UserId, request: BaseRequest<*>): HandlingResult<GetMyRolesRequest.Response?> {
         return (request as? GetMyRolesRequest) ?.let {
             val isSupervisor = supervisorId == userId
             val user = usersRepo.getById(userId)
@@ -28,7 +28,7 @@ class GetMyRolesRequestHandler(
                     isSupervisor = isSupervisor,
                     isStudent = false
                 ).requestHandlingSuccess()
-                user == null -> requestHandlingFailure(HttpStatusCode.Unauthorized)
+                user == null -> HttpStatusCode.Unauthorized.requestHandlingFailure()
                 else -> {
                     val isTeacher = teachersRepo.getById(user.id) != null
                     val isStudent = subscribersRepo.keys(user.id, FirstPagePagination(1)).results.isNotEmpty()
@@ -40,6 +40,6 @@ class GetMyRolesRequestHandler(
                 }
 
             }
-        } ?: requestHandlingFailure(HttpStatusCode.BadRequest)
+        } ?: HttpStatusCode.BadRequest.requestHandlingFailure()
     }
 }

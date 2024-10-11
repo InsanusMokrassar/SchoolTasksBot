@@ -10,28 +10,25 @@ sealed interface HandlingResult<R : Any?> {
     val data: R
     @Serializable
     data class Success<R : Any?>(
-        override val code: @Serializable(HttpStatusCodeSerializer::class) HttpStatusCode = HttpStatusCode.OK,
-        override val data: R
+        override val data: R,
+        override val code: @Serializable(HttpStatusCodeSerializer::class) HttpStatusCode = HttpStatusCode.OK
     ) : HandlingResult<R>
-
     @Serializable
     data class Failure<R : Any?>(
         override val code: @Serializable(HttpStatusCodeSerializer::class) HttpStatusCode,
-        override val data: R,
-        val errorMessage: String? = null
+        override val data: R
     ) : HandlingResult<R>
 }
 
 fun <T : Any?> T.requestHandlingSuccess(
     code: HttpStatusCode = HttpStatusCode.OK
-) = HandlingResult.Success(code, this)
+) = HandlingResult.Success<T>(this, code)
+
+fun <T : Any> HttpStatusCode.requestHandlingFailure(
+    data: T? = null
+) = HandlingResult.Failure(this, data)
 
 fun requestSuccessTrue(
-    code: HttpStatusCode = HttpStatusCode.OK
-) = HandlingResult.Success(code, null)
-
-fun requestHandlingFailure(
-    code: HttpStatusCode,
-    data: Any? = null,
-    errorMessage: String? = null
-) = HandlingResult.Failure(code, data, errorMessage)
+    code: HttpStatusCode = HttpStatusCode.OK,
+    data: Any? = null
+) = HandlingResult.Success(data, code)

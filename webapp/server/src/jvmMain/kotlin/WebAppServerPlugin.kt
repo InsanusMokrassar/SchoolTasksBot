@@ -87,6 +87,8 @@ object WebAppServerPlugin : Plugin {
                                     handlingResult.data
                                 )
                             }
+                            val isSuccess = handlingResult is HandlingResult.Success
+                            call.response.header("internal_status_type", if (isSuccess) "success" else "failure")
 
                             serializedData ?.let {
                                 call.respond(handlingResult.code, it)

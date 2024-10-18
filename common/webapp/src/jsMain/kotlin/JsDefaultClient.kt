@@ -11,16 +11,17 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.*
+import kotlinx.serialization.json.Json
 
 class JsDefaultClient(
     private val client: HttpClient,
-    private val stringFormat: StringFormat,
+    private val json: Json,
     private val initData: String = webApp.initData,
     private val initDataHash: String = webApp.initDataUnsafe.hash
 ) : DefaultClient {
     override suspend fun <R> request(payload: BaseRequest<R>): HandlingResult<R> {
         val result = runCatching {
-            val serialized = stringFormat.encodeToString(
+            val serialized = json.encodeToString(
                 AuthorizedRequestBody.serializer(),
                 AuthorizedRequestBody(initData, initDataHash, payload)
             )
@@ -28,8 +29,9 @@ class JsDefaultClient(
                 setBody(serialized)
             }
             val body = response.bodyAsText()
+            val isSuccess = response.headers["internal_status_type"] == "success"
             val responseData = if (body.isNotBlank()) {
-                stringFormat.decodeFromString(
+                json.decodeFromString(
                     payload.resultSerializer,
                     body
                 )
@@ -37,16 +39,8 @@ class JsDefaultClient(
                 null
             }
             when {
-                response.status != HttpStatusCode.OK ->
-                    HandlingResult.Failure(
-                        response.status,
-                        responseData as R
-                    )
-                else ->
-                    HandlingResult.Success(
-                        responseData as R,
-                        response.status
-                    )
+                isSuccess -> HandlingResult.Success<R>(responseData as R, response.status)
+                else -> HandlingResult.Failure<R>(response.status, responseData as R)
             }
         }.getOrElse {
             logger.e(it)

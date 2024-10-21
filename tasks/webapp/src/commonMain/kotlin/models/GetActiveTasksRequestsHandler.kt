@@ -36,18 +36,18 @@ class GetActiveTasksRequestsHandler(
             val coursesCache = (teachingCoursesIds + studentCoursesIds).mapNotNull {
                 it to (coursesRepo.getById(it) ?: return@mapNotNull null)
             }.toMap()
-            val teachingTasks = teachingCoursesIds.mapNotNull {
-                val course = coursesCache[it] ?: return@mapNotNull null
-                tasksRepo.getActiveTasks(it, now).map {
+            val teachingTasks = teachingCoursesIds.mapNotNull { courseId ->
+                val course = coursesCache[courseId] ?: return@mapNotNull null
+                tasksRepo.getActiveTasks(courseId, now).map {
                     TaskInfo(
                         it,
                         course
                     )
                 }
             }.flatten()
-            val studyingTasks = (studentCoursesIds - teachingCoursesIds.toSet()).mapNotNull {
-                val course = coursesCache[it] ?: return@mapNotNull null
-                tasksRepo.getActiveTasks(it, now).map {
+            val studyingTasks = (studentCoursesIds - teachingCoursesIds.toSet()).mapNotNull { courseId ->
+                val course = coursesCache[courseId] ?: return@mapNotNull null
+                tasksRepo.getActiveTasks(courseId, now).map {
                     TaskInfo(
                         it,
                         course

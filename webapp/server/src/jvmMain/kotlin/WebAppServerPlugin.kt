@@ -39,8 +39,7 @@ object WebAppServerPlugin : Plugin {
         with(CommonPlugin) { setupDI(params) }
 
         singleWithRandomQualifier<ApplicationRoutingConfigurator.Element> {
-            val config = getOrNull<Config>()
-                ?: error("Unable to create ktor server due to absence of config in json (field 'webapp')")
+            val config = getOrNull<Config>() ?: error("Unable to create ktor server due to absence of config in json (field 'webapp')")
 
             ApplicationRoutingConfigurator.Element {
                 config.staticFolders.forEach {
@@ -94,10 +93,12 @@ object WebAppServerPlugin : Plugin {
                                 call.respond(handlingResult.code, it)
                             } ?: call.respond(handlingResult.code)
 
-                        } else call.respond(
-                            HttpStatusCode.Unauthorized,
-                            HandlingResult.Failure<Any?>(HttpStatusCode.Unauthorized, null) as HandlingResult<*>
-                        )
+                        } else {
+                            call.respond(
+                                HttpStatusCode.Unauthorized,
+                                HandlingResult.Failure<Any?>(HttpStatusCode.Unauthorized, null) as HandlingResult<*>
+                            )
+                        }
                     }.getOrElse {
                         it.printStackTrace()
                         throw it
@@ -109,8 +110,7 @@ object WebAppServerPlugin : Plugin {
             ApplicationRoutingConfigurator(getAllDistinct())
         }
         single<BaseApplicationEngine> {
-            val config = getOrNull<Config>()
-                ?: error("Unable to create ktor server due to absence of config in json (field 'webapp')")
+            val config = getOrNull<Config>() ?: error("Unable to create ktor server due to absence of config in json (field 'webapp')")
 
             val json = get<Json>()
 

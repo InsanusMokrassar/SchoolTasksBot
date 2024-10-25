@@ -9,8 +9,6 @@ import dev.inmo.tgbotapi.webapps.webApp
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import io.ktor.http.*
-import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
 
 class JsDefaultClient(
@@ -33,7 +31,7 @@ class JsDefaultClient(
             val responseData = if (body.isNotBlank()) {
                 json.decodeFromString(
                     payload.resultSerializer,
-                    response.bodyAsText()
+                    body
                 )
             } else {
                 null

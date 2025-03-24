@@ -109,7 +109,7 @@ object WebAppServerPlugin : Plugin {
         singleWithRandomQualifier<KtorApplicationConfigurator> {
             ApplicationRoutingConfigurator(getAllDistinct())
         }
-        single<BaseApplicationEngine> {
+        single<EmbeddedServer<*, *>> {
             val config = getOrNull<Config>() ?: error("Unable to create ktor server due to absence of config in json (field 'webapp')")
 
             val json = get<Json>()
@@ -137,7 +137,7 @@ object WebAppServerPlugin : Plugin {
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {
         with(CommonPlugin) { setupBotPlugin(koin) }
 
-        koin.get<BaseApplicationEngine>().start(
+        koin.get<EmbeddedServer<*, *>>().start(
             wait = false
         )
     }

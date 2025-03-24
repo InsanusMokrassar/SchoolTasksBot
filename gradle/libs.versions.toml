@@ -1,26 +1,26 @@
 [versions]
 
-kotlin = "2.0.21"
-kotlin-serialization = "1.7.2"
+kotlin = "2.1.20"
+kotlin-serialization = "1.8.0"
 
-dokka = "1.9.20"
+dokka = "2.0.0"
 
-microutils = "0.22.2"
+microutils = "0.25.2"
 
-ktor = "2.3.12"
+ktor = "3.1.1"
 
-navigation = "0.5.7"
+navigation = "0.6.0"
 
-tgbotapi = "18.2.0"
-tgbotapi-libraries = "0.24.0"
-plagubot = "10.0.0"
-plagubot-plugins = "0.23.0"
+tgbotapi = "24.0.1"
+tgbotapi-libraries = "0.26.2"
+plagubot = "10.4.0"
+plagubot-plugins = "0.24.3"
 
-compose = "1.7.0-alpha03"
+compose = "1.7.3"
 
 psql = "42.6.0"
 
-ksp = "2.0.20-1.0.24"
+ksp = "2.1.20-1.0.31"
 
 junit_version = "4.12"
 

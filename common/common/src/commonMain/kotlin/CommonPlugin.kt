@@ -15,6 +15,8 @@
 @file:GenerateKoinDefinition("webappUrl", String::class, nullable = false, generateFactory = false)
 package center.sciprog.tasks_bot.common.common
 
+import center.sciprog.tasks_bot.common.utils.serializers.ChatIdSerializer
+import center.sciprog.tasks_bot.common.utils.serializers.ChatIdWithThreadIdSerializer
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.koin.annotations.GenerateKoinDefinition
 import dev.inmo.micro_utils.koin.getAllDistinct
@@ -27,6 +29,8 @@ import dev.inmo.tgbotapi.types.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.booleanOrNull
@@ -69,16 +73,36 @@ object CommonPlugin : StartPlugin {
 
         singleWithRandomQualifier {
             SerializersModule {
-//                polymorphic(Any::class, String::class, String.serializer())
-//                polymorphic(Any::class, Byte::class, Byte.serializer())
-//                polymorphic(Any::class, Short::class, Short.serializer())
-//                polymorphic(Any::class, Int::class, Int.serializer())
-//                polymorphic(Any::class, Long::class, Long.serializer())
-//                polymorphic(Any::class, Float::class, Float.serializer())
-//                polymorphic(Any::class, Double::class, Double.serializer())
-//                polymorphic(Any::class, ChatId::class, ChatIdSerializer)
-//                polymorphic(Any::class, ChatIdWithThreadId::class, ChatIdWithThreadIdSerializer)
-//                polymorphic(Any::class, ChatIdentifier::class, FullChatIdentifierSerializer)
+                polymorphicDefaultSerializer(Any::class) {
+                    when (it) {
+                        is String -> String.serializer()
+                        is Byte -> Byte.serializer()
+                        is Short -> Short.serializer()
+                        is Int -> Int.serializer()
+                        is Long -> Long.serializer()
+                        is Float -> Float.serializer()
+                        is Double -> Double.serializer()
+                        is ChatId -> ChatIdSerializer
+                        is ChatIdWithThreadId -> ChatIdWithThreadIdSerializer
+                        is ChatIdentifier -> FullChatIdentifierSerializer
+                        else -> null
+                    } as KSerializer<Any>
+                }
+                polymorphicDefaultDeserializer(Any::class) {
+                    when (it) {
+                        "String" -> String.serializer()
+                        "Byte" -> Byte.serializer()
+                        "Short" -> Short.serializer()
+                        "Int" -> Int.serializer()
+                        "Long" -> Long.serializer()
+                        "Float" -> Float.serializer()
+                        "Double" -> Double.serializer()
+                        "ChatId" -> ChatIdSerializer
+                        "ChatIdWithThreadId" -> ChatIdWithThreadIdSerializer
+                        "ChatIdentifier" -> FullChatIdentifierSerializer
+                        else -> null
+                    } as KSerializer<Any>
+                }
             }
         }
 

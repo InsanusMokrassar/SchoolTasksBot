@@ -1,0 +1,33 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.plugin.serialization"
+    id "com.google.devtools.ksp"
+    id "application"
+}
+
+version = null
+
+application {
+    mainClassName = "dev.inmo.micro_utils.startup.launcher.MainKt"
+}
+
+dependencies {
+    api libs.ktor.server.tomcat
+    api libs.ktor.websockets
+    api libs.ktor.client.apache
+    api libs.ktor.serialization.kotlinx.json
+    api libs.exposed.jdbc
+    api libs.psql
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
+}
+
+ksp {
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}

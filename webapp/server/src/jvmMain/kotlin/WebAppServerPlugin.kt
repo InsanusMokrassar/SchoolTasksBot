@@ -96,7 +96,7 @@ object WebAppServerPlugin : Plugin {
                         } else {
                             call.respond(
                                 HttpStatusCode.Unauthorized,
-                                HandlingResult.Failure<Any?>(HttpStatusCode.Unauthorized, null) as HandlingResult<*>
+                                HandlingResult.Failure<Any?>(HttpStatusCode.Unauthorized, null)
                             )
                         }
                     }.getOrElse {

@@ -20,5 +20,27 @@ dependencies {
 }
 
 application {
-    mainClassName = 'dev.inmo.plagubot.AppKt'
+    mainClass = 'dev.inmo.plagubot.AppKt'
+}
+
+// Compose 1.12 forwards these desktop runtimes to AndroidX with metadata-only JARs.
+def composeRuntimeForwarders = configurations.runtimeClasspath.incoming.artifactView {
+    componentFilter { id ->
+        id instanceof org.gradle.api.artifacts.component.ModuleComponentIdentifier &&
+            id.group == "org.jetbrains.compose.runtime" &&
+            id.module in ["runtime-desktop", "runtime-saveable-desktop"]
+    }
+}.files
+
+distributions.main.contents.eachFile { details ->
+    if (composeRuntimeForwarders.contains(details.file)) {
+        if (!zipTree(details.file).matching { include "**/*.class" }.isEmpty()) {
+            throw new GradleException("Expected a metadata-only Compose runtime forwarder: ${details.file.name}")
+        }
+        details.name = "org.jetbrains.compose.runtime-${details.name}"
+    }
+}
+
+tasks.named("startScripts") {
+    classpath = classpath.minus(composeRuntimeForwarders)
 }

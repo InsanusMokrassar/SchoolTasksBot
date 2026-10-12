@@ -43,6 +43,7 @@ import dev.inmo.plagubot.Plugin
 import dev.inmo.tgbotapi.extensions.api.answers.answer
 import dev.inmo.tgbotapi.extensions.api.delete
 import dev.inmo.tgbotapi.extensions.api.edit.edit
+import dev.inmo.tgbotapi.extensions.api.send.sendTextMessage
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.*
@@ -60,6 +61,7 @@ import dev.inmo.tgbotapi.libraries.resender.MessageMetaInfo
 import dev.inmo.tgbotapi.libraries.resender.MessagesResender
 import dev.inmo.tgbotapi.libraries.resender.invoke
 import dev.inmo.tgbotapi.types.IdChatIdentifier
+import dev.inmo.tgbotapi.types.ReplyParameters
 import dev.inmo.tgbotapi.types.MessageId
 import dev.inmo.tgbotapi.types.UserId
 import dev.inmo.tgbotapi.types.chat.ExtendedBot
@@ -695,9 +697,9 @@ internal object DraftButtonsDrawer : Plugin {
             val locale = languagesRepo.getChatLanguage(it.user).locale
 
             if (draft.canBeCreated) {
-                reply(
-                    it.message,
-                    buildEntities {
+                sendTextMessage(
+                    chatId = it.message.chat.id,
+                    entities = buildEntities {
                         bold(TasksStrings.createTaskConfirmationTemplate.translation(locale)) + regular("\n\n")
                         +drawDraftInfoOnMessage(
                             me,
@@ -706,6 +708,11 @@ internal object DraftButtonsDrawer : Plugin {
                             draft
                         )
                     },
+                    threadId = it.message.chat.id.threadId,
+                    businessConnectionId = it.message.chat.id.businessConnectionId,
+                    directMessageThreadId = null,
+                    ephemeralMessageParameters = null,
+                    replyParameters = ReplyParameters(it.message.metaInfo),
                     replyMarkup = inlineKeyboard {
                         row {
                             dataButton(

@@ -44,7 +44,7 @@ import org.koin.core.module.Module
 object CommonPlugin : StartPlugin {
     override fun Module.setupDI(params: JsonObject) {
         singleSupervisorId {
-            UserId(params["supervisor"] ?.jsonPrimitive ?.long ?.let(::RawChatId) ?: error("Unable to load supervisor id"))
+            ChatId(params["supervisor"] ?.jsonPrimitive ?.long ?.let(::RawChatId) ?: error("Unable to load supervisor id"))
         }
         singleSupervisorIetfLanguageCode {
             params["supervisor_locale"]?.jsonPrimitive?.contentOrNull?.let {

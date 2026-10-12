@@ -17,11 +17,12 @@ import dev.inmo.tgbotapi.libraries.resender.MessageMetaInfo
 import dev.inmo.tgbotapi.types.*
 import korlibs.time.DateTime
 import kotlinx.coroutines.CoroutineScope
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.statements.InsertStatement
-import org.jetbrains.exposed.sql.statements.UpdateBuilder
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.*
+import org.jetbrains.exposed.v1.jdbc.*
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.statements.InsertStatement
+import org.jetbrains.exposed.v1.core.statements.UpdateBuilder
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class ExposedTasksCRUDRepo(
     override val database: Database
@@ -116,7 +117,7 @@ class ExposedTasksCRUDRepo(
         }
     }
 
-    override val selectById: ISqlExpressionBuilder.(TaskId) -> Op<Boolean> = { idColumn.eq(it.long) }
+    override val selectById: (TaskId) -> Op<Boolean> = { idColumn.eq(it.long) }
     override val ResultRow.asId: TaskId
         get() = TaskId(get(idColumn))
     override val ResultRow.asObject: RegisteredTask

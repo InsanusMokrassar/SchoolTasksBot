@@ -27,7 +27,7 @@ import dev.inmo.tgbotapi.types.commands.BotCommandScope
 import dev.inmo.tgbotapi.types.request.RequestId
 import dev.inmo.tgbotapi.utils.row
 import kotlinx.serialization.json.JsonObject
-import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.v1.jdbc.Database
 import org.koin.core.Koin
 import org.koin.core.module.Module
 import kotlin.math.absoluteValue

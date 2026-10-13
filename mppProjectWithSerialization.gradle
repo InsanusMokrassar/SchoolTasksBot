@@ -4,13 +4,8 @@ project.group = "$group"
 // apply from: "$publishGradlePath"
 
 kotlin {
-    jvm {
-        compilations.main {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-    }
+    jvmToolchain(17)
+    jvm()
     js (IR) {
         browser()
         nodejs()

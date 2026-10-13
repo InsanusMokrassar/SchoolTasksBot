@@ -10,10 +10,11 @@ import dev.inmo.micro_utils.repos.exposed.AbstractExposedCRUDRepo
 import dev.inmo.micro_utils.repos.exposed.initTable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.statements.InsertStatement
-import org.jetbrains.exposed.sql.statements.UpdateBuilder
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.*
+import org.jetbrains.exposed.v1.jdbc.*
+import org.jetbrains.exposed.v1.core.statements.InsertStatement
+import org.jetbrains.exposed.v1.core.statements.UpdateBuilder
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class ExposedAnswersFormatsCRUDRepo(
     override val database: Database,
@@ -27,7 +28,7 @@ class ExposedAnswersFormatsCRUDRepo(
     private val answerFormatColumn = text("answer_format")
     override val primaryKey: PrimaryKey = PrimaryKey(idColumn)
 
-    override val selectById: ISqlExpressionBuilder.(AnswerFormatInfoId) -> Op<Boolean> = { idColumn.eq(it.long) }
+    override val selectById: (AnswerFormatInfoId) -> Op<Boolean> = { idColumn.eq(it.long) }
     override val ResultRow.asId: AnswerFormatInfoId
         get() = AnswerFormatInfoId(get(idColumn))
     override val ResultRow.asObject: RegisteredAnswerFormatInfo

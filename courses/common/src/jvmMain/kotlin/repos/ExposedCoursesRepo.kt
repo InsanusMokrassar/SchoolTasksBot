@@ -6,13 +6,14 @@ import center.sciprog.tasks_bot.courses.common.models.CourseId
 import center.sciprog.tasks_bot.teachers.common.models.TeacherId
 import dev.inmo.micro_utils.repos.exposed.AbstractExposedCRUDRepo
 import dev.inmo.micro_utils.repos.exposed.initTable
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.ISqlExpressionBuilder
-import org.jetbrains.exposed.sql.Op
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.statements.InsertStatement
-import org.jetbrains.exposed.sql.statements.UpdateBuilder
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.jdbc.selectAll
+import org.jetbrains.exposed.v1.core.Op
+import org.jetbrains.exposed.v1.core.ResultRow
+import org.jetbrains.exposed.v1.core.statements.InsertStatement
+import org.jetbrains.exposed.v1.core.statements.UpdateBuilder
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class ExposedCoursesRepo(
     override val database: Database
@@ -24,7 +25,7 @@ class ExposedCoursesRepo(
 
     override val primaryKey: PrimaryKey = PrimaryKey(idColumn)
 
-    override val selectById: ISqlExpressionBuilder.(CourseId) -> Op<Boolean> = {
+    override val selectById: (CourseId) -> Op<Boolean> = {
         idColumn.eq(it.long)
     }
     override val ResultRow.asId: CourseId
